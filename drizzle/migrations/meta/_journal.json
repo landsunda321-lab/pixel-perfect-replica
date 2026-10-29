@@ -8,6 +8,13 @@
       "when": 1793267549335,
       "tag": "0000_lov_database_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793267573905,
+      "tag": "0001_create_contact_messages",
+      "breakpoints": true
     }
   ]
 }
