@@ -35,7 +35,9 @@ export function BookCard({ book }: { book: Book }) {
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-navy-deep to-navy px-6 text-center">
               <BookText className="size-8 text-sky/70" aria-hidden="true" />
-              <p className="font-display text-lg font-semibold leading-snug text-sky">{book.title}</p>
+              <p className="font-display text-lg font-semibold leading-snug text-sky">
+                {book.title}
+              </p>
               <p className="text-xs uppercase tracking-widest text-sky/60">{book.author}</p>
             </div>
           )}

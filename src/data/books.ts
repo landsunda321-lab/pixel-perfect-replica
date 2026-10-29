@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { site } from "@/data/site";
+
 /**
  * Data katalog buku — dipisahkan dari komponen UI agar mudah dikelola dan
  * dimigrasikan ke database kelak.
@@ -10,7 +12,15 @@ import { z } from "zod";
  *   sampai nomor resmi tersedia. Jangan mengisi angka yang menyerupai ISBN.
  * - Untuk buku "Dalam Persiapan", jangan mengisi isbn, publicationYear, atau
  *   accessUrl seolah sudah terbit.
+ * - accessUrl hanya untuk tautan resmi yang sudah dikonfirmasi berfungsi.
+ * - Cara memasukkan data: lihat src/data/README.md.
  */
+
+/** Nama penerbit yang diterima pada field `publisher` (konsisten di seluruh situs). */
+const OFFICIAL_PUBLISHER_NAMES = new Set(["griya pustaka mandiri", "pt griya pustaka mandiri"]);
+
+/** Nama penerbit yang disarankan untuk entri baru. */
+export const DEFAULT_PUBLISHER = site.legalName;
 
 export const BOOK_STATUSES = [
   "Dalam Persiapan",
@@ -24,23 +34,43 @@ export type BookStatus = (typeof BOOK_STATUSES)[number];
 
 export const bookSchema = z.object({
   id: z.string().min(1),
-  slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug format: huruf-kecil-dengan-tanda-hubung"),
+  slug: z
+    .string()
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug format: huruf-kecil-dengan-tanda-hubung"),
   title: z.string().min(1),
   subtitle: z.string().min(1).nullable().optional(),
   author: z.string().min(1),
   editor: z.string().min(1).nullable().optional(),
   category: z.string().min(1),
   description: z.string().min(1),
-  coverImage: z.string().url().nullable().optional(),
+  coverImage: z
+    .string()
+    .refine(
+      (value) => value.startsWith("/") || /^https?:\/\//.test(value),
+      "cover harus berupa path aset diawali / atau URL http(s)",
+    )
+    .nullable()
+    .optional(),
   publicationYear: z.number().int().min(1900).max(2100).nullable().optional(),
-  publisher: z.string().min(1),
+  publisher: z
+    .string()
+    .min(1)
+    .refine(
+      (value) => OFFICIAL_PUBLISHER_NAMES.has(value.trim().toLowerCase()),
+      "nama penerbit harus konsisten dengan nama resmi penerbit",
+    ),
   isbn: z.string().min(10).max(17).nullable().optional(),
   format: z.string().min(1).nullable().optional(),
   language: z.string().min(1).nullable().optional(),
   pages: z.number().int().positive().nullable().optional(),
   price: z.number().nonnegative().nullable().optional(),
   availabilityStatus: z.enum(BOOK_STATUSES),
-  accessUrl: z.string().url().nullable().optional(),
+  accessUrl: z
+    .string()
+    .url()
+    .refine((value) => value.startsWith("https://"), "tautan akses wajib HTTPS")
+    .nullable()
+    .optional(),
   createdAt: z.string().min(1),
   updatedAt: z.string().min(1),
 });
@@ -50,9 +80,10 @@ export type Book = z.infer<typeof bookSchema>;
 /** Katalog buku. Kosong sampai data publikasi resmi tersedia. */
 export const BOOKS: Book[] = [];
 
-/** Validasi field penting; entri yang tidak valid dilewati dengan peringatan. */
-export function getValidatedBooks(): Book[] {
-  return BOOKS.flatMap((book) => {
+/** Validasi field penting; entri yang tidak valid atau slug ganda dilewati dengan peringatan. */
+export function getValidatedBooks(books: Book[] = BOOKS): Book[] {
+  const seenSlugs = new Set<string>();
+  return books.flatMap((book) => {
     const parsed = bookSchema.safeParse(book);
     if (!parsed.success) {
       console.warn(
@@ -62,6 +93,11 @@ export function getValidatedBooks(): Book[] {
       );
       return [];
     }
+    if (seenSlugs.has(parsed.data.slug)) {
+      console.warn("[katalog] Slug duplikat dilewati:", parsed.data.slug);
+      return [];
+    }
+    seenSlugs.add(parsed.data.slug);
     return [parsed.data];
   });
 }
@@ -78,6 +114,15 @@ export function canShowIsbn(book: Book): boolean {
 /** Buku dianggap sudah memiliki publikasi yang terkonfirmasi. */
 export function isPublished(book: Book): boolean {
   return book.availabilityStatus !== "Dalam Persiapan";
+}
+
+/**
+ * Buku benar-benar tersedia untuk diakses atau didistribusikan: sudah terbit
+ * dan tidak berstatus "Tidak tersedia". Dipakai halaman Akses dan Distribusi
+ * agar tidak mengklaim ketersediaan yang belum pasti.
+ */
+export function isAvailable(book: Book): boolean {
+  return isPublished(book) && book.availabilityStatus !== "Tidak tersedia";
 }
 
 /** Tahun terbit unik dan terurut menurun, untuk filter katalog. */

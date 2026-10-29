@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { site } from "@/data/site";
+import { canonicalLinks, site } from "@/data/site";
 
 export const Route = createFileRoute("/kebijakan-privasi")({
   head: () => ({
@@ -14,6 +14,7 @@ export const Route = createFileRoute("/kebijakan-privasi")({
       { property: "og:title", content: "Kebijakan Privasi — Griya Pustaka Mandiri" },
       { property: "og:type", content: "website" },
     ],
+    links: canonicalLinks("/kebijakan-privasi"),
   }),
   component: PrivacyPolicyPage,
 });
@@ -30,7 +31,9 @@ function PolicySection({ title, children }: { title: string; children: React.Rea
 function PrivacyPolicyPage() {
   return (
     <div className="shell max-w-3xl py-16 lg:py-20">
-      <h1 className="font-display text-3xl font-bold text-primary sm:text-4xl">Kebijakan Privasi</h1>
+      <h1 className="font-display text-3xl font-bold text-primary sm:text-4xl">
+        Kebijakan Privasi
+      </h1>
       <p className="mt-3 text-sm text-muted-foreground">
         Berlaku untuk website resmi {site.legalName}.
       </p>
@@ -38,8 +41,8 @@ function PrivacyPolicyPage() {
       <PolicySection title="Data yang Kami Kumpulkan">
         <p>
           Melalui formulir kontak pada website ini, kami mengumpulkan nama, alamat email, subjek,
-          dan isi pesan yang Anda kirimkan. Data tersebut digunakan semata-mata untuk menindaklanjuti
-          pertanyaan atau permohonan Anda.
+          dan isi pesan yang Anda kirimkan. Data tersebut digunakan semata-mata untuk
+          menindaklanjuti pertanyaan atau permohonan Anda.
         </p>
         <p>
           Website ini tidak menggunakan pelacakan iklan pihak ketiga dan tidak menjual atau

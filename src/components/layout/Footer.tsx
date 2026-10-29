@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Mail, MapPin, Phone } from "lucide-react";
 
-import { site } from "@/data/site";
+import { businessFieldLabel, site } from "@/data/site";
 
 const MAIN_LINKS = [
   { label: "Beranda", to: "/" },
@@ -24,7 +24,9 @@ export function Footer() {
     <footer className="bg-navy-deep text-sky/90">
       <div className="shell grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-3">
-          <p className="font-display text-lg font-bold tracking-wide text-white">{site.brandName}</p>
+          <p className="font-display text-lg font-bold tracking-wide text-white">
+            {site.brandName}
+          </p>
           <p className="text-sm italic text-sky/80">“{site.tagline}”</p>
           <p className="text-sm leading-relaxed text-sky/70">{site.shortSummary}</p>
         </div>
@@ -91,7 +93,7 @@ export function Footer() {
           <ul className="mt-4 space-y-2.5 text-sm text-sky/80">
             <li>{site.legalName}</li>
             <li>{site.entityForm}</li>
-            <li>{site.businessField}</li>
+            <li>{businessFieldLabel()}</li>
           </ul>
         </div>
       </div>

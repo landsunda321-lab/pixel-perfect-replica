@@ -15,7 +15,7 @@ import heroBooks from "@/assets/hero-books.jpg";
 import { BookCard } from "@/components/BookCard";
 import { SectionHeading } from "@/components/SectionHeading";
 import { getValidatedBooks } from "@/data/books";
-import { principles, publishingAreas, site } from "@/data/site";
+import { canonicalLinks, principles, publishingAreas, site } from "@/data/site";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -37,6 +37,7 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
     ],
+    links: canonicalLinks("/"),
   }),
   component: HomePage,
 });

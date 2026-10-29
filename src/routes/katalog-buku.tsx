@@ -4,11 +4,8 @@ import { useMemo, useState } from "react";
 
 import { BookCard } from "@/components/BookCard";
 import { SectionHeading } from "@/components/SectionHeading";
-import {
-  getCatalogCategories,
-  getCatalogYears,
-  getValidatedBooks,
-} from "@/data/books";
+import { getCatalogCategories, getCatalogYears, getValidatedBooks } from "@/data/books";
+import { canonicalLinks } from "@/data/site";
 
 export const Route = createFileRoute("/katalog-buku")({
   head: () => ({
@@ -22,10 +19,12 @@ export const Route = createFileRoute("/katalog-buku")({
       { property: "og:title", content: "Katalog Buku — Griya Pustaka Mandiri" },
       {
         property: "og:description",
-        content: "Telusuri publikasi Griya Pustaka Mandiri berdasarkan judul, penulis, kategori, dan tahun terbit.",
+        content:
+          "Telusuri publikasi Griya Pustaka Mandiri berdasarkan judul, penulis, kategori, dan tahun terbit.",
       },
       { property: "og:type", content: "website" },
     ],
+    links: canonicalLinks("/katalog-buku"),
   }),
   component: CatalogPage,
 });
@@ -58,9 +57,7 @@ function CatalogPage() {
       const matchesCategory = category === "semua" || book.category === category;
       const matchesYear = year === "semua" || String(book.publicationYear ?? "") === year;
       const matchesQuery =
-        q === "" ||
-        book.title.toLowerCase().includes(q) ||
-        book.author.toLowerCase().includes(q);
+        q === "" || book.title.toLowerCase().includes(q) || book.author.toLowerCase().includes(q);
       return matchesCategory && matchesYear && matchesQuery;
     });
 
@@ -126,9 +123,16 @@ function CatalogPage() {
       </section>
 
       <section className="shell py-12 lg:py-16">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" role="search" aria-label="Pencarian dan filter katalog">
+        <div
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          role="search"
+          aria-label="Pencarian dan filter katalog"
+        >
           <div className="relative sm:col-span-2 lg:col-span-1">
-            <label htmlFor="catalog-search" className="mb-1.5 block text-xs font-medium text-muted-foreground">
+            <label
+              htmlFor="catalog-search"
+              className="mb-1.5 block text-xs font-medium text-muted-foreground"
+            >
               Cari judul atau penulis
             </label>
             <div className="relative">
@@ -148,7 +152,10 @@ function CatalogPage() {
           </div>
 
           <div>
-            <label htmlFor="catalog-category" className="mb-1.5 block text-xs font-medium text-muted-foreground">
+            <label
+              htmlFor="catalog-category"
+              className="mb-1.5 block text-xs font-medium text-muted-foreground"
+            >
               Kategori
             </label>
             <select
@@ -167,7 +174,10 @@ function CatalogPage() {
           </div>
 
           <div>
-            <label htmlFor="catalog-year" className="mb-1.5 block text-xs font-medium text-muted-foreground">
+            <label
+              htmlFor="catalog-year"
+              className="mb-1.5 block text-xs font-medium text-muted-foreground"
+            >
               Tahun terbit
             </label>
             <select
@@ -186,7 +196,10 @@ function CatalogPage() {
           </div>
 
           <div>
-            <label htmlFor="catalog-sort" className="mb-1.5 block text-xs font-medium text-muted-foreground">
+            <label
+              htmlFor="catalog-sort"
+              className="mb-1.5 block text-xs font-medium text-muted-foreground"
+            >
               Urutkan
             </label>
             <select

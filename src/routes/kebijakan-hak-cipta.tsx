@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import { site } from "@/data/site";
+import { canonicalLinks, site } from "@/data/site";
 
 export const Route = createFileRoute("/kebijakan-hak-cipta")({
   head: () => ({
@@ -14,6 +14,7 @@ export const Route = createFileRoute("/kebijakan-hak-cipta")({
       { property: "og:title", content: "Kebijakan Hak Cipta — Griya Pustaka Mandiri" },
       { property: "og:type", content: "website" },
     ],
+    links: canonicalLinks("/kebijakan-hak-cipta"),
   }),
   component: CopyrightPolicyPage,
 });
@@ -40,8 +41,8 @@ function CopyrightPolicyPage() {
       <PolicySection title="Perlindungan Karya">
         <p>
           Seluruh buku, naskah, sampul, dan materi lain yang diterbitkan oleh {site.legalName}
-          dilindungi oleh hak cipta sesuai ketentuan peraturan perundang-undangan yang berlaku.
-          Hak cipta atas isi karya tetap melekat pada pemegang hak sesuai perjanjian penerbitan
+          dilindungi oleh hak cipta sesuai ketentuan peraturan perundang-undangan yang berlaku. Hak
+          cipta atas isi karya tetap melekat pada pemegang hak sesuai perjanjian penerbitan
           masing-masing judul.
         </p>
       </PolicySection>
@@ -57,10 +58,10 @@ function CopyrightPolicyPage() {
 
       <PolicySection title="Materi Pihak Ketiga">
         <p>
-          Kami menghormati hak cipta pihak lain. Materi pihak ketiga yang digunakan dalam
-          penerbitan selalu disertai izin atau dasar penggunaan yang sahih. Apabila Anda menemukan
-          materi yang diduga melanggar hak cipta pada website ini, silakan laporkan kepada kami
-          melalui formulir pada halaman Kontak Penerbit beserta uraian dan bukti kepemilikan hak.
+          Kami menghormati hak cipta pihak lain. Materi pihak ketiga yang digunakan dalam penerbitan
+          selalu disertai izin atau dasar penggunaan yang sahih. Apabila Anda menemukan materi yang
+          diduga melanggar hak cipta pada website ini, silakan laporkan kepada kami melalui formulir
+          pada halaman Kontak Penerbit beserta uraian dan bukti kepemilikan hak.
         </p>
       </PolicySection>
 

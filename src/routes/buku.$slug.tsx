@@ -1,8 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, BookOpen, Info } from "lucide-react";
 
-import { canShowIsbn } from "@/data/books";
-import { getBookBySlug } from "@/data/books";
+import { canShowIsbn, getBookBySlug } from "@/data/books";
+import { canonicalLinks } from "@/data/site";
 
 export const Route = createFileRoute("/buku/$slug")({
   loader: ({ params }) => {
@@ -35,6 +35,7 @@ export const Route = createFileRoute("/buku/$slug")({
       },
       { property: "og:type", content: "book" },
     ],
+    links: loaderData ? canonicalLinks(`/buku/${loaderData.book.slug}`) : [],
   }),
   component: BookDetailPage,
   notFoundComponent: BookNotFound,
@@ -133,7 +134,9 @@ function BookDetailPage() {
               {book.editor ? ` · Disunting oleh ${book.editor}` : ""}
             </p>
 
-            <p className="mt-6 text-base leading-relaxed text-muted-foreground">{book.description}</p>
+            <p className="mt-6 text-base leading-relaxed text-muted-foreground">
+              {book.description}
+            </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
               {book.accessUrl ? (

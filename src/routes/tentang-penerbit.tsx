@@ -3,7 +3,17 @@ import { Building2, Copyright, FileText, PenLine, ShieldCheck } from "lucide-rea
 
 import editorialDesk from "@/assets/editorial-desk.jpg";
 import { SectionHeading } from "@/components/SectionHeading";
-import { commitments, mission, profileParagraphs, publishingAreas, site, vision } from "@/data/site";
+import {
+  businessFieldLabel,
+  canonicalLinks,
+  commitments,
+  domainLabel,
+  mission,
+  profileParagraphs,
+  publishingAreas,
+  site,
+  vision,
+} from "@/data/site";
 
 export const Route = createFileRoute("/tentang-penerbit")({
   head: () => ({
@@ -17,10 +27,12 @@ export const Route = createFileRoute("/tentang-penerbit")({
       { property: "og:title", content: "Tentang Griya Pustaka Mandiri" },
       {
         property: "og:description",
-        content: "Penerbitan Buku dan Pengembangan Pengetahuan — profil, visi, misi, dan komitmen penerbit.",
+        content:
+          "Penerbitan Buku dan Pengembangan Pengetahuan — profil, visi, misi, dan komitmen penerbit.",
       },
       { property: "og:type", content: "website" },
     ],
+    links: canonicalLinks("/tentang-penerbit"),
   }),
   component: AboutPage,
 });
@@ -31,11 +43,11 @@ function AboutPage() {
   const identityRows: Array<{ label: string; value: string }> = [
     { label: "Nama Penerbit", value: site.brandName },
     { label: "Bentuk Badan Usaha", value: site.entityForm },
-    { label: "Bidang Usaha", value: site.businessField },
+    { label: "Bidang Usaha", value: businessFieldLabel() },
     ...(address ? [{ label: "Alamat Resmi", value: address }] : []),
     ...(email ? [{ label: "Email Resmi", value: email }] : []),
     ...(phone ? [{ label: "Nomor Telepon Resmi", value: phone }] : []),
-    { label: "Website Resmi", value: `${site.plannedDomain.replace("https://", "")} (domain yang direncanakan)` },
+    { label: "Website Resmi", value: domainLabel() },
   ];
 
   const COMMITMENT_ICONS = [ShieldCheck, Copyright, FileText, PenLine, Building2];
@@ -45,7 +57,9 @@ function AboutPage() {
       {/* Bagian A — Hero */}
       <section className="bg-mist">
         <div className="shell py-16 lg:py-20">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-azure">Profil Penerbit</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-azure">
+            Profil Penerbit
+          </p>
           <h1 className="mt-3 font-display text-4xl font-bold text-primary sm:text-5xl">
             Tentang Griya Pustaka Mandiri
           </h1>
@@ -62,7 +76,10 @@ function AboutPage() {
             <SectionHeading eyebrow="Profil" title="Penerbit yang Berfokus pada Karya Tulis" />
             <div className="mt-6 space-y-4">
               {profileParagraphs.map((paragraph) => (
-                <p key={paragraph.slice(0, 32)} className="text-base leading-relaxed text-muted-foreground">
+                <p
+                  key={paragraph.slice(0, 32)}
+                  className="text-base leading-relaxed text-muted-foreground"
+                >
                   {paragraph}
                 </p>
               ))}
@@ -119,7 +136,9 @@ function AboutPage() {
               className="rounded-2xl border border-border bg-card p-6 shadow-card"
             >
               <h3 className="font-display text-base font-semibold text-foreground">{area.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{area.description}</p>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {area.description}
+              </p>
             </div>
           ))}
         </div>

@@ -5,14 +5,33 @@
  * legalitas yang dipakai untuk pendaftaran akun ISBN Perpusnas. Jangan mengisi
  * nilai contoh atau palsu — biarkan null sampai data resmi tersedia; UI akan
  * menyembunyikan baris yang belum ada datanya.
+ *
+ * Cara mengonfigurasi (lihat juga src/data/README.md):
+ * - Alamat/email/telepon: tempelkan nilai persis dari dokumen legalitas ke
+ *   site.contact; baris yang null otomatis tidak ditampilkan di mana pun.
+ * - KBLI: cukup ubah site.klbiCode bila klasifikasi resmi berbeda.
+ * - Domain: isi domain.host/domain.url, lalu ubah domain.verified menjadi true
+ *   HANYA setelah DNS menyelesaikan dan HTTPS berhasil diverifikasi. Selama
+ *   false, halaman menampilkan keterangan "domain yang direncanakan" dan
+ *   canonical URL belum dikirim.
  */
 export const site = {
   brandName: "GRIYA PUSTAKA MANDIRI",
   legalName: "PT Griya Pustaka Mandiri",
   entityForm: "Perseroan Perorangan",
-  businessField: "Penerbitan Buku (KBLI 58110)",
+  /** Klasifikasi baku kegiatan usaha penerbitan buku. */
+  klbiCode: "58110",
+  businessField: "Penerbitan Buku",
   tagline: "Menerbitkan Gagasan, Mengembangkan Pengetahuan",
-  plannedDomain: "https://griyapustakamandiri.my.id",
+  domain: {
+    host: "griyapustakamandiri.my.id",
+    url: "https://griyapustakamandiri.my.id",
+    /**
+     * true HANYA setelah domain terpasang dan terverifikasi (DNS + HTTPS
+     * berhasil). Saat ini DNS domain belum memiliki rekaman, jadi tetap false.
+     */
+    verified: false,
+  },
   shortSummary:
     "Penerbit yang berfokus pada buku akademik, ilmiah, pendidikan, dan praktis untuk mendukung pengembangan pengetahuan serta pemberdayaan masyarakat.",
   contact: {
@@ -22,6 +41,34 @@ export const site = {
     operatingHours: null as string | null,
   },
 } as const;
+
+/** Label bidang usaha lengkap dengan kode KBLI. */
+export function businessFieldLabel(): string {
+  return `${site.businessField} (KBLI ${site.klbiCode})`;
+}
+
+/**
+ * Label domain untuk ditampilkan: menambahkan keterangan "direncanakan" hanya
+ * selama domain belum terpasang, sehingga tidak ada klaim domain aktif.
+ */
+export function domainLabel(): string {
+  return site.domain.verified ? site.domain.host : `${site.domain.host} (domain yang direncanakan)`;
+}
+
+/**
+ * Tag canonical untuk sebuah path. Kosong selama domain belum terpasang agar
+ * URL produksi yang belum ada tidak pernah diiklankan ke mesin pencari.
+ */
+export function canonicalLinks(path: string): Array<{ rel: string; href: string }> {
+  if (!site.domain.verified) return [];
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  return [{ rel: "canonical", href: `${site.domain.url}${normalized}` }];
+}
+
+/** True jika minimal satu kanal kontak resmi sudah diisi. */
+export function hasOfficialContact(): boolean {
+  return Boolean(site.contact.address || site.contact.email || site.contact.phone);
+}
 
 export interface PublishingArea {
   title: string;

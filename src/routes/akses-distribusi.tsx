@@ -1,11 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookOpen, ExternalLink, Globe2, Library, ShieldCheck, TabletSmartphone } from "lucide-react";
+import {
+  BookOpen,
+  ExternalLink,
+  Globe2,
+  Library,
+  ShieldCheck,
+  TabletSmartphone,
+} from "lucide-react";
 import { useMemo } from "react";
 
 import { BookCard } from "@/components/BookCard";
 import { SectionHeading } from "@/components/SectionHeading";
-import { isPublished, getValidatedBooks } from "@/data/books";
-import { site } from "@/data/site";
+import { isAvailable, getValidatedBooks } from "@/data/books";
+import { canonicalLinks, site } from "@/data/site";
 
 export const Route = createFileRoute("/akses-distribusi")({
   head: () => ({
@@ -24,13 +31,14 @@ export const Route = createFileRoute("/akses-distribusi")({
       },
       { property: "og:type", content: "website" },
     ],
+    links: canonicalLinks("/akses-distribusi"),
   }),
   component: AccessDistributionPage,
 });
 
 function AccessDistributionPage() {
   const books = useMemo(() => getValidatedBooks(), []);
-  const availableBooks = books.filter(isPublished);
+  const availableBooks = books.filter(isAvailable);
 
   return (
     <div className="flex flex-col">
@@ -62,7 +70,9 @@ function AccessDistributionPage() {
             <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
               <BookOpen className="size-5" aria-hidden="true" />
             </span>
-            <h3 className="mt-4 font-display text-lg font-semibold text-foreground">Format Cetak</h3>
+            <h3 className="mt-4 font-display text-lg font-semibold text-foreground">
+              Format Cetak
+            </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               Buku cetak disediakan untuk judul-judul tertentu sesuai rencana penerbitan.
               Ketersediaan dan informasi pemesanan ditampilkan pada halaman buku apabila layanan
@@ -73,7 +83,9 @@ function AccessDistributionPage() {
             <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
               <TabletSmartphone className="size-5" aria-hidden="true" />
             </span>
-            <h3 className="mt-4 font-display text-lg font-semibold text-foreground">Format Digital</h3>
+            <h3 className="mt-4 font-display text-lg font-semibold text-foreground">
+              Format Digital
+            </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               Beberapa judul dapat tersedia dalam format digital (PDF atau e-book) melalui tautan
               akses resmi. Tautan hanya ditampilkan jika sumbernya sah dan terkonfirmasi.
@@ -88,7 +100,7 @@ function AccessDistributionPage() {
           <SectionHeading
             eyebrow="Daftar Publikasi"
             title="Publikasi yang Tersedia"
-            description="Buku dengan status publikasi dan akses yang sudah dikonfirmasi."
+            description="Buku dengan status ketersediaan yang sudah dikonfirmasi — tidak termasuk judul yang berstatus belum terbit atau tidak tersedia."
           />
           {availableBooks.length > 0 ? (
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

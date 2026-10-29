@@ -3,7 +3,7 @@ import { CheckCircle2, Mail, MapPin, Phone, Send, TriangleAlert } from "lucide-r
 import { useState, type FormEvent } from "react";
 
 import { SectionHeading } from "@/components/SectionHeading";
-import { site } from "@/data/site";
+import { canonicalLinks, site } from "@/data/site";
 
 export const Route = createFileRoute("/kontak")({
   head: () => ({
@@ -21,6 +21,7 @@ export const Route = createFileRoute("/kontak")({
       },
       { property: "og:type", content: "website" },
     ],
+    links: canonicalLinks("/kontak"),
   }),
   component: ContactPage,
 });
@@ -33,7 +34,13 @@ interface ContactFormValues {
   website: string; // honeypot — wajib dibiarkan kosong
 }
 
-const EMPTY_FORM: ContactFormValues = { name: "", email: "", subject: "", message: "", website: "" };
+const EMPTY_FORM: ContactFormValues = {
+  name: "",
+  email: "",
+  subject: "",
+  message: "",
+  website: "",
+};
 
 const FIELD_CLASSES =
   "w-full rounded-lg border border-input bg-background px-3.5 py-2.5 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring";
@@ -55,15 +62,17 @@ function validate(values: ContactFormValues): Partial<Record<keyof ContactFormVa
 function ContactPage() {
   const [values, setValues] = useState<ContactFormValues>(EMPTY_FORM);
   const [errors, setErrors] = useState<Partial<Record<keyof ContactFormValues, string>>>({});
-  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error" | "unavailable">(
+    "idle",
+  );
   const { address, email, phone, operatingHours } = site.contact;
 
-  const update = (field: keyof ContactFormValues) => (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setValues((prev) => ({ ...prev, [field]: event.target.value }));
-    setErrors((prev) => ({ ...prev, [field]: undefined }));
-  };
+  const update =
+    (field: keyof ContactFormValues) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setValues((prev) => ({ ...prev, [field]: event.target.value }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    };
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -82,9 +91,10 @@ function ContactPage() {
       if (response.ok) {
         setValues(EMPTY_FORM);
         setStatus("success");
-      } else {
-        setStatus("error");
+        return;
       }
+      const payload = (await response.json().catch(() => null)) as { code?: string } | null;
+      setStatus(payload?.code === "not_configured" ? "unavailable" : "error");
     } catch {
       setStatus("error");
     }
@@ -157,8 +167,9 @@ function ContactPage() {
               {!hasContactData ? (
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
                   Alamat, email, dan nomor telepon resmi akan ditampilkan setelah data tersebut
-                  dikonfirmasi dari dokumen legalitas perusahaan. Sementara itu, formulir di samping
-                  adalah saluran kontak yang berfungsi.
+                  dikonfirmasi dari dokumen legalitas perusahaan. Sementara itu, sampaikan pesan
+                  melalui formulir di samping — status pengiriman ditampilkan apa adanya, termasuk
+                  bila layanan pesan belum terhubung.
                 </p>
               ) : null}
             </div>
@@ -177,8 +188,8 @@ function ContactPage() {
                 <div>
                   <p className="text-sm font-semibold text-foreground">Pesan berhasil terkirim.</p>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Terima kasih telah menghubungi {site.brandName}. Kami akan menindaklanjuti
-                    pesan Anda.
+                    Terima kasih telah menghubungi {site.brandName}. Kami akan menindaklanjuti pesan
+                    Anda.
                   </p>
                   <button
                     type="button"
@@ -193,8 +204,14 @@ function ContactPage() {
               <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div>
-                    <label htmlFor="contact-name" className="mb-1.5 block text-sm font-medium text-foreground">
-                      Nama <span aria-hidden="true" className="text-destructive">*</span>
+                    <label
+                      htmlFor="contact-name"
+                      className="mb-1.5 block text-sm font-medium text-foreground"
+                    >
+                      Nama{" "}
+                      <span aria-hidden="true" className="text-destructive">
+                        *
+                      </span>
                     </label>
                     <input
                       id="contact-name"
@@ -216,8 +233,14 @@ function ContactPage() {
                     ) : null}
                   </div>
                   <div>
-                    <label htmlFor="contact-email" className="mb-1.5 block text-sm font-medium text-foreground">
-                      Email <span aria-hidden="true" className="text-destructive">*</span>
+                    <label
+                      htmlFor="contact-email"
+                      className="mb-1.5 block text-sm font-medium text-foreground"
+                    >
+                      Email{" "}
+                      <span aria-hidden="true" className="text-destructive">
+                        *
+                      </span>
                     </label>
                     <input
                       id="contact-email"
@@ -241,8 +264,14 @@ function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="contact-subject" className="mb-1.5 block text-sm font-medium text-foreground">
-                    Subjek <span aria-hidden="true" className="text-destructive">*</span>
+                  <label
+                    htmlFor="contact-subject"
+                    className="mb-1.5 block text-sm font-medium text-foreground"
+                  >
+                    Subjek{" "}
+                    <span aria-hidden="true" className="text-destructive">
+                      *
+                    </span>
                   </label>
                   <input
                     id="contact-subject"
@@ -264,8 +293,14 @@ function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="contact-message" className="mb-1.5 block text-sm font-medium text-foreground">
-                    Pesan <span aria-hidden="true" className="text-destructive">*</span>
+                  <label
+                    htmlFor="contact-message"
+                    className="mb-1.5 block text-sm font-medium text-foreground"
+                  >
+                    Pesan{" "}
+                    <span aria-hidden="true" className="text-destructive">
+                      *
+                    </span>
                   </label>
                   <textarea
                     id="contact-message"
@@ -300,12 +335,38 @@ function ContactPage() {
                   />
                 </div>
 
+                {status === "unavailable" ? (
+                  <div
+                    role="alert"
+                    className="flex items-start gap-3 rounded-xl border border-border bg-mist p-4"
+                  >
+                    <TriangleAlert
+                      className="mt-0.5 size-5 shrink-0 text-azure"
+                      aria-hidden="true"
+                    />
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">
+                        Formulir belum terhubung ke layanan pesan.
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Pesan Anda <strong className="font-semibold">belum terkirim</strong>. Kanal
+                        kontak resmi {site.legalName} — alamat, email, dan nomor telepon — akan
+                        ditampilkan di halaman ini setelah dikonfirmasi dari dokumen legalitas
+                        perusahaan.
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
+
                 {status === "error" ? (
                   <div
                     role="alert"
                     className="flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4"
                   >
-                    <TriangleAlert className="mt-0.5 size-5 shrink-0 text-destructive" aria-hidden="true" />
+                    <TriangleAlert
+                      className="mt-0.5 size-5 shrink-0 text-destructive"
+                      aria-hidden="true"
+                    />
                     <p className="text-sm text-destructive">
                       Pesan gagal terkirim. Silakan coba lagi dalam beberapa saat.
                     </p>
