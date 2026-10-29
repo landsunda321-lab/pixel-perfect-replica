@@ -130,7 +130,7 @@ function HomePage() {
           />
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {publishingAreas.map((area, index) => {
-              const Icon = AREA_ICONS[index % AREA_ICONS.length];
+              const Icon = AREA_ICONS[index % AREA_ICONS.length]!;
               return (
                 <Link
                   key={area.title}
