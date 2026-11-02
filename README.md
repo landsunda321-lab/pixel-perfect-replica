@@ -1,24 +1,116 @@
-# Pixel Perfect Replica
 
-Implement exactly the screenshot and nothing else
+# PT GRIYA PUSTAKA MANDIRI
 
-This project was built with [Lovable](https://lovable.dev).
+Website resmi PT Griya Pustaka Mandiri, perusahaan yang bergerak di bidang penerbitan buku, publikasi jurnal ilmiah, dan layanan literasi digital.
 
-## Build with Lovable
+## Project Overview
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/57f7a2eb-5643-4134-a4a8-f8dfbd098e36).
+Website ini dikembangkan sebagai platform digital penerbitan untuk menampilkan profil perusahaan, katalog buku, publikasi, layanan penerbitan, serta informasi kontak.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+## Technology Stack
 
-## Development
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- TanStack Start
+- Node.js
+- npm
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## Requirements
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+Pastikan perangkat telah memiliki:
+
+- Node.js versi 20 atau lebih baru
+- npm
+- Git
+
+## Installation
+
+Clone repository:
+
+```bash
+git clone https://github.com/landsunda321-lab/pixel-perfect-replica.git
+```
+
+Masuk ke direktori proyek:
+
+```bash
+cd pixel-perfect-replica
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Jalankan development server:
+
+```bash
 npm run dev
 ```
+
+## Production Build
+
+Jalankan pemeriksaan TypeScript dan build sesuai konfigurasi proyek:
+
+```bash
+npm run build
+```
+
+Jangan mengubah konfigurasi build tanpa memeriksa konfigurasi Vite dan TanStack Start yang digunakan proyek.
+
+## Deployment on Vercel
+
+Project ini terhubung dengan Vercel melalui GitHub.
+
+Deployment dilakukan melalui:
+
+1. Push perubahan ke branch `main`.
+2. Vercel mendeteksi commit baru.
+3. Vercel menjalankan proses instalasi dependencies.
+4. Vercel menjalankan production build.
+5. Jika build berhasil dan kebijakan deployment terpenuhi, Vercel menerbitkan deployment.
+
+### Deployment Configuration
+
+- Git Provider: GitHub
+- Repository: `landsunda321-lab/pixel-perfect-replica`
+- Production Branch: `main`
+- Hosting: Vercel
+
+Pastikan konfigurasi build dan environment variables pada dashboard Vercel sesuai kebutuhan aplikasi.
+
+## Project Structure
+
+Struktur direktori mengikuti arsitektur aplikasi yang sudah tersedia di repository.
+
+Jangan menghapus atau mengganti konfigurasi berikut tanpa pemeriksaan:
+
+- `package.json`
+- `package-lock.json`
+- `vite.config.ts`
+- `tsconfig.json`
+- `src/`
+- `public/`
+
+## Development Guidelines
+
+- Pertahankan struktur aplikasi yang sudah berjalan.
+- Hindari perubahan yang tidak diperlukan.
+- Jangan menyimpan API keys atau credentials di repository.
+- Gunakan environment variables untuk konfigurasi rahasia.
+- Pastikan perubahan telah diuji sebelum deployment produksi.
+
+## Repository
+
+GitHub:
+https://github.com/landsunda321-lab/pixel-perfect-replica
+
+Vercel:
+https://vercel.com/sundaland/pixel-perfect-replica
+
+## Copyright
+
+© 2026 PT Griya Pustaka Mandiri. All Rights Reserved.
