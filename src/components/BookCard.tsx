@@ -5,6 +5,7 @@ import { canShowIsbn, type Book, type BookStatus } from "@/data/books";
 
 const STATUS_BADGE: Record<BookStatus, string> = {
   "Dalam Persiapan": "bg-secondary text-secondary-foreground",
+  "Simulasi — Dalam Proses Pengajuan ISBN": "bg-amber-100 text-amber-900",
   Terbit: "bg-primary text-primary-foreground",
   "Tersedia dalam format digital": "bg-accent text-accent-foreground",
   "Tersedia dalam format cetak": "bg-accent text-accent-foreground",
@@ -52,7 +53,7 @@ export function BookCard({ book }: { book: Book }) {
           <span
             className={`rounded-full px-2.5 py-1 font-medium ${STATUS_BADGE[book.availabilityStatus]}`}
           >
-            {book.availabilityStatus}
+            {book.availabilityStatus.startsWith("Simulasi") ? "Contoh · Pengajuan ISBN" : book.availabilityStatus}
           </span>
           {book.publicationYear ? (
             <span className="text-muted-foreground">Terbit {book.publicationYear}</span>
