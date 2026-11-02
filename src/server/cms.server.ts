@@ -88,13 +88,13 @@ export async function handleCmsRequest(request: Request) {
       return json({ ok: true, items: rows });
     }
     if (request.method === "GET" && action === "public-authors") {
-      const rows = await db()`SELECT id,slug,name,biography,expertise,photo_url,is_demo FROM public.gpm_cms_authors WHERE show_public=true ORDER BY name`;
+      const rows = await db()`SELECT id,slug,name,biography,expertise,photo_url,is_demo FROM public.gpm_cms_authors WHERE show_public=true AND is_demo=false ORDER BY name`;
       return json({ ok: true, items: rows });
     }
     if (request.method === "GET" && action === "public-author") {
       const slug = text(url.searchParams.get("slug"), 120);
       if (!slug) return json({ok:false,error:"Profil penulis tidak ditemukan."},404);
-      const rows = await db()`SELECT id,slug,name,biography,expertise,photo_url FROM public.gpm_cms_authors WHERE slug=${slug} AND show_public=true LIMIT 1`;
+      const rows = await db()`SELECT id,slug,name,biography,expertise,photo_url FROM public.gpm_cms_authors WHERE slug=${slug} AND show_public=true AND is_demo=false LIMIT 1`;
       return rows.length ? json({ok:true,item:rows[0]}) : json({ok:false,error:"Profil penulis tidak ditemukan."},404);
     }
     if (request.method === "POST" && action === "setup") {

@@ -33,7 +33,7 @@ function AuthorsPage() {
       .finally(()=>{if(active)setLoading(false);});
     return ()=>{active=false;};
   },[]);
-  const loopAuthors = authors.length > 1 ? [...authors,...authors] : authors;
+  const loopAuthors = [...authors,...authors];
   return <div>
     <section className="relative overflow-hidden bg-[#102544] text-white">
       <div className="shell relative py-16 lg:py-24">
