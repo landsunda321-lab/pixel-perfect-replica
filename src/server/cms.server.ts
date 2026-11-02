@@ -1,4 +1,5 @@
 import postgres from "postgres";
+import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { createHash, createHmac, randomBytes, scrypt as scryptCallback, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 
@@ -266,5 +267,45 @@ export async function handleCmsRequest(request: Request) {
     const message=error instanceof Error ? error.message : "Terjadi kesalahan.";
     if (status>=500) console.error("[GPM CMS]",message);
     return json({ok:false,error:message},status);
+  }
+}
+
+
+const IMAGE_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+
+export async function handleCmsImageUpload(request: Request) {
+  try {
+    if (request.method !== "POST") return json({ok:false,error:"Metode tidak diizinkan."},405);
+    if (!process.env.BLOB_READ_WRITE_TOKEN) return json({ok:false,error:"Penyimpanan gambar belum terhubung. Periksa konfigurasi Blob."},503);
+    const body = await request.json() as HandleUploadBody;
+    const response = await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async (pathname, clientPayload) => {
+        const user = await currentUser(request);
+        requireRole(user, ["admin", "editor"]);
+        let payload: {kind?:string} = {};
+        try { payload = JSON.parse(clientPayload || "{}"); } catch { throw new Error("Jenis unggahan tidak valid."); }
+        const kind = payload.kind;
+        if (kind !== "cover" && kind !== "author") throw new Error("Jenis gambar tidak diizinkan.");
+        const prefix = kind === "cover" ? "gpm/covers/" : "gpm/authors/";
+        if (!pathname.startsWith(prefix)) throw new Error("Lokasi penyimpanan tidak valid.");
+        return {
+          allowedContentTypes: IMAGE_MIME_TYPES,
+          maximumSizeInBytes: IMAGE_MAX_BYTES,
+          addRandomSuffix: true,
+          cacheControlMaxAge: 60 * 60 * 24 * 30,
+          tokenPayload: JSON.stringify({ userId: user!.id, kind }),
+        };
+      },
+      onUploadCompleted: async ({ blob, tokenPayload }) => {
+        if (!blob.url || !tokenPayload) throw new Error("Konfirmasi unggahan gambar tidak valid.");
+      },
+    });
+    return json(response);
+  } catch (error) {
+    const status = Number((error as {status?:number})?.status) || 400;
+    return json({ok:false,error:error instanceof Error ? error.message : "Unggahan gambar gagal."},status);
   }
 }
