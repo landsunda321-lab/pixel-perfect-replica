@@ -110,19 +110,18 @@ function CatalogPage() {
 
   return (
     <div className="flex flex-col">
-      <section className="bg-mist">
-        <div className="shell py-16 lg:py-20">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-azure">Katalog</p>
-          <h1 className="mt-3 font-display text-4xl font-bold text-primary sm:text-5xl">
-            Katalog Buku
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-            Telusuri publikasi berdasarkan judul, penulis, kategori, dan tahun terbit.
-          </p>
+      <section className="relative overflow-hidden bg-[#0c1e3a] text-white">
+        <div className="absolute -right-24 -top-36 size-[30rem] rounded-full border-[60px] border-white/5" />
+        <div className="shell relative py-16 lg:py-20">
+          <p className="text-xs font-bold uppercase tracking-[.25em] text-sky-200">Katalog Penerbit</p>
+          <h1 className="mt-4 max-w-3xl font-display text-4xl font-extrabold leading-tight sm:text-5xl">Karya yang sedang disiapkan untuk diterbitkan.</h1>
+          <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300">Jelajahi contoh tampilan katalog buku Griya Pustaka Mandiri. Entri pada halaman ini merupakan data simulasi, bukan pengumuman buku terbit.</p>
+          <div className="mt-8 flex flex-wrap gap-3 text-xs font-semibold text-sky-100"><span className="rounded-full border border-white/20 bg-white/10 px-4 py-2">6 contoh judul</span><span className="rounded-full border border-white/20 bg-white/10 px-4 py-2">Simulasi pengajuan ISBN</span><span className="rounded-full border border-white/20 bg-white/10 px-4 py-2">Belum ada ISBN resmi</span></div>
         </div>
       </section>
 
-      <section className="shell py-12 lg:py-16">
+      <section className="shell py-10 lg:py-14">
+        <div className="mb-8 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950"><strong>Katalog demonstrasi — bukan data pengajuan ISBN resmi.</strong> Judul, penulis, deskripsi, dan sampul di bawah adalah contoh untuk pratinjau. ISBN tidak dicantumkan sebelum nomor resmi diterbitkan oleh Perpusnas. Status simulasi tidak berarti permohonan sudah diajukan atau disetujui.</div>
         <div
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
           role="search"
@@ -218,7 +217,7 @@ function CatalogPage() {
         </div>
 
         <p className="mt-6 text-sm text-muted-foreground" aria-live="polite">
-          Menampilkan {filtered.length} dari {books.length} buku.
+          Menampilkan {filtered.length} dari {books.length} contoh judul.
         </p>
 
         {filtered.length > 0 ? (

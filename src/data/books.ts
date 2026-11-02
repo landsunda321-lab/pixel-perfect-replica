@@ -24,6 +24,7 @@ export const DEFAULT_PUBLISHER = site.legalName;
 
 export const BOOK_STATUSES = [
   "Dalam Persiapan",
+  "Simulasi — Dalam Proses Pengajuan ISBN",
   "Terbit",
   "Tersedia dalam format digital",
   "Tersedia dalam format cetak",
@@ -77,8 +78,20 @@ export const bookSchema = z.object({
 
 export type Book = z.infer<typeof bookSchema>;
 
-/** Katalog buku. Kosong sampai data publikasi resmi tersedia. */
-export const BOOKS: Book[] = [];
+
+/**
+ * ENTRI DEMONSTRASI — bukan daftar permohonan ISBN yang benar-benar dikirim.
+ * Ganti atau hapus seluruh entri DEMO sebelum katalog dipublikasikan sebagai data faktual.
+ * ISBN, tahun terbit, jumlah halaman, harga, dan tautan akses sengaja tidak diisi.
+ */
+export const BOOKS: Book[] = [
+  { id:"demo-001", slug:"pengantar-pekerjaan-sosial-kontemporer", title:"Pengantar Pekerjaan Sosial Kontemporer", subtitle:"Konsep, Praktik, dan Tantangan Perubahan Sosial", author:"Tim Penulis (Data Simulasi)", editor:null, category:"Sosial dan Pemberdayaan", description:"Contoh naskah akademik tentang landasan pekerjaan sosial, praktik berbasis bukti, etika profesi, serta respons terhadap persoalan sosial kontemporer. Seluruh metadata merupakan data demonstrasi.", coverImage:null, publicationYear:null, publisher:"PT Griya Pustaka Mandiri", isbn:null, format:"Rencana cetak dan digital", language:"Indonesia", pages:null, price:null, availabilityStatus:"Simulasi — Dalam Proses Pengajuan ISBN", accessUrl:null, createdAt:"2026-11-02", updatedAt:"2026-11-02" },
+  { id:"demo-002", slug:"metodologi-penelitian-sosial-terapan", title:"Metodologi Penelitian Sosial Terapan", subtitle:"Desain, Teknik Pengumpulan Data, dan Analisis", author:"Tim Penulis (Data Simulasi)", editor:null, category:"Akademik dan Ilmiah", description:"Contoh naskah referensi mengenai pendekatan penelitian sosial, perumusan masalah, pemilihan metode, pengumpulan data, dan analisis temuan secara sistematis. Judul dan metadata ini hanya untuk simulasi tampilan.", coverImage:null, publicationYear:null, publisher:"PT Griya Pustaka Mandiri", isbn:null, format:"Rencana cetak dan digital", language:"Indonesia", pages:null, price:null, availabilityStatus:"Simulasi — Dalam Proses Pengajuan ISBN", accessUrl:null, createdAt:"2026-11-02", updatedAt:"2026-11-02" },
+  { id:"demo-003", slug:"pemberdayaan-perempuan-dan-ketahanan-ekonomi", title:"Pemberdayaan Perempuan dan Ketahanan Ekonomi", subtitle:"Strategi Penguatan Kapasitas dan Kemandirian", author:"Tim Penulis (Data Simulasi)", editor:null, category:"Sosial dan Pemberdayaan", description:"Contoh naskah praktis-akademik tentang pemberdayaan perempuan, penguatan kapasitas, akses sumber daya, dan pengembangan usaha berkelanjutan. Isi dan identitas penulis belum mewakili publikasi nyata.", coverImage:null, publicationYear:null, publisher:"PT Griya Pustaka Mandiri", isbn:null, format:"Rencana cetak", language:"Indonesia", pages:null, price:null, availabilityStatus:"Simulasi — Dalam Proses Pengajuan ISBN", accessUrl:null, createdAt:"2026-11-02", updatedAt:"2026-11-02" },
+  { id:"demo-004", slug:"manajemen-lembaga-dan-pelayanan-sosial", title:"Manajemen Lembaga dan Pelayanan Sosial", subtitle:"Tata Kelola Program, Mutu Layanan, dan Akuntabilitas", author:"Tim Penulis (Data Simulasi)", editor:null, category:"Pendidikan dan Referensi", description:"Contoh naskah referensi yang mengulas perencanaan program, tata kelola lembaga pelayanan sosial, pengukuran mutu, dan akuntabilitas pelayanan kepada masyarakat.", coverImage:null, publicationYear:null, publisher:"PT Griya Pustaka Mandiri", isbn:null, format:"Rencana cetak dan digital", language:"Indonesia", pages:null, price:null, availabilityStatus:"Simulasi — Dalam Proses Pengajuan ISBN", accessUrl:null, createdAt:"2026-11-02", updatedAt:"2026-11-02" },
+  { id:"demo-005", slug:"komunikasi-pemberdayaan-masyarakat", title:"Komunikasi Pemberdayaan Masyarakat", subtitle:"Partisipasi, Literasi, dan Transformasi Sosial", author:"Tim Penulis (Data Simulasi)", editor:null, category:"Pendidikan dan Referensi", description:"Contoh naskah tentang komunikasi partisipatif, penguatan literasi, pemetaan pemangku kepentingan, dan strategi komunikasi dalam program pemberdayaan masyarakat.", coverImage:null, publicationYear:null, publisher:"PT Griya Pustaka Mandiri", isbn:null, format:"Rencana digital", language:"Indonesia", pages:null, price:null, availabilityStatus:"Simulasi — Dalam Proses Pengajuan ISBN", accessUrl:null, createdAt:"2026-11-02", updatedAt:"2026-11-02" },
+  { id:"demo-006", slug:"dasar-dasar-penulisan-buku-akademik", title:"Dasar-Dasar Penulisan Buku Akademik", subtitle:"Dari Gagasan, Naskah, hingga Kesiapan Terbit", author:"Tim Penulis (Data Simulasi)", editor:null, category:"Akademik dan Ilmiah", description:"Contoh naskah panduan bagi calon penulis mengenai pengembangan gagasan, struktur buku, penelusuran referensi, etika sitasi, penyuntingan, dan persiapan penerbitan.", coverImage:null, publicationYear:null, publisher:"PT Griya Pustaka Mandiri", isbn:null, format:"Rencana cetak dan digital", language:"Indonesia", pages:null, price:null, availabilityStatus:"Simulasi — Dalam Proses Pengajuan ISBN", accessUrl:null, createdAt:"2026-11-02", updatedAt:"2026-11-02" }
+];
 
 /** Validasi field penting; entri yang tidak valid atau slug ganda dilewati dengan peringatan. */
 export function getValidatedBooks(books: Book[] = BOOKS): Book[] {
@@ -108,12 +121,12 @@ export function getBookBySlug(slug: string): Book | undefined {
 
 /** ISBN hanya boleh ditampilkan jika benar-benar diberikan dan buku tidak dalam persiapan. */
 export function canShowIsbn(book: Book): boolean {
-  return book.isbn != null && book.availabilityStatus !== "Dalam Persiapan";
+  return book.isbn != null && book.availabilityStatus !== "Dalam Persiapan" && book.availabilityStatus !== "Simulasi — Dalam Proses Pengajuan ISBN";
 }
 
 /** Buku dianggap sudah memiliki publikasi yang terkonfirmasi. */
 export function isPublished(book: Book): boolean {
-  return book.availabilityStatus !== "Dalam Persiapan";
+  return book.availabilityStatus !== "Dalam Persiapan" && book.availabilityStatus !== "Simulasi — Dalam Proses Pengajuan ISBN";
 }
 
 /**
