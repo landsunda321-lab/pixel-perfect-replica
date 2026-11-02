@@ -209,3 +209,17 @@ main .rounded-2xl.border:hover, main .rounded-3xl.border:hover {
   main section { animation: section-enter .55s ease both; }
   @keyframes section-enter { from { opacity: .82; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 }
+
+
+/* Author portrait marquee: continuous right-to-left loop with pause and reduced-motion support. */
+.author-marquee-shell { overflow: hidden; width: 100%; padding: 1rem 0 1.5rem; mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent); }
+.author-marquee-track { display: flex; width: max-content; gap: 1.25rem; animation: author-marquee-scroll 38s linear infinite; will-change: transform; }
+.author-marquee-shell:hover .author-marquee-track, .author-marquee-shell:focus-within .author-marquee-track { animation-play-state: paused; }
+.author-marquee-card { display: block; width: 172px; flex: 0 0 172px; text-decoration: none; }
+.author-photo-frame { aspect-ratio: 4 / 5; padding: 7px; border: 1px solid #d9e5f5; border-radius: 1.25rem; background: linear-gradient(145deg,#fff,#eaf2fc); box-shadow: 0 12px 28px -20px rgba(16,37,68,.55); transition: transform .25s ease, box-shadow .25s ease; }
+.author-marquee-card:hover .author-photo-frame, .author-marquee-card:focus-visible .author-photo-frame { transform: translateY(-5px); box-shadow: 0 18px 35px -18px rgba(16,37,68,.45); }
+.author-photo-inner { width: 100%; height: 100%; overflow: hidden; border-radius: .9rem; background: #dce8f7; }
+.author-photo-inner img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.author-initials { display:flex; width:100%; height:100%; align-items:center; justify-content:center; color:#17396c; font:800 2.2rem Montserrat,sans-serif; background:linear-gradient(145deg,#eaf3ff,#c9dcf6); }
+@keyframes author-marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .author-marquee-track { animation: none; } }

@@ -35,6 +35,19 @@ async function readBody(request: Request) {
   catch { throw new Error("Format permintaan tidak valid."); }
 }
 function text(v: unknown, max = 5000) { return typeof v === "string" ? v.trim().slice(0, max) : ""; }
+function slugify(value: string) {
+  return value.normalize("NFKD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 90) || "penulis";
+}
+async function uniqueAuthorSlug(name: string, excludeId = "") {
+  const base = slugify(name);
+  const rows = await db()`SELECT slug FROM public.gpm_cms_authors WHERE slug LIKE ${base + "%"} AND id::text <> ${excludeId}`;
+  const used = new Set(rows.map((row: {slug:string|null}) => row.slug).filter(Boolean));
+  if (!used.has(base)) return base;
+  let suffix = 2;
+  while (used.has(`${base}-${suffix}`)) suffix++;
+  return `${base}-${suffix}`;
+}
 async function passwordHash(password: string) {
   if (password.length < 12) throw new Error("Password minimal 12 karakter.");
   const salt = randomBytes(16);
@@ -75,8 +88,14 @@ export async function handleCmsRequest(request: Request) {
       return json({ ok: true, items: rows });
     }
     if (request.method === "GET" && action === "public-authors") {
-      const rows = await db()`SELECT id,name,biography,expertise,photo_url,is_demo FROM public.gpm_cms_authors WHERE show_public=true ORDER BY name`;
+      const rows = await db()`SELECT id,slug,name,biography,expertise,photo_url,is_demo FROM public.gpm_cms_authors WHERE show_public=true ORDER BY name`;
       return json({ ok: true, items: rows });
+    }
+    if (request.method === "GET" && action === "public-author") {
+      const slug = text(url.searchParams.get("slug"), 120);
+      if (!slug) return json({ok:false,error:"Profil penulis tidak ditemukan."},404);
+      const rows = await db()`SELECT id,slug,name,biography,expertise,photo_url FROM public.gpm_cms_authors WHERE slug=${slug} AND show_public=true LIMIT 1`;
+      return rows.length ? json({ok:true,item:rows[0]}) : json({ok:false,error:"Profil penulis tidak ditemukan."},404);
     }
     if (request.method === "POST" && action === "setup") {
       const body = await readBody(request);
@@ -182,8 +201,9 @@ export async function handleCmsRequest(request: Request) {
       requireRole(user,["admin","editor"]);
       const b=await readBody(request), name=text(b.name,200);
       if (!name) return json({ok:false,error:"Nama penulis wajib diisi."},400);
-      const rows=await db()`INSERT INTO public.gpm_cms_authors(name,biography,expertise,photo_url,is_demo,show_public,created_by)
-        VALUES (${name},${text(b.biography,10000)},${text(b.expertise,500)},${text(b.photo_url,2000)},${b.is_demo===true},${b.show_public===true},${user!.id}) RETURNING *`;
+      const slug = await uniqueAuthorSlug(name);
+      const rows=await db()`INSERT INTO public.gpm_cms_authors(slug,name,biography,expertise,photo_url,is_demo,show_public,created_by)
+        VALUES (${slug},${name},${text(b.biography,10000)},${text(b.expertise,500)},${text(b.photo_url,2000)},${b.is_demo===true},${b.show_public===true},${user!.id}) RETURNING *`;
       await audit(user!.id,"create_author","author",String(rows[0].id),name);
       return json({ok:true,item:rows[0]},201);
     }
@@ -191,7 +211,8 @@ export async function handleCmsRequest(request: Request) {
       requireRole(user,["admin","editor"]);
       const b=await readBody(request), id=text(b.id,80), name=text(b.name,200);
       if (!id || !name) return json({ok:false,error:"Data penulis tidak lengkap."},400);
-      const rows=await db()`UPDATE public.gpm_cms_authors SET name=${name},biography=${text(b.biography,10000)},
+      const slug = await uniqueAuthorSlug(name, id);
+      const rows=await db()`UPDATE public.gpm_cms_authors SET slug=${slug},name=${name},biography=${text(b.biography,10000)},
         expertise=${text(b.expertise,500)},photo_url=${text(b.photo_url,2000)},is_demo=${b.is_demo===true},
         show_public=${b.show_public===true},updated_at=now() WHERE id=${id} RETURNING *`;
       if (!rows.length) return json({ok:false,error:"Penulis tidak ditemukan."},404);
