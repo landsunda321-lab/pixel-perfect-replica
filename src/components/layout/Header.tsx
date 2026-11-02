@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { label: "Jurnal", to: "/jurnal" },
   { label: "Layanan", to: "/layanan-penerbitan" },
   { label: "Kontak", to: "/kontak" },
+  { label: "Login", to: "/login" },
 ] as const;
 
 export function Header() {
