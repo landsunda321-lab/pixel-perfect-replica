@@ -1,13 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpenText, Menu, X } from "lucide-react";
+import { ArrowUpRight, BookOpenText, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
-
 import { site } from "@/data/site";
 
 const NAV_ITEMS = [
   { label: "Beranda", to: "/" },
   { label: "Tentang", to: "/tentang-penerbit" },
-  { label: "Katalog Buku", to: "/katalog-buku" },
+  { label: "Katalog", to: "/katalog-buku" },
   { label: "Penulis", to: "/penulis" },
   { label: "Jurnal", to: "/jurnal" },
   { label: "Layanan", to: "/layanan-penerbitan" },
@@ -17,55 +16,42 @@ const NAV_ITEMS = [
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-
   useEffect(() => setMenuOpen(false), [pathname]);
-
-  const isActive = (to: string) =>
-    to === "/" ? pathname === "/" : pathname === to || pathname.startsWith(`${to}/`);
+  const isActive = (to: string) => to === "/" ? pathname === "/" : pathname === to || pathname.startsWith(`${to}/`);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-md">
-      <div className="shell flex min-h-16 items-center justify-between gap-4">
-        <Link to="/" className="flex items-center gap-2.5 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" aria-label={`${site.brandName} — ke beranda`}>
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-card">
-            <BookOpenText className="size-5" aria-hidden="true" />
+    <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/90 shadow-[0_4px_24px_-20px_rgba(15,35,70,.3)] backdrop-blur-xl">
+      <div className="shell flex min-h-[76px] items-center justify-between gap-5">
+        <Link to="/" className="group flex min-w-0 items-center gap-3" aria-label={`${site.brandName} — beranda`}>
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#17396c] to-[#0b1d3b] text-white shadow-lg shadow-blue-950/15 transition-transform group-hover:-rotate-3">
+            <BookOpenText className="size-5" />
           </span>
-          <span className="font-display text-sm font-bold tracking-wide text-primary sm:text-base">{site.brandName}</span>
+          <span className="min-w-0">
+            <span className="block truncate font-display text-[13px] font-extrabold tracking-[.13em] text-[#142c52] sm:text-sm">GRIYA PUSTAKA</span>
+            <span className="mt-0.5 block text-[10px] font-semibold tracking-[.28em] text-slate-500">MANDIRI · PUBLISHING</span>
+          </span>
         </Link>
 
-        <nav aria-label="Navigasi utama" className="hidden items-center gap-0.5 xl:flex">
+        <nav aria-label="Navigasi utama" className="hidden items-center gap-1 lg:flex">
           {NAV_ITEMS.map((item) => (
-            <Link key={item.to} to={item.to} className={`rounded-full px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${isActive(item.to) ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-accent/60 hover:text-accent-foreground"}`}>
+            <Link key={item.to} to={item.to} className={`rounded-full px-3 py-2.5 text-[13px] font-semibold transition-all ${isActive(item.to) ? "bg-blue-50 text-blue-900" : "text-slate-600 hover:bg-slate-50 hover:text-blue-900"}`}>
               {item.label}
             </Link>
           ))}
         </nav>
-
-        <div className="hidden xl:block">
-          <Link to="/ajukan-naskah" className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-card transition-colors hover:bg-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
-            Ajukan Naskah
-          </Link>
-        </div>
-
-        <button type="button" className="inline-flex size-10 items-center justify-center rounded-lg border border-border text-foreground transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring xl:hidden" aria-expanded={menuOpen} aria-controls="mobile-nav" aria-label={menuOpen ? "Tutup menu navigasi" : "Buka menu navigasi"} onClick={() => setMenuOpen((v) => !v)}>
-          {menuOpen ? <X className="size-5" aria-hidden="true" /> : <Menu className="size-5" aria-hidden="true" />}
+        <Link to="/ajukan-naskah" className="hidden items-center gap-2 rounded-full bg-[#17396c] px-5 py-3 text-[13px] font-bold text-white shadow-lg shadow-blue-950/15 transition-all hover:-translate-y-0.5 hover:bg-[#0d274f] lg:inline-flex">
+          Ajukan Naskah <ArrowUpRight className="size-4" />
+        </Link>
+        <button type="button" className="inline-flex size-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-800 lg:hidden" aria-expanded={menuOpen} aria-controls="mobile-nav" aria-label={menuOpen ? "Tutup menu" : "Buka menu"} onClick={() => setMenuOpen(v => !v)}>
+          {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
         </button>
       </div>
-
-      {menuOpen && (
-        <nav id="mobile-nav" aria-label="Navigasi utama" className="border-t border-border bg-background xl:hidden">
-          <ul className="shell flex flex-col gap-1 py-3">
-            {NAV_ITEMS.map((item) => (
-              <li key={item.to}>
-                <Link to={item.to} className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${isActive(item.to) ? "bg-accent text-accent-foreground" : "text-foreground hover:bg-accent/60"}`}>{item.label}</Link>
-              </li>
-            ))}
-            <li className="pt-2">
-              <Link to="/ajukan-naskah" className="inline-flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground">Ajukan Naskah</Link>
-            </li>
-          </ul>
-        </nav>
-      )}
+      {menuOpen && <nav id="mobile-nav" aria-label="Navigasi utama" className="border-t border-slate-200 bg-white lg:hidden">
+        <ul className="shell grid gap-1 py-4">
+          {NAV_ITEMS.map(item => <li key={item.to}><Link to={item.to} className={`block rounded-xl px-4 py-3 text-sm font-semibold ${isActive(item.to) ? "bg-blue-50 text-blue-900" : "text-slate-700 hover:bg-slate-50"}`}>{item.label}</Link></li>)}
+          <li className="pt-2"><Link to="/ajukan-naskah" className="flex items-center justify-center gap-2 rounded-full bg-[#17396c] px-5 py-3.5 text-sm font-bold text-white">Ajukan Naskah <ArrowUpRight className="size-4" /></Link></li>
+        </ul>
+      </nav>}
     </header>
   );
 }

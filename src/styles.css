@@ -177,3 +177,35 @@
     padding-inline: 2.5rem;
   }
 }
+
+
+/* Editorial refresh — refined surfaces, rhythm, focus and motion */
+:root {
+  --radius: 1rem;
+  --mist: oklch(0.965 0.012 248);
+  --navy: oklch(0.235 0.075 260);
+  --navy-deep: oklch(0.16 0.055 260);
+  --azure: oklch(0.59 0.18 252);
+}
+body { background: #fbfcff; }
+::selection { background: #c8ddff; color: #102449; }
+a, button { -webkit-tap-highlight-color: transparent; }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 3px solid #8db8ff; outline-offset: 3px;
+}
+.shell { max-width: 80rem; }
+section { scroll-margin-top: 6rem; }
+main h1 { letter-spacing: -0.045em; }
+main h2 { letter-spacing: -0.035em; }
+main p { text-wrap: pretty; }
+main .rounded-2xl.border, main .rounded-3xl.border {
+  transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+}
+main .rounded-2xl.border:hover, main .rounded-3xl.border:hover {
+  border-color: #c5d7f4;
+  box-shadow: 0 18px 48px -28px rgba(20, 49, 91, .28);
+}
+@media (prefers-reduced-motion: no-preference) {
+  main section { animation: section-enter .55s ease both; }
+  @keyframes section-enter { from { opacity: .82; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+}

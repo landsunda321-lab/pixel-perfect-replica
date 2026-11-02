@@ -1,18 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  BookMarked,
-  BookOpen,
-  GraduationCap,
-  HandHeart,
-  Library,
-  MonitorSmartphone,
-  type LucideIcon,
-} from "lucide-react";
-import { useMemo } from "react";
-
+import { ArrowRight, ArrowUpRight, BookOpen, BookOpenCheck, Feather, GraduationCap, HandHeart, Library, PenLine, Sparkles } from "lucide-react";
 import heroBooks from "@/assets/hero-books.jpg";
-import { BookCard } from "@/components/BookCard";
 import { SectionHeading } from "@/components/SectionHeading";
 import { getValidatedBooks } from "@/data/books";
 import { canonicalLinks, principles, publishingAreas, site } from "@/data/site";
@@ -20,21 +8,10 @@ import { canonicalLinks, principles, publishingAreas, site } from "@/data/site";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Griya Pustaka Mandiri — Menerbitkan Gagasan, Mengembangkan Pengetahuan" },
-      {
-        name: "description",
-        content:
-          "Griya Pustaka Mandiri menghadirkan karya tulis akademik, ilmiah, pendidikan, dan praktis untuk mendukung pengembangan pengetahuan serta pemberdayaan masyarakat.",
-      },
-      {
-        property: "og:title",
-        content: "Griya Pustaka Mandiri — Menerbitkan Gagasan, Mengembangkan Pengetahuan",
-      },
-      {
-        property: "og:description",
-        content:
-          "Karya tulis akademik, ilmiah, pendidikan, dan praktis dari penerbit buku Griya Pustaka Mandiri.",
-      },
+      { title: "Griya Pustaka Mandiri — Penerbit Buku Akademik dan Ilmiah" },
+      { name: "description", content: "Penerbitan buku akademik, ilmiah, pendidikan, dan praktis. Temukan ruang untuk menerbitkan gagasan dan mengembangkan pengetahuan bersama Griya Pustaka Mandiri." },
+      { property: "og:title", content: "Griya Pustaka Mandiri — Menerbitkan Gagasan" },
+      { property: "og:description", content: "Penerbit buku akademik, ilmiah, pendidikan, dan praktis." },
       { property: "og:type", content: "website" },
     ],
     links: canonicalLinks("/"),
@@ -42,221 +19,76 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const AREA_ICONS: LucideIcon[] = [GraduationCap, HandHeart, BookMarked, MonitorSmartphone];
-
-const PRIMARY_CTA =
-  "inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:bg-navy-deep hover:shadow-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
-const SECONDARY_CTA =
-  "inline-flex items-center justify-center gap-2 rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
-
+const iconSet = [GraduationCap, HandHeart, BookOpenCheck, Library];
 function HomePage() {
-  const books = useMemo(() => getValidatedBooks(), []);
-  const featuredBooks = books.slice(0, 8);
-
+  const books = getValidatedBooks();
   return (
-    <div className="flex flex-col">
-      {/* Bagian A — Hero */}
-      <section className="relative overflow-hidden bg-mist">
-        <div className="shell grid items-center gap-10 py-16 lg:grid-cols-2 lg:py-24">
-          <div className="animate-fade-up">
-            <p className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
-              {site.legalName}
-            </p>
-            <h1 className="mt-5 font-display text-4xl font-bold leading-tight text-primary sm:text-5xl">
-              {site.tagline}
-            </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Griya Pustaka Mandiri menghadirkan karya tulis akademik, ilmiah, pendidikan, dan
-              praktis untuk mendukung pengembangan pengetahuan serta pemberdayaan masyarakat.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/katalog-buku" className={PRIMARY_CTA}>
-                Jelajahi Katalog Buku
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
-              <Link to="/tentang-penerbit" className={SECONDARY_CTA}>
-                Tentang Penerbit
-              </Link>
-            </div>
-          </div>
-
-          <div className="relative animate-fade-in">
-            <div
-              aria-hidden="true"
-              className="absolute -right-4 -top-4 h-full w-full rounded-3xl border-2 border-sky"
-            />
-            <img
-              src={heroBooks}
-              alt="Tumpukan buku berhardcover navy di atas meja studio yang bersih"
-              className="relative w-full rounded-3xl object-cover shadow-soft"
-              width={1024}
-              height={1024}
-            />
-          </div>
+    <div className="overflow-hidden bg-[#fbfcff]">
+      <section className="relative isolate bg-[#0c1e3a] text-white">
+        <div className="absolute inset-0 -z-10">
+          <img src={heroBooks} alt="" className="h-full w-full object-cover opacity-25 mix-blend-luminosity" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#09172d] via-[#10294d]/95 to-[#10294d]/65" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_25%,rgba(105,164,255,.24),transparent_35%)]" />
         </div>
-      </section>
-
-      {/* Bagian B — Pengantar penerbit */}
-      <section className="shell py-16 lg:py-20">
-        <div className="grid items-start gap-10 lg:grid-cols-2">
-          <SectionHeading
-            eyebrow="Pengantar"
-            title="Ruang bagi Gagasan dan Pengetahuan"
-            description={site.shortSummary}
-          />
-          <div className="space-y-4">
-            <p className="text-base leading-relaxed text-muted-foreground">
-              Kami mendukung penulis, akademisi, praktisi, dan masyarakat dalam menghasilkan karya
-              yang bernilai ilmiah, edukatif, dan bermanfaat bagi pengembangan pengetahuan — melalui
-              proses penerbitan yang terencana dan penyuntingan yang cermat.
-            </p>
-            <Link
-              to="/tentang-penerbit"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-azure transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-            >
-              Kenali penerbit lebih dekat
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Bagian C — Bidang penerbitan */}
-      <section className="bg-mist py-16 lg:py-20">
-        <div className="shell">
-          <SectionHeading
-            eyebrow="Bidang Penerbitan"
-            title="Fokus Penerbitan Kami"
-            description="Empat arah penerbitan yang menjadi perhatian utama Griya Pustaka Mandiri."
-          />
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {publishingAreas.map((area, index) => {
-              const Icon = AREA_ICONS[index % AREA_ICONS.length]!;
-              return (
-                <Link
-                  key={area.title}
-                  to={area.href}
-                  className="group flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                >
-                  <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-                    <Icon className="size-5" aria-hidden="true" />
-                  </span>
-                  <h3 className="mt-4 font-display text-base font-semibold text-foreground">
-                    {area.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {area.description}
-                  </p>
-                  <span className="mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-medium text-azure transition-colors group-hover:text-primary">
-                    Lihat katalog
-                    <ArrowRight className="size-4" aria-hidden="true" />
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Bagian D — Pilihan buku */}
-      <section className="shell py-16 lg:py-20">
-        <SectionHeading
-          eyebrow="Katalog"
-          title="Pilihan Buku"
-          description="Karya yang telah dan akan diterbitkan oleh Griya Pustaka Mandiri."
-        />
-        {featuredBooks.length > 0 ? (
-          <>
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {featuredBooks.map((book) => (
-                <BookCard key={book.id} book={book} />
-              ))}
+        <div className="shell relative grid min-h-[620px] items-center gap-12 py-20 lg:grid-cols-[1.1fr_.9fr] lg:py-28">
+          <div className="max-w-3xl animate-fade-up">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[11px] font-bold uppercase tracking-[.2em] text-sky-100 backdrop-blur"><Sparkles className="size-3.5" /> Independent Publishing House</span>
+            <p className="mt-8 text-xs font-semibold uppercase tracking-[.28em] text-sky-200">{site.legalName}</p>
+            <h1 className="mt-5 max-w-3xl font-display text-5xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[4.4rem]">Setiap gagasan besar <span className="text-sky-300">layak menemukan</span> pembacanya.</h1>
+            <p className="mt-7 max-w-xl text-base leading-8 text-slate-200 sm:text-lg">Kami membuka ruang bagi karya akademik, ilmiah, pendidikan, dan gagasan praktis untuk tumbuh menjadi pengetahuan yang dapat dibagikan.</p>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Link to="/ajukan-naskah" className="inline-flex items-center gap-3 rounded-full bg-sky-300 px-7 py-4 text-sm font-extrabold text-[#10284b] shadow-xl shadow-black/20 transition-all hover:-translate-y-1 hover:bg-white">Mulai Terbitkan Naskah <ArrowUpRight className="size-4" /></Link>
+              <Link to="/katalog-buku" className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/5 px-7 py-4 text-sm font-bold text-white backdrop-blur transition-colors hover:bg-white/15">Jelajahi Katalog <ArrowRight className="size-4" /></Link>
             </div>
-            <div className="mt-10 text-center">
-              <Link to="/katalog-buku" className={PRIMARY_CTA}>
-                Lihat Semua Buku
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
-            </div>
-          </>
-        ) : (
-          <div className="mt-10 flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border bg-mist px-6 py-14 text-center">
-            <span className="flex size-12 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-              <Library className="size-6" aria-hidden="true" />
-            </span>
-            <p className="max-w-xl text-base text-muted-foreground">
-              Katalog buku sedang dipersiapkan. Informasi buku akan ditampilkan setelah data
-              publikasi tersedia.
-            </p>
-            <Link to="/katalog-buku" className={SECONDARY_CTA}>
-              Buka Halaman Katalog
-            </Link>
+            <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/15 pt-6 text-xs font-medium tracking-wide text-slate-300"><span className="flex items-center gap-2"><BookOpen className="size-4 text-sky-300" /> Buku akademik & ilmiah</span><span className="flex items-center gap-2"><Feather className="size-4 text-sky-300" /> Pendampingan naskah</span></div>
           </div>
-        )}
-      </section>
-
-      {/* Bagian E — Komitmen penerbit */}
-      <section className="bg-mist py-16 lg:py-20">
-        <div className="shell">
-          <SectionHeading
-            eyebrow="Komitmen"
-            title="Prinsip yang Kami Jaga"
-            description="Tiga prinsip yang menjadi landasan setiap proses penerbitan."
-          />
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {principles.map((principle, index) => (
-              <div
-                key={principle.title}
-                className="rounded-2xl border border-border bg-card p-6 shadow-card"
-              >
-                <p className="font-display text-3xl font-bold text-sky">{`0${index + 1}`}</p>
-                <h3 className="mt-3 font-display text-lg font-semibold text-foreground">
-                  {principle.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {principle.description}
-                </p>
+          <div className="relative mx-auto hidden w-full max-w-[470px] lg:block">
+            <div className="absolute -inset-5 rounded-[2.5rem] border border-white/15 rotate-3" />
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/20 bg-white/10 p-3 shadow-2xl shadow-black/30 backdrop-blur">
+              <img src={heroBooks} alt="Tumpukan buku sebagai representasi karya penerbitan" className="aspect-[4/5] w-full rounded-[1.4rem] object-cover" />
+              <div className="absolute bottom-7 left-7 right-7 rounded-2xl border border-white/20 bg-[#0c1e3a]/80 p-5 backdrop-blur-xl">
+                <p className="text-[10px] font-bold uppercase tracking-[.22em] text-sky-200">Our publishing philosophy</p>
+                <p className="mt-2 font-display text-xl font-bold leading-snug text-white">Menerbitkan Gagasan,<br />Mengembangkan Pengetahuan.</p>
               </div>
-            ))}
+            </div>
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-sky-300/70 to-transparent" />
+      </section>
+
+      <section className="relative z-10 -mt-1 bg-white py-7">
+        <div className="shell grid gap-5 sm:grid-cols-3">
+          {[
+            ["01", "Editorial", "Naskah ditata dengan perhatian pada struktur dan keterbacaan."],
+            ["02", "Kolaboratif", "Ruang tumbuh bagi penulis, akademisi, dan praktisi."],
+            ["03", "Bertanggung jawab", "Mengutamakan etika, keaslian, dan akurasi publikasi."],
+          ].map(([n, title, desc]) => <div key={n} className="flex gap-4 border-b border-slate-100 py-4 sm:border-b-0 sm:border-r sm:py-3 last:border-0"><span className="font-display text-2xl font-extrabold text-blue-200">{n}</span><div><h2 className="text-sm font-bold text-[#172e52]">{title}</h2><p className="mt-1 text-xs leading-6 text-slate-500">{desc}</p></div></div>)}
+        </div>
+      </section>
+
+      <section className="shell py-20 lg:py-28">
+        <div className="grid gap-10 lg:grid-cols-[.85fr_1.15fr] lg:items-end">
+          <div><p className="text-xs font-extrabold uppercase tracking-[.24em] text-blue-700">Tentang Penerbit</p><h2 className="mt-4 max-w-xl font-display text-3xl font-extrabold leading-tight text-[#142b50] sm:text-4xl">Membawa karya baik lebih dekat kepada pembaca.</h2></div>
+          <div><p className="max-w-2xl text-base leading-8 text-slate-600">{site.shortSummary} Kami mendukung proses penerbitan yang terencana agar setiap karya memiliki penyajian yang jelas, tertata, dan bermanfaat.</p><Link to="/tentang-penerbit" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-800 hover:text-blue-600">Kenali Griya Pustaka Mandiri <ArrowUpRight className="size-4" /></Link></div>
+        </div>
+      </section>
+
+      <section className="bg-[#f1f5fb] py-20 lg:py-24">
+        <div className="shell">
+          <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="text-xs font-extrabold uppercase tracking-[.24em] text-blue-700">Area Publikasi</p><h2 className="mt-3 font-display text-3xl font-extrabold text-[#142b50] sm:text-4xl">Ruang lingkup penerbitan</h2><p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">Beragam disiplin dan pengalaman yang memperkaya khazanah pengetahuan.</p></div><Link to="/layanan-penerbitan" className="inline-flex items-center gap-2 text-sm font-bold text-blue-800">Lihat layanan <ArrowUpRight className="size-4" /></Link></div>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {publishingAreas.map((area, i) => { const Icon = iconSet[i % iconSet.length]!; return <Link key={area.title} to={area.href} className="group rounded-3xl border border-slate-200/80 bg-white p-7 shadow-[0_12px_35px_-28px_rgba(14,39,78,.3)] transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl"><span className="flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-800 transition-colors group-hover:bg-[#17396c] group-hover:text-white"><Icon className="size-5" /></span><h3 className="mt-6 font-display text-lg font-bold text-[#172e52]">{area.title}</h3><p className="mt-3 text-sm leading-7 text-slate-500">{area.description}</p><span className="mt-7 inline-flex items-center gap-2 text-xs font-bold text-blue-800">Jelajahi <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" /></span></Link>; })}
           </div>
         </div>
       </section>
 
-      {/* Bagian F — Akses buku */}
-      <section className="shell py-16 lg:py-20">
-        <div className="grid items-center gap-8 rounded-3xl border border-border bg-card p-8 shadow-card lg:grid-cols-[1fr_auto] lg:p-10">
-          <div>
-            <SectionHeading
-              eyebrow="Akses Buku"
-              title="Cara Mengakses dan Memperoleh Buku"
-              description="Informasi ketersediaan, format cetak dan digital, serta tautan akses resmi untuk setiap judul dapat dilihat pada halaman Akses dan Distribusi Buku."
-            />
-          </div>
-          <Link to="/akses-distribusi" className={PRIMARY_CTA}>
-            Akses dan Distribusi Buku
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
-        </div>
+      <section className="shell py-20 lg:py-28">
+        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="text-xs font-extrabold uppercase tracking-[.24em] text-blue-700">Katalog</p><h2 className="mt-3 font-display text-3xl font-extrabold text-[#142b50] sm:text-4xl">Karya yang diterbitkan</h2><p className="mt-3 text-sm leading-7 text-slate-600">Jelajahi judul dan informasi publikasi yang tersedia.</p></div><Link to="/katalog-buku" className="inline-flex items-center gap-2 text-sm font-bold text-blue-800">Lihat katalog lengkap <ArrowUpRight className="size-4" /></Link></div>
+        {books.length ? <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{books.slice(0,4).map(book => <div key={book.id} className="rounded-2xl"><Link to="/katalog-buku" className="block"><div className="rounded-2xl border border-slate-200 bg-white p-4"><p className="font-semibold text-[#17396c]">{book.title}</p></div></Link></div>)}</div> : <div className="mt-10 flex flex-col items-center rounded-[2rem] border border-dashed border-slate-300 bg-white px-6 py-14 text-center"><span className="flex size-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-800"><Library className="size-6" /></span><h3 className="mt-5 font-display text-xl font-bold text-[#172e52]">Katalog sedang dipersiapkan</h3><p className="mt-2 max-w-lg text-sm leading-7 text-slate-500">Informasi buku akan ditampilkan setelah data publikasi resmi tersedia. Kami menjaga agar informasi judul, penulis, dan ISBN yang tampil tetap akurat.</p><Link to="/kontak" className="mt-6 rounded-full bg-[#17396c] px-6 py-3 text-sm font-bold text-white hover:bg-[#0d274f]">Tanyakan informasi buku</Link></div>}
       </section>
 
-      {/* Bagian G — CTA penutup */}
-      <section className="bg-navy py-16 lg:py-20">
-        <div className="shell flex flex-col items-center gap-6 text-center">
-          <BookOpen className="size-10 text-sky" aria-hidden="true" />
-          <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
-            Temukan Karya dan Gagasan Baru
-          </h2>
-          <p className="max-w-xl text-base text-sky/80">
-            Telusuri publikasi Griya Pustaka Mandiri dan ikuti perkembangan katalog kami.
-          </p>
-          <Link
-            to="/katalog-buku"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-sky px-6 py-3 text-sm font-semibold text-navy-deep transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            Jelajahi Katalog
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
-        </div>
+      <section className="bg-[#10284b] py-20 text-white lg:py-24">
+        <div className="shell grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center"><div><p className="text-xs font-extrabold uppercase tracking-[.24em] text-sky-200">Kolaborasi</p><h2 className="mt-4 max-w-2xl font-display text-3xl font-extrabold leading-tight sm:text-4xl">Punya naskah yang ingin dibagikan kepada dunia?</h2><p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300">Mari mulai percakapan tentang gagasan, proses editorial, dan rencana penerbitan karya Anda.</p></div><Link to="/ajukan-naskah" className="inline-flex items-center justify-center gap-3 rounded-full bg-sky-300 px-7 py-4 text-sm font-extrabold text-[#10284b] hover:bg-white">Diskusikan Naskah <ArrowUpRight className="size-4" /></Link></div>
       </section>
     </div>
   );
