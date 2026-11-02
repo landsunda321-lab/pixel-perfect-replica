@@ -42,7 +42,7 @@ export function Footer() {
           <ul className="mt-4 space-y-3 text-sm text-sky/80">
             {address ? <li className="flex gap-2.5"><MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" /><span>{address}</span></li> : null}
             {email ? <li className="flex gap-2.5"><Mail className="mt-0.5 size-4 shrink-0" aria-hidden="true" /><a href={`mailto:${email}`} className="hover:text-white">{email}</a></li> : null}
-            {phone ? <li className="flex gap-2.5"><Phone className="mt-0.5 size-4 shrink-0" aria-hidden="true" /><span>{phone}</span></li> : null}
+            {phone ? <li className="flex gap-2.5"><Phone className="mt-0.5 size-4 shrink-0" aria-hidden="true" /><a href={`https://wa.me/62${phone.replace(/^0/, "").replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="hover:text-white">{phone} (WhatsApp)</a></li> : null}
             {!address && !email && !phone ? <li className="text-sky/70">Data kontak resmi akan ditampilkan setelah dikonfirmasi dari dokumen legalitas perusahaan.</li> : null}
           </ul>
         </div>

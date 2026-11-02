@@ -153,7 +153,7 @@ function ContactPage() {
                     <Phone className="mt-0.5 size-5 shrink-0 text-azure" aria-hidden="true" />
                     <div>
                       <dt className="text-sm font-medium text-foreground">Nomor Telepon Resmi</dt>
-                      <dd className="mt-1 text-sm text-muted-foreground">{phone}</dd>
+                      <dd className="mt-1 text-sm text-muted-foreground"><a href={`https://wa.me/62${phone.replace(/^0/, "").replace(/\\D/g, "")}`} target="_blank" rel="noreferrer" className="transition-colors hover:text-primary"> {phone} (WhatsApp)</a></dd>
                     </div>
                   </div>
                 ) : null}
