@@ -91,6 +91,17 @@ function AdminPage() {
   <ImageUploadField label="File PDF buku" kind="book-pdf" value={form.pdf_url||""} onChange={url=>setForm({...form,pdf_url:url})}/>
   <label className="flex gap-2 text-sm"><input type="checkbox" checked={!!form.allow_pdf_download} onChange={e=>setForm({...form,allow_pdf_download:e.target.checked})}/>Izinkan pengunjung mengunduh PDF</label>
   </fieldset>
+  <fieldset className="space-y-3 rounded-xl border border-blue-100 p-3"><legend className="text-sm font-bold text-blue-900">Distribusi dan akses buku</legend>
+  <label className="flex gap-2 text-sm"><input type="checkbox" checked={!!form.print_available} onChange={e=>setForm({...form,print_available:e.target.checked})}/>Buku cetak tersedia untuk dipesan langsung</label>
+  <input type="number" min="0" placeholder="Harga buku cetak (Rp), kosong jika belum ditetapkan" value={form.print_price??""} onChange={e=>setForm({...form,print_price:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
+  <label className="flex gap-2 text-sm"><input type="checkbox" checked={!!form.digital_available} onChange={e=>setForm({...form,digital_available:e.target.checked})}/>Buku digital tersedia</label>
+  <select value={form.digital_access_type||"none"} onChange={e=>setForm({...form,digital_access_type:e.target.value})} className="w-full rounded-xl border p-3 text-sm"><option value="none">Belum tersedia</option><option value="paid">Digital berbayar</option><option value="free">Digital gratis / Open Access</option></select>
+  <input type="number" min="0" placeholder="Harga digital (Rp), untuk digital berbayar" value={form.digital_price??""} onChange={e=>setForm({...form,digital_price:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
+  <label className="flex gap-2 text-sm"><input type="checkbox" checked={!!form.open_access} onChange={e=>setForm({...form,open_access:e.target.checked})}/>Buku tidak diperjualbelikan — sediakan PDF lengkap untuk akses publik</label>
+  <input placeholder="URL pemesanan khusus (opsional, hanya jika sudah aktif)" value={form.order_url||""} onChange={e=>setForm({...form,order_url:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
+  <input placeholder="URL akses digital (opsional, hanya jika sudah aktif)" value={form.digital_access_url||""} onChange={e=>setForm({...form,digital_access_url:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
+  <p className="text-xs leading-5 text-slate-500">Jika URL tidak diisi, website tidak akan membuat tautan palsu. Untuk Open Access, unggah PDF lengkap dan aktifkan izin unduh pada bagian Berkas Buku.</p>
+  </fieldset>
   <fieldset className="space-y-3"><legend className="text-sm font-bold text-blue-900">Pengaturan publikasi</legend>
   <select value={form.publication_status||"persiapan"} onChange={e=>setForm({...form,publication_status:e.target.value})} className="w-full rounded-xl border p-3 text-sm"><option value="persiapan">Dalam persiapan</option><option value="proses_isbn">Proses ISBN</option><option value="isbn_terbit">ISBN terbit</option><option value="proses_cetak">Proses cetak</option><option value="terbit">Terbit</option><option value="arsip">Arsip</option></select>
   <label className="flex gap-2 text-sm"><input type="checkbox" checked={!!form.show_public} onChange={e=>setForm({...form,show_public:e.target.checked})}/>Tampilkan di website publik</label>
