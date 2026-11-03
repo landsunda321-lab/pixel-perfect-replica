@@ -83,8 +83,18 @@ export async function handleCmsRequest(request: Request) {
   const url = new URL(request.url);
   const action = url.searchParams.get("action") || "";
   try {
+    // Kolom distribusi ditambahkan secara idempoten agar database lama tetap kompatibel.
+    await db()`ALTER TABLE public.gpm_cms_books
+      ADD COLUMN IF NOT EXISTS print_available boolean NOT NULL DEFAULT false,
+      ADD COLUMN IF NOT EXISTS print_price integer,
+      ADD COLUMN IF NOT EXISTS digital_available boolean NOT NULL DEFAULT false,
+      ADD COLUMN IF NOT EXISTS digital_access_type text NOT NULL DEFAULT 'none',
+      ADD COLUMN IF NOT EXISTS digital_price integer,
+      ADD COLUMN IF NOT EXISTS open_access boolean NOT NULL DEFAULT false,
+      ADD COLUMN IF NOT EXISTS order_url text,
+      ADD COLUMN IF NOT EXISTS digital_access_url text`;
     if (request.method === "GET" && action === "public-books") {
-      const rows = await db()`SELECT id,title,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo
+      const rows = await db()`SELECT id,title,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,publication_year,publisher,page_count,book_size,book_format,language,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url
         FROM public.gpm_cms_books WHERE show_public=true AND publication_status <> 'arsip' ORDER BY created_at DESC`;
       return json({ ok: true, items: rows });
     }
@@ -92,7 +102,7 @@ export async function handleCmsRequest(request: Request) {
       const id = text(url.searchParams.get("id"), 80);
       if (!id) return json({ok:false,error:"Buku tidak ditemukan."},404);
       const rows = await db()`SELECT id,title,author,category,synopsis,abstract,keywords,kata_pengantar,cover_url,isbn,qrcbn,publication_status,
-        publisher,publication_year,publication_date,edition,page_count,book_size,book_format,language,pdf_url,allow_pdf_download
+        publisher,publication_year,publication_date,edition,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url
         FROM public.gpm_cms_books WHERE id::text=${id} AND show_public=true AND publication_status <> 'arsip' LIMIT 1`;
       return rows.length ? json({ok:true,item:rows[0]}) : json({ok:false,error:"Buku tidak ditemukan."},404);
     }
@@ -179,9 +189,9 @@ export async function handleCmsRequest(request: Request) {
       const status=text(b.publication_status,30) || "persiapan";
       const rows=await db()`INSERT INTO public.gpm_cms_books
         (title,subtitle,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,show_public,created_by,
-         publisher,publication_year,publication_date,edition,abstract,keywords,kata_pengantar,page_count,book_size,book_format,language,pdf_url,allow_pdf_download)
+         publisher,publication_year,publication_date,edition,abstract,keywords,kata_pengantar,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url)
         VALUES (${title},'',${author},${text(b.category,120)||"Umum"},${text(b.synopsis,10000)},${text(b.cover_url,2000)},${text(b.isbn,30)},${text(b.qrcbn,60)},${status},${b.is_demo===true},${b.show_public===true},${user!.id},
-         ${text(b.publisher,200)||"PT Griya Pustaka Mandiri"},${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},${text(b.publication_date,10)||null},${text(b.edition,100)},${text(b.abstract,20000)},${text(b.keywords,2000)},${text(b.kata_pengantar,20000)},${Number.isInteger(Number(b.page_count))&&Number(b.page_count)>0?Number(b.page_count):null},${text(b.book_size,80)},${text(b.book_format,40)},${text(b.language,80)},${text(b.pdf_url,2000)},${b.allow_pdf_download===true}) RETURNING *`;
+         ${text(b.publisher,200)||"PT Griya Pustaka Mandiri"},${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},${text(b.publication_date,10)||null},${text(b.edition,100)},${text(b.abstract,20000)},${text(b.keywords,2000)},${text(b.kata_pengantar,20000)},${Number.isInteger(Number(b.page_count))&&Number(b.page_count)>0?Number(b.page_count):null},${text(b.book_size,80)},${text(b.book_format,40)},${text(b.language,80)},${text(b.pdf_url,2000)},${b.allow_pdf_download===true},${b.print_available===true},${Number.isInteger(Number(b.print_price))&&Number(b.print_price)>=0?Number(b.print_price):null},${b.digital_available===true},${["paid","free","none"].includes(text(b.digital_access_type,10))?text(b.digital_access_type,10):"none"},${Number.isInteger(Number(b.digital_price))&&Number(b.digital_price)>=0?Number(b.digital_price):null},${b.open_access===true},${text(b.order_url,2000)||null},${text(b.digital_access_url,2000)||null}) RETURNING *`;
       await audit(user!.id,"create_book","book",String(rows[0].id),title);
       return json({ok:true,item:rows[0]},201);
     }
@@ -199,6 +209,7 @@ export async function handleCmsRequest(request: Request) {
         page_count=${Number.isInteger(Number(b.page_count))&&Number(b.page_count)>0?Number(b.page_count):null},
         book_size=${text(b.book_size,80)},book_format=${text(b.book_format,40)},language=${text(b.language,80)},
         pdf_url=${text(b.pdf_url,2000)},allow_pdf_download=${b.allow_pdf_download===true},
+        print_available=${b.print_available===true},print_price=${Number.isInteger(Number(b.print_price))&&Number(b.print_price)>=0?Number(b.print_price):null},digital_available=${b.digital_available===true},digital_access_type=${["paid","free","none"].includes(text(b.digital_access_type,10))?text(b.digital_access_type,10):"none"},digital_price=${Number.isInteger(Number(b.digital_price))&&Number(b.digital_price)>=0?Number(b.digital_price):null},open_access=${b.open_access===true},order_url=${text(b.order_url,2000)||null},digital_access_url=${text(b.digital_access_url,2000)||null},
         updated_at=now() WHERE id=${id} RETURNING *`;
       if (!rows.length) return json({ok:false,error:"Buku tidak ditemukan."},404);
       await audit(user!.id,"update_book","book",id,title);
