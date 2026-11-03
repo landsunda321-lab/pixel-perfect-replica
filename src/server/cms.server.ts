@@ -91,9 +91,8 @@ export async function handleCmsRequest(request: Request) {
     if (request.method === "GET" && action === "public-book") {
       const id = text(url.searchParams.get("id"), 80);
       if (!id) return json({ok:false,error:"Buku tidak ditemukan."},404);
-      const rows = await db()`SELECT id,title,author,category,synopsis,abstract,keywords,table_of_contents,cover_url,isbn,qrcbn,publication_status,
+      const rows = await db()`SELECT id,title,author,category,synopsis,abstract,keywords,kata_pengantar,cover_url,isbn,qrcbn,publication_status,
         publisher,publication_year,publication_date,edition,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,
-        author_biography,author_expertise
         FROM public.gpm_cms_books WHERE id::text=${id} AND show_public=true AND publication_status <> 'arsip' LIMIT 1`;
       return rows.length ? json({ok:true,item:rows[0]}) : json({ok:false,error:"Buku tidak ditemukan."},404);
     }
@@ -180,9 +179,9 @@ export async function handleCmsRequest(request: Request) {
       const status=text(b.publication_status,30) || "persiapan";
       const rows=await db()`INSERT INTO public.gpm_cms_books
         (title,subtitle,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,show_public,created_by,
-         publisher,publication_year,publication_date,edition,abstract,keywords,table_of_contents,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,author_biography,author_expertise)
+         publisher,publication_year,publication_date,edition,abstract,keywords,kata_pengantar,page_count,book_size,book_format,language,pdf_url,allow_pdf_download)
         VALUES (${title},'',${author},${text(b.category,120)||"Umum"},${text(b.synopsis,10000)},${text(b.cover_url,2000)},${text(b.isbn,30)},${text(b.qrcbn,60)},${status},${b.is_demo===true},${b.show_public===true},${user!.id},
-         ${text(b.publisher,200)||"PT Griya Pustaka Mandiri"},${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},${text(b.publication_date,10)||null},${text(b.edition,100)},${text(b.abstract,20000)},${text(b.keywords,2000)},${text(b.table_of_contents,20000)},${Number.isInteger(Number(b.page_count))&&Number(b.page_count)>0?Number(b.page_count):null},${text(b.book_size,80)},${text(b.book_format,40)},${text(b.language,80)},${text(b.pdf_url,2000)},${b.allow_pdf_download===true},${text(b.author_biography,10000)},${text(b.author_expertise,1000)}) RETURNING *`;
+         ${text(b.publisher,200)||"PT Griya Pustaka Mandiri"},${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},${text(b.publication_date,10)||null},${text(b.edition,100)},${text(b.abstract,20000)},${text(b.keywords,2000)},${text(b.kata_pengantar,20000)},${Number.isInteger(Number(b.page_count))&&Number(b.page_count)>0?Number(b.page_count):null},${text(b.book_size,80)},${text(b.book_format,40)},${text(b.language,80)},${text(b.pdf_url,2000)},${b.allow_pdf_download===true}) RETURNING *`;
       await audit(user!.id,"create_book","book",String(rows[0].id),title);
       return json({ok:true,item:rows[0]},201);
     }
@@ -196,11 +195,10 @@ export async function handleCmsRequest(request: Request) {
         show_public=${b.show_public===true},publisher=${text(b.publisher,200)||"PT Griya Pustaka Mandiri"},
         publication_year=${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},
         publication_date=${text(b.publication_date,10)||null},edition=${text(b.edition,100)},abstract=${text(b.abstract,20000)},
-        keywords=${text(b.keywords,2000)},table_of_contents=${text(b.table_of_contents,20000)},
+        keywords=${text(b.keywords,2000)},kata_pengantar=${text(b.kata_pengantar,20000)},
         page_count=${Number.isInteger(Number(b.page_count))&&Number(b.page_count)>0?Number(b.page_count):null},
         book_size=${text(b.book_size,80)},book_format=${text(b.book_format,40)},language=${text(b.language,80)},
         pdf_url=${text(b.pdf_url,2000)},allow_pdf_download=${b.allow_pdf_download===true},
-        author_biography=${text(b.author_biography,10000)},author_expertise=${text(b.author_expertise,1000)},
         updated_at=now() WHERE id=${id} RETURNING *`;
       if (!rows.length) return json({ok:false,error:"Buku tidak ditemukan."},404);
       await audit(user!.id,"update_book","book",id,title);
