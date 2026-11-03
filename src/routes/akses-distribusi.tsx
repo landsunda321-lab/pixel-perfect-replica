@@ -1,193 +1,40 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  BookOpen,
-  ExternalLink,
-  Globe2,
-  Library,
-  ShieldCheck,
-  TabletSmartphone,
-} from "lucide-react";
-import { useMemo } from "react";
-
-import { BookCard } from "@/components/BookCard";
-import { SectionHeading } from "@/components/SectionHeading";
-import { isAvailable, getValidatedBooks } from "@/data/books";
+import { useEffect, useState } from "react";
 import { canonicalLinks, site } from "@/data/site";
 
+type DistributionBook = {
+  id:string; title:string; author:string; cover_url?:string|null; isbn?:string|null;
+  publication_status:string; print_available?:boolean; print_price?:number|null;
+  digital_available?:boolean; digital_access_type?:string; digital_price?:number|null;
+  open_access?:boolean; pdf_url?:string|null; allow_pdf_download?:boolean;
+  digital_access_url?:string|null; order_url?:string|null;
+};
 export const Route = createFileRoute("/akses-distribusi")({
-  head: () => ({
-    meta: [
-      { title: "Akses dan Distribusi Buku — Griya Pustaka Mandiri" },
-      {
-        name: "description",
-        content:
-          "Informasi ketersediaan, format, dan akses terhadap publikasi Griya Pustaka Mandiri — format cetak dan digital sesuai ketersediaan masing-masing judul.",
-      },
-      { property: "og:title", content: "Akses dan Distribusi Buku — Griya Pustaka Mandiri" },
-      {
-        property: "og:description",
-        content:
-          "Temukan informasi mengenai ketersediaan, format, dan akses terhadap publikasi Griya Pustaka Mandiri.",
-      },
-      { property: "og:type", content: "website" },
-    ],
-    links: canonicalLinks("/akses-distribusi"),
-  }),
-  component: AccessDistributionPage,
+  head:()=>({meta:[
+    {title:"Akses dan Distribusi Buku — Griya Pustaka Mandiri"},
+    {name:"description",content:"Informasi pemesanan buku cetak, buku digital berbayar, dan akses terbuka publikasi Griya Pustaka Mandiri."}
+  ],links:canonicalLinks("/akses-distribusi")}),
+  component:AccessDistributionPage,
 });
-
-function AccessDistributionPage() {
-  const books = useMemo(() => getValidatedBooks(), []);
-  const availableBooks = books.filter(isAvailable);
-
-  return (
-    <div className="flex flex-col">
-      {/* Bagian A — Hero */}
-      <section className="bg-mist">
-        <div className="shell py-16 lg:py-20">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-azure">
-            Informasi Publikasi
-          </p>
-          <h1 className="mt-3 font-display text-4xl font-bold text-primary sm:text-5xl">
-            Akses dan Distribusi Buku
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-            Temukan informasi mengenai ketersediaan, format, dan akses terhadap publikasi Griya
-            Pustaka Mandiri.
-          </p>
-        </div>
-      </section>
-
-      {/* Bagian B — Format publikasi */}
-      <section className="shell py-16 lg:py-20">
-        <SectionHeading
-          eyebrow="Format Publikasi"
-          title="Format Cetak dan Digital"
-          description="Format berikut dapat disediakan sesuai ketersediaan masing-masing judul. Tidak setiap judul tersedia dalam kedua format."
-        />
-        <div className="mt-10 grid gap-5 md:grid-cols-2">
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
-            <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-              <BookOpen className="size-5" aria-hidden="true" />
-            </span>
-            <h3 className="mt-4 font-display text-lg font-semibold text-foreground">
-              Format Cetak
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Buku cetak disediakan untuk judul-judul tertentu sesuai rencana penerbitan.
-              Ketersediaan dan informasi pemesanan ditampilkan pada halaman buku apabila layanan
-              tersebut benar-benar tersedia.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
-            <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-              <TabletSmartphone className="size-5" aria-hidden="true" />
-            </span>
-            <h3 className="mt-4 font-display text-lg font-semibold text-foreground">
-              Format Digital
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Beberapa judul dapat tersedia dalam format digital (PDF atau e-book) melalui tautan
-              akses resmi. Tautan hanya ditampilkan jika sumbernya sah dan terkonfirmasi.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Bagian C — Daftar publikasi */}
-      <section className="bg-mist py-16 lg:py-20">
-        <div className="shell">
-          <SectionHeading
-            eyebrow="Daftar Publikasi"
-            title="Publikasi yang Tersedia"
-            description="Buku dengan status ketersediaan yang sudah dikonfirmasi — tidak termasuk judul yang berstatus belum terbit atau tidak tersedia."
-          />
-          {availableBooks.length > 0 ? (
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {availableBooks.map((book) => (
-                <BookCard key={book.id} book={book} />
-              ))}
-            </div>
-          ) : (
-            <div className="mt-10 flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border bg-card px-6 py-14 text-center">
-              <span className="flex size-12 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-                <Library className="size-6" aria-hidden="true" />
-              </span>
-              <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
-                Belum ada publikasi yang tersedia. Informasi ketersediaan buku akan ditampilkan
-                setelah data publikasi terkonfirmasi — tidak ada klaim publikasi yang sudah terbit
-                sebelum benar-benar terbit.
-              </p>
-              <Link
-                to="/katalog-buku"
-                className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-card transition-colors hover:bg-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-              >
-                Buka Katalog Buku
-              </Link>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Bagian D — Akses digital */}
-      <section className="shell py-16 lg:py-20">
-        <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,420px)]">
-          <div>
-            <SectionHeading
-              eyebrow="Akses Digital"
-              title="Tautan Baca dan Distribusi Resmi"
-              description="Apabila sebuah judul tersedia secara digital, tautan baca digital, PDF, atau e-book yang sah akan ditampilkan pada halaman detail buku tersebut. Kami tidak menyediakan tautan palsu, tidak membuka akses ke file internal tanpa izin, dan tidak mengunggah buku berhak cipta tanpa kewenangan."
-            />
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
-            <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-              <Globe2 className="size-5" aria-hidden="true" />
-            </span>
-            <h3 className="mt-4 font-display text-base font-semibold text-foreground">
-              Ketentuan Tautan
-            </h3>
-            <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
-              <li>• Hanya tautan HTTPS dari sumber resmi yang digunakan.</li>
-              <li>• Tautan akses muncul pada halaman detail masing-masing buku.</li>
-              <li>• Tidak ada tautan unduhan menuju file yang tidak ada.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Bagian E — Distribusi cetak */}
-      <section className="bg-mist py-16 lg:py-20">
-        <div className="shell">
-          <SectionHeading
-            eyebrow="Distribusi Cetak"
-            title="Pemesanan Buku Cetak"
-            description="Informasi pemesanan atau ketersediaan buku cetak ditampilkan apabila layanan tersebut benar-benar tersedia untuk judul terkait. Untuk pertanyaan mengenai ketersediaan buku cetak, silakan hubungi kami melalui halaman kontak."
-          />
-        </div>
-      </section>
-
-      {/* Bagian F — Hak cipta */}
-      <section className="shell py-16 lg:py-20">
-        <div className="rounded-3xl bg-navy p-8 text-white shadow-soft lg:p-10">
-          <span className="flex size-11 items-center justify-center rounded-xl bg-white/10 text-sky">
-            <ShieldCheck className="size-5" aria-hidden="true" />
-          </span>
-          <h2 className="mt-4 font-display text-2xl font-bold">Hak Cipta</h2>
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-sky/85 sm:text-base">
-            Seluruh buku yang diterbitkan oleh {site.legalName} dilindungi hak cipta. Penggunaan,
-            penggandaan, atau distribusi ulang materi buku harus mengikuti izin dari pemegang hak
-            cipta. Untuk permohonan izin penggunaan, silakan menghubungi kami melalui halaman
-            kontak.
-          </p>
-          <Link
-            to="/kebijakan-hak-cipta"
-            className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-sky transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            Baca Kebijakan Hak Cipta
-            <ExternalLink className="size-4" aria-hidden="true" />
-          </Link>
-        </div>
-      </section>
-    </div>
-  );
+function AccessDistributionPage(){
+ const [books,setBooks]=useState<DistributionBook[]>([]);
+ const [loading,setLoading]=useState(true);
+ const [failed,setFailed]=useState(false);
+ useEffect(()=>{let active=true;fetch("/api/cms?action=public-books").then(async r=>{if(!r.ok)throw new Error("Gagal memuat publikasi");return r.json();}).then(d=>{if(active)setBooks(Array.isArray(d.items)?d.items.filter((b:DistributionBook)=>b.publication_status!=="arsip"):[]);}).catch(()=>{if(active)setFailed(true);}).finally(()=>{if(active)setLoading(false);});return()=>{active=false;};},[]);
+ const contact=site.contact.phone?"https://wa.me/62"+site.contact.phone.replace(/^0/,"").replace(/\\D/g,""):"mailto:"+site.contact.email;
+ return <main className="min-h-screen bg-white">
+  <section className="bg-[#0c1e3a] text-white"><div className="shell py-16 lg:py-20"><p className="text-xs font-bold uppercase tracking-[.2em] text-sky-200">Informasi Publikasi</p><h1 className="mt-3 font-display text-4xl font-extrabold sm:text-5xl">Akses dan Distribusi Buku</h1><p className="mt-4 max-w-2xl leading-7 text-slate-300">Griya Pustaka Mandiri menyediakan pemesanan buku cetak secara langsung, pilihan buku digital berbayar maupun gratis, serta akses naskah lengkap untuk judul Open Access yang telah diaktifkan.</p></div></section>
+  <section className="shell py-12"><div className="grid gap-5 md:grid-cols-3">
+   <article className="rounded-2xl border p-5"><h2 className="font-bold text-[#10294f]">Buku cetak</h2><p className="mt-2 text-sm leading-6 text-slate-600">Pemesanan dilakukan langsung kepada penerbit. Harga dan ketersediaan mengikuti informasi setiap judul.</p></article>
+   <article className="rounded-2xl border p-5"><h2 className="font-bold text-[#10294f]">Buku digital</h2><p className="mt-2 text-sm leading-6 text-slate-600">Setiap judul dapat ditandai digital berbayar atau digital gratis. Akses hanya ditampilkan jika tautan atau berkasnya benar-benar tersedia.</p></article>
+   <article className="rounded-2xl border p-5"><h2 className="font-bold text-[#10294f]">Open Access</h2><p className="mt-2 text-sm leading-6 text-slate-600">Buku yang tidak diperjualbelikan disediakan dalam bentuk naskah lengkap PDF untuk akses publik setelah penerbit mengaktifkannya.</p></article>
+  </div>
+  <div className="mt-12"><h2 className="font-display text-2xl font-bold text-[#10294f]">Ketersediaan per judul</h2><p className="mt-2 text-sm text-slate-600">Informasi berikut berasal dari katalog CMS dan ditampilkan sesuai pengaturan masing-masing buku.</p>
+  {loading?<p className="py-10 text-sm text-slate-500">Memuat informasi publikasi...</p>:failed?<p role="alert" className="mt-6 rounded-xl bg-amber-50 p-5 text-sm text-amber-900">Informasi distribusi belum dapat dimuat. Silakan coba kembali.</p>:books.length===0?<p className="mt-6 rounded-xl border border-dashed p-8 text-sm text-slate-600">Belum ada publikasi yang ditampilkan. Informasi akan muncul setelah data buku diaktifkan melalui CMS.</p>:<div className="mt-6 divide-y rounded-2xl border">{books.map(book=><article key={book.id} className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+   {book.cover_url&&<img src={book.cover_url} alt={"Sampul "+book.title} className="h-28 w-20 rounded-lg object-contain bg-slate-50"/>}
+   <div className="min-w-0 flex-1"><h3 className="font-bold text-[#10294f]">{book.title}</h3><p className="mt-1 text-sm text-slate-600">Oleh: {book.author}</p><div className="mt-3 flex flex-wrap gap-2 text-xs">{book.print_available&&<span className="rounded-full bg-blue-50 px-3 py-1 text-blue-900">Cetak tersedia</span>}{book.digital_available&&<span className="rounded-full bg-sky-50 px-3 py-1 text-sky-900">{book.digital_access_type==="paid"?"Digital berbayar":book.digital_access_type==="free"?"Digital gratis":"Digital"}</span>}{book.open_access&&book.pdf_url&&book.allow_pdf_download&&<span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-900">Open Access</span>}</div></div>
+   <Link to="/katalog-buku/$bookId" params={{bookId:book.id}} className="shrink-0 rounded-lg border border-blue-200 px-4 py-2.5 text-sm font-semibold text-[#123d78] hover:bg-blue-50">Lihat detail</Link>
+  </article>)}</div>}
+  </div><div className="mt-12 rounded-2xl bg-[#10294f] p-6 text-white"><h2 className="font-display text-xl font-bold">Pertanyaan pemesanan dan akses</h2><p className="mt-2 text-sm leading-6 text-slate-300">Untuk menanyakan ketersediaan judul yang belum memiliki tautan pemesanan atau akses digital, hubungi penerbit.</p><a href={contact} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-lg bg-sky-300 px-5 py-3 text-sm font-bold text-[#10294f]">Hubungi penerbit</a></div></section>
+ </main>;
 }
