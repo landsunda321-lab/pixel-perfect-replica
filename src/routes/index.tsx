@@ -1,9 +1,29 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ArrowRight, ArrowUpRight, BookOpen, BookOpenCheck, Feather, GraduationCap, HandHeart, Library, PenLine, Sparkles } from "lucide-react";
 import heroBooks from "@/assets/hero-books.jpg";
 import { SectionHeading } from "@/components/SectionHeading";
-import { getValidatedBooks } from "@/data/books";
 import { canonicalLinks, principles, publishingAreas, site } from "@/data/site";
+
+type PublicBook = {
+  id: string;
+  title: string;
+  author: string;
+  category?: string;
+  synopsis?: string;
+  cover_url?: string;
+  isbn?: string;
+  publication_status: string;
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  persiapan: "Dalam Persiapan",
+  proses_isbn: "Proses ISBN",
+  isbn_terbit: "ISBN Terbit",
+  proses_cetak: "Proses Cetak",
+  terbit: "Telah Terbit",
+  arsip: "Arsip",
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -21,7 +41,22 @@ export const Route = createFileRoute("/")({
 
 const iconSet = [GraduationCap, HandHeart, BookOpenCheck, Library];
 function HomePage() {
-  const books = getValidatedBooks();
+  const [books, setBooks] = useState<PublicBook[]>([]);
+  const [booksLoading, setBooksLoading] = useState(true);
+  const [booksFailed, setBooksFailed] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/cms?action=public-books")
+      .then(async (r) => { if (!r.ok) throw new Error("Gagal memuat katalog"); return r.json(); })
+      .then((data) => {
+        if (active) setBooks(Array.isArray(data.items) ? data.items.filter((book: PublicBook) => book.publication_status !== "arsip") : []);
+      })
+      .catch(() => { if (active) setBooksFailed(true); })
+      .finally(() => { if (active) setBooksLoading(false); });
+    return () => { active = false; };
+  }, []);
+
   return (
     <div className="overflow-hidden bg-[#fbfcff]">
       <section className="relative isolate bg-[#0c1e3a] text-white">
@@ -82,9 +117,23 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="shell py-20 lg:py-28">
-        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="text-xs font-extrabold uppercase tracking-[.24em] text-blue-700">Katalog</p><h2 className="mt-3 font-display text-3xl font-extrabold text-[#142b50] sm:text-4xl">Karya yang diterbitkan</h2><p className="mt-3 text-sm leading-7 text-slate-600">Jelajahi judul dan informasi publikasi yang tersedia.</p></div><Link to="/katalog-buku" className="inline-flex items-center gap-2 text-sm font-bold text-blue-800">Lihat katalog lengkap <ArrowUpRight className="size-4" /></Link></div>
-        {books.length ? <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{books.slice(0,4).map(book => <div key={book.id} className="rounded-2xl"><Link to="/katalog-buku" className="block"><div className="rounded-2xl border border-slate-200 bg-white p-4"><p className="font-semibold text-[#17396c]">{book.title}</p></div></Link></div>)}</div> : <div className="mt-10 flex flex-col items-center rounded-[2rem] border border-dashed border-slate-300 bg-white px-6 py-14 text-center"><span className="flex size-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-800"><Library className="size-6" /></span><h3 className="mt-5 font-display text-xl font-bold text-[#172e52]">Katalog sedang dipersiapkan</h3><p className="mt-2 max-w-lg text-sm leading-7 text-slate-500">Informasi buku akan ditampilkan setelah data publikasi resmi tersedia. Kami menjaga agar informasi judul, penulis, dan ISBN yang tampil tetap akurat.</p><Link to="/kontak" className="mt-6 rounded-full bg-[#17396c] px-6 py-3 text-sm font-bold text-white hover:bg-[#0d274f]">Tanyakan informasi buku</Link></div>}
+      <section className="shell py-20 lg:py-24">
+        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="text-xs font-extrabold uppercase tracking-[.24em] text-blue-700">Katalog Pilihan</p><h2 className="mt-3 font-display text-3xl font-extrabold text-[#142b50] sm:text-4xl">Karya dan buku terbaru</h2><p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">Kenali karya yang sedang dipersiapkan, dalam proses ISBN, maupun yang telah terbit.</p></div><Link to="/katalog-buku" className="inline-flex items-center gap-2 text-sm font-bold text-blue-800">Lihat katalog lengkap <ArrowUpRight className="size-4" /></Link></div>
+        {booksLoading ? <p className="mt-10 rounded-2xl bg-slate-50 p-8 text-center text-sm text-slate-500">Memuat katalog buku...</p>
+          : booksFailed ? <p role="alert" className="mt-10 rounded-2xl bg-amber-50 p-6 text-sm text-amber-900">Informasi buku belum dapat dimuat. Silakan kunjungi katalog lengkap.</p>
+          : books.length ? <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {books.slice(0, 4).map((book) => {
+              const label = STATUS_LABELS[book.publication_status] || book.publication_status;
+              const isPublished = book.publication_status === "terbit" || book.publication_status === "isbn_terbit";
+              return <article key={book.id} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+                <div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden bg-gradient-to-br from-slate-100 to-blue-100">
+                  {book.cover_url ? <img src={book.cover_url} alt={`Sampul buku ${book.title}`} loading="lazy" className="h-full w-full object-contain p-3 transition-transform duration-500 group-hover:scale-[1.03]" /> : <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center text-[#17396c]"><BookOpen className="size-10 opacity-60" /><span className="mt-4 font-display text-lg font-bold">{book.title}</span></div>}
+                  <span className={`absolute left-3 top-3 rounded-full px-3 py-1.5 text-[11px] font-bold shadow-sm ${isPublished ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900"}`}>{label}</span>
+                </div>
+                <div className="p-5"><p className="text-[11px] font-bold uppercase tracking-wider text-blue-700">{book.category || "Karya pilihan"}</p><h3 className="mt-2 line-clamp-2 font-display text-base font-bold leading-snug text-[#172e52]">{book.title}</h3><p className="mt-2 line-clamp-1 text-sm text-slate-500">{book.author}</p>{book.isbn && <p className="mt-3 text-xs text-slate-500">ISBN: {book.isbn}</p>}</div>
+              </article>;
+            })}
+          </div> : <div className="mt-10 rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center"><Library className="mx-auto size-9 text-slate-400" /><h3 className="mt-4 font-display text-lg font-bold text-[#172e52]">Karya akan segera ditampilkan</h3><p className="mt-2 text-sm text-slate-500">Buku yang dipublikasikan melalui katalog akan muncul di bagian ini.</p></div>}
       </section>
 
       <section className="bg-[#10284b] py-20 text-white lg:py-24">
