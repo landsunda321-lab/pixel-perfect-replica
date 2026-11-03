@@ -1,30 +1,167 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, BookOpen, CalendarDays, Check, Clipboard, Download, FileText, List, Share2, UserRound } from "lucide-react";
+import { ArrowLeft, BookOpen, CalendarDays, Check, Clipboard, Download, FileText, Share2, UserRound, BookMarked } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 type CmsBook = {
- id:string; title:string; author:string; category:string; synopsis?:string; abstract?:string; keywords?:string;
- kata_pengantar?:string; cover_url?:string; isbn?:string; qrcbn?:string; publication_status:string;
- publisher?:string; publication_year?:number|null; publication_date?:string|null; edition?:string;
- page_count?:number|null; book_size?:string; book_format?:string; language?:string; pdf_url?:string;
- allow_pdf_download?:boolean;
+  id: string; title: string; author: string; category: string; synopsis?: string; abstract?: string;
+  keywords?: string; kata_pengantar?: string; cover_url?: string; isbn?: string; qrcbn?: string;
+  publication_status: string; publisher?: string; publication_year?: number | null;
+  publication_date?: string | null; edition?: string; page_count?: number | null;
+  book_size?: string; book_format?: string; language?: string; pdf_url?: string;
+  allow_pdf_download?: boolean;
 };
-type Tab="abstract"|"foreword"|"details";
-const STATUS:Record<string,string>={persiapan:"Dalam Persiapan",proses_isbn:"Proses ISBN",isbn_terbit:"ISBN Terbit",proses_cetak:"Proses Cetak",terbit:"Telah Terbit",arsip:"Arsip"};
-export const Route=createFileRoute("/katalog-buku/$bookId")({head:()=>({meta:[{title:"Detail Buku — Griya Pustaka Mandiri"},{name:"description",content:"Informasi buku, abstrak, dan data bibliografi terbitan Griya Pustaka Mandiri."}]}),component:BookDetailPage});
-function BookDetailPage(){
- const {bookId}=Route.useParams(); const [book,setBook]=useState<CmsBook|null>(null); const [loading,setLoading]=useState(true); const [error,setError]=useState(""); const [tab,setTab]=useState<Tab>("abstract"); const [copied,setCopied]=useState(false);
- useEffect(()=>{let active=true;fetch("/api/cms?action=public-book&id="+encodeURIComponent(bookId)).then(async r=>{const d=await r.json();if(!r.ok||!d.item)throw new Error(d.error||"Buku tidak ditemukan.");return d.item as CmsBook;}).then(b=>{if(active)setBook(b);}).catch(e=>{if(active)setError(e instanceof Error?e.message:"Buku tidak dapat dimuat.");}).finally(()=>{if(active)setLoading(false);});return()=>{active=false;};},[bookId]);
- const citation=useMemo(()=>book?book.author+". ("+(book.publication_year||"t.t.")+"). "+book.title+". "+(book.publisher||"PT Griya Pustaka Mandiri")+".": "",[book]);
- async function copyText(v:string){try{await navigator.clipboard.writeText(v);setCopied(true);window.setTimeout(()=>setCopied(false),1800);}catch{setError("Tidak dapat menyalin. Silakan salin secara manual.");}}
- async function shareBook(){if(!book)return;try{if(navigator.share)await navigator.share({title:book.title,text:"Informasi buku dari PT Griya Pustaka Mandiri",url:window.location.href});else await copyText(window.location.href);}catch{}}
- if(loading)return <main className="shell py-24 text-center text-sm text-muted-foreground">Memuat informasi buku...</main>;
- if(!book||error)return <main className="shell py-20"><div role="alert" className="rounded-xl bg-amber-50 p-6 text-sm text-amber-900">{error||"Buku tidak ditemukan."}</div><Link to="/katalog-buku" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-blue-800"><ArrowLeft className="size-4"/> Kembali ke katalog</Link></main>;
- const tabs:{id:Tab;label:string;icon:typeof FileText}[]=[{id:"abstract",label:"Abstrak",icon:FileText},{id:"foreword",label:"Kata Pengantar",icon:FileText},{id:"details",label:"Detail Buku",icon:Clipboard}];
- const rows:[string,string|number|undefined|null][]=[["Kategori",book.category],["Penerbit",book.publisher],["Tahun Terbit",book.publication_year],["Tanggal Terbit",book.publication_date],["Edisi",book.edition],["ISBN",book.isbn],["QRCBN",book.qrcbn],["Jumlah Halaman",book.page_count],["Ukuran",book.book_size],["Format",book.book_format],["Bahasa",book.language]];
- return <main className="min-h-screen bg-white"><div className="border-b border-blue-100 bg-gradient-to-r from-slate-50 to-blue-50/80"><div className="shell py-3 text-xs text-slate-600"><Link to="/">Beranda</Link><span className="mx-2">/</span><Link to="/katalog-buku">Katalog Buku</Link><span className="mx-2">/</span><span className="text-slate-800">{book.title}</span></div></div>
- <section className="shell grid items-start gap-8 py-7 lg:grid-cols-[minmax(0,1fr)_minmax(300px,415px)]"><div className="min-w-0"><div className="grid gap-7 md:grid-cols-[minmax(220px,330px)_minmax(0,1fr)] md:items-center"><div className="flex min-h-[250px] items-center justify-center rounded-xl bg-gradient-to-br from-slate-50 to-blue-50 p-4">{book.cover_url?<img src={book.cover_url} alt={"Sampul buku "+book.title} className="max-h-[390px] w-full object-contain drop-shadow-xl"/>:<div className="flex aspect-[3/2] w-full flex-col items-center justify-center rounded-lg bg-[#10294f] p-6 text-center text-white"><BookOpen className="size-10 text-sky-200"/><p className="mt-4 font-display text-lg font-bold">{book.title}</p><p className="mt-2 text-sm text-sky-100">{book.author}</p></div>}</div><div><div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-blue-100 px-3 py-1.5 text-xs font-bold text-blue-900">Buku</span><span className="rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-900">{STATUS[book.publication_status]||book.publication_status}</span></div><h1 className="mt-4 font-display text-3xl font-extrabold leading-tight text-[#10294f] sm:text-4xl">{book.title}</h1>{book.publication_date&&<p className="mt-5 flex items-center gap-2 text-sm text-slate-600"><CalendarDays className="size-4 text-blue-800"/>{new Date(book.publication_date).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})}</p>}<p className="mt-4 flex items-start gap-2 text-sm leading-6 text-slate-700"><UserRound className="mt-0.5 size-4 shrink-0 text-blue-800"/>{book.author}</p><div className="mt-7 flex flex-wrap gap-2">{book.pdf_url&&book.allow_pdf_download&&<a href={book.pdf_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-[#123d78] px-5 py-3 text-sm font-bold text-white"><Download className="size-4"/> Download PDF</a>}<button type="button" onClick={()=>copyText(citation)} className="inline-flex items-center gap-2 rounded-lg border px-5 py-3 text-sm font-bold text-[#10294f]">{copied?<Check className="size-4"/>:"❝"} Cite This</button><button type="button" onClick={shareBook} className="inline-flex items-center gap-2 rounded-lg border px-5 py-3 text-sm font-bold text-[#10294f]"><Share2 className="size-4"/> Share</button></div></div></div>
- <div className="mt-8 border-b border-blue-200"><div className="flex gap-2 overflow-x-auto">{tabs.map(t=>{const Icon=t.icon;return <button key={t.id} type="button" onClick={()=>setTab(t.id)} className={"inline-flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold "+(tab===t.id?"border-blue-600 text-blue-700":"border-transparent text-slate-600 hover:text-blue-700")}><Icon className="size-4"/>{t.label}</button>;})}</div></div>
- <section className="min-h-[250px] py-6">{tab==="abstract"&&<><h2 className="font-display text-2xl font-bold text-[#10294f]">Abstrak</h2><div className="mt-4 whitespace-pre-line text-[15px] leading-7 text-slate-700">{book.abstract||book.synopsis||"Abstrak belum ditambahkan."}</div>{book.keywords&&<p className="mt-5 text-sm"><strong>Kata kunci:</strong> {book.keywords}</p>}</>}{tab==="foreword"&&<><h2 className="font-display text-2xl font-bold text-[#10294f]">Kata Pengantar</h2><div className="mt-4 whitespace-pre-line text-[15px] leading-7 text-slate-700">{book.kata_pengantar||"Kata pengantar belum ditambahkan."}</div></>}{tab==="details"&&<><h2 className="font-display text-2xl font-bold text-[#10294f]">Detail Buku</h2><p className="mt-4 text-sm text-slate-600">Informasi bibliografi lengkap tersedia pada panel di samping.</p></>}</section></div>
- <aside className="space-y-4"><section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm"><h2 className="border-b border-blue-100 pb-3 font-display text-lg font-bold text-[#10294f]">Informasi Bibliografi</h2><dl className="mt-2 divide-y divide-slate-100 text-sm">{rows.filter(([,v])=>v!==null&&v!==undefined&&String(v).trim()!=="").map(([label,value])=><div key={label} className="grid grid-cols-[105px_12px_1fr] gap-2 py-2"><dt className="font-semibold text-slate-700">{label}</dt><span>:</span><dd className="break-words">{value}</dd></div>)}</dl></section><section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm"><div className="flex items-center justify-between gap-3"><h2 className="font-display font-bold text-[#10294f]">Sitasi (APA 7th)</h2><button type="button" onClick={()=>copyText(citation)} className="rounded-lg border px-3 py-2 text-xs font-bold text-[#10294f]">{copied?"Tersalin":"Salin"}</button></div><p className="mt-3 rounded-lg bg-slate-50 p-3 text-xs leading-6 text-slate-700">{citation}</p></section></aside></section></main>;
+type Tab = "abstract" | "foreword" | "details";
+const STATUS: Record<string, string> = {
+  persiapan: "Dalam Persiapan", proses_isbn: "Proses ISBN", isbn_terbit: "ISBN Terbit",
+  proses_cetak: "Proses Cetak", terbit: "Telah Terbit", arsip: "Arsip",
+};
+const dateLabel = (value?: string | null) => {
+  if (!value) return "";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+};
+
+export const Route = createFileRoute("/katalog-buku/$bookId")({
+  head: () => ({ meta: [
+    { title: "Detail Buku — Griya Pustaka Mandiri" },
+    { name: "description", content: "Informasi bibliografi, abstrak, dan detail terbitan Griya Pustaka Mandiri." },
+  ] }),
+  component: BookDetailPage,
+});
+
+function BookDetailPage() {
+  const { bookId } = Route.useParams();
+  const [book, setBook] = useState<CmsBook | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [tab, setTab] = useState<Tab>("abstract");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError("");
+    fetch("/api/cms?action=public-book&id=" + encodeURIComponent(bookId))
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok || !data.item) throw new Error(data.error || "Buku tidak ditemukan.");
+        return data.item as CmsBook;
+      })
+      .then((item) => { if (active) setBook(item); })
+      .catch((reason) => { if (active) setError(reason instanceof Error ? reason.message : "Buku tidak dapat dimuat."); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [bookId]);
+
+  const citation = useMemo(() => book
+    ? book.author + ". (" + (book.publication_year || "t.t.") + "). " + book.title + ". " + (book.publisher || "PT Griya Pustaka Mandiri") + "."
+    : "", [book]);
+
+  async function copyText(value: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setError("Tidak dapat menyalin teks. Silakan salin secara manual.");
+    }
+  }
+
+  async function shareBook() {
+    if (!book) return;
+    try {
+      if (navigator.share) await navigator.share({ title: book.title, text: "Informasi buku dari PT Griya Pustaka Mandiri", url: window.location.href });
+      else await copyText(window.location.href);
+    } catch { /* Share dialog dismissed. */ }
+  }
+
+  if (loading) return <div className="shell flex min-h-[55vh] items-center justify-center text-sm text-muted-foreground">Memuat detail buku...</div>;
+  if (!book || error) return (
+    <section className="shell flex min-h-[55vh] flex-col items-start justify-center py-16">
+      <div role="alert" className="w-full rounded-xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">{error || "Buku tidak ditemukan."}</div>
+      <Link to="/katalog-buku" className="mt-6 inline-flex items-center gap-2 font-semibold text-blue-800"><ArrowLeft className="size-4" /> Kembali ke katalog</Link>
+    </section>
+  );
+
+  const tabs: { id: Tab; label: string; icon: typeof FileText }[] = [
+    { id: "abstract", label: "Abstrak", icon: FileText },
+    { id: "foreword", label: "Kata Pengantar", icon: BookMarked },
+    { id: "details", label: "Detail Buku", icon: Clipboard },
+  ];
+  const rows: [string, string | number | null | undefined][] = [
+    ["Kategori", book.category], ["Penerbit", book.publisher || "PT Griya Pustaka Mandiri"],
+    ["Tahun Terbit", book.publication_year], ["Tanggal Terbit", dateLabel(book.publication_date)],
+    ["Edisi", book.edition], ["ISBN", book.isbn], ["QRCBN", book.qrcbn],
+    ["Jumlah Halaman", book.page_count ? book.page_count + " halaman" : null],
+    ["Ukuran", book.book_size], ["Format", book.book_format], ["Bahasa", book.language],
+  ];
+
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="border-b border-blue-100 bg-gradient-to-r from-slate-50 to-blue-50/80">
+        <nav aria-label="Breadcrumb" className="shell flex flex-wrap items-center gap-2 py-3 text-sm text-slate-600">
+          <Link to="/" className="hover:text-blue-800">Beranda</Link><span>/</span>
+          <Link to="/katalog-buku" className="hover:text-blue-800">Katalog Buku</Link><span>/</span>
+          <span className="font-medium text-slate-900">{book.title}</span>
+        </nav>
+      </div>
+
+      <section className="shell grid items-start gap-7 py-7 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-9 lg:py-9">
+        <div className="min-w-0">
+          <div className="grid items-center gap-7 md:grid-cols-[minmax(220px,310px)_minmax(0,1fr)]">
+            <div className="flex min-h-[300px] items-center justify-center rounded-xl bg-gradient-to-br from-slate-50 to-blue-50 p-4">
+              {book.cover_url
+                ? <img src={book.cover_url} alt={"Sampul buku " + book.title} className="max-h-[440px] w-full object-contain drop-shadow-xl" />
+                : <div className="flex aspect-[3/4] w-full flex-col items-center justify-center rounded-lg bg-gradient-to-br from-[#10294f] to-[#1760a6] p-6 text-center text-white"><BookOpen className="size-12 text-sky-200" /><p className="mt-5 font-display text-xl font-bold">{book.title}</p><p className="mt-3 text-sm text-sky-100">{book.author}</p></div>}
+            </div>
+
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1.5 text-sm font-semibold text-blue-900"><BookOpen className="size-4" /> Buku</span>
+                <span className="rounded-full bg-emerald-100 px-3 py-1.5 text-sm font-semibold text-emerald-900">{STATUS[book.publication_status] || book.publication_status}</span>
+              </div>
+              <h1 className="mt-5 font-display text-3xl font-extrabold leading-tight text-[#10294f] sm:text-4xl">{book.title}</h1>
+              {book.publication_date && <p className="mt-5 flex items-center gap-2 text-base text-slate-700"><CalendarDays className="size-5 text-blue-800" /> {dateLabel(book.publication_date)}</p>}
+              <p className="mt-4 flex items-start gap-2 text-base leading-7 text-slate-700"><UserRound className="mt-1 size-5 shrink-0 text-blue-800" /> {book.author}</p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                {book.pdf_url && book.allow_pdf_download && <a href={book.pdf_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-[#123d78] px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#0d2c59]"><Download className="size-5" /> Download PDF</a>}
+                <button type="button" onClick={() => copyText(citation)} className="inline-flex items-center gap-2 rounded-lg border border-blue-200 px-5 py-3 text-sm font-bold text-[#10294f] hover:bg-blue-50"><span className="text-lg">❝</span> {copied ? "Tersalin" : "Cite This"}</button>
+                <button type="button" onClick={shareBook} className="inline-flex items-center gap-2 rounded-lg border border-blue-200 px-5 py-3 text-sm font-bold text-[#10294f] hover:bg-blue-50"><Share2 className="size-5" /> Share</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-9 border-b border-blue-200">
+            <div className="flex gap-3 overflow-x-auto">
+              {tabs.map((item) => {
+                const Icon = item.icon;
+                return <button key={item.id} type="button" onClick={() => setTab(item.id)} className={"inline-flex shrink-0 items-center gap-2 border-b-[3px] px-4 py-4 text-sm font-semibold transition-colors " + (tab === item.id ? "border-blue-600 text-blue-700" : "border-transparent text-slate-700 hover:text-blue-700")}><Icon className="size-5" />{item.label}</button>;
+              })}
+            </div>
+          </div>
+
+          <section className="min-h-[280px] py-7">
+            {tab === "abstract" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><FileText className="size-7 text-blue-700" /> Abstrak</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.abstract || book.synopsis || "Abstrak belum ditambahkan."}</div>{book.keywords && <p className="mt-5 text-sm text-slate-700"><strong>Kata kunci:</strong> {book.keywords}</p>}</>}
+            {tab === "foreword" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookMarked className="size-7 text-blue-700" /> Kata Pengantar</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.kata_pengantar || "Kata pengantar belum ditambahkan."}</div></>}
+            {tab === "details" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><Clipboard className="size-7 text-blue-700" /> Detail Buku</h2><dl className="mt-5 divide-y divide-slate-100 rounded-xl border border-blue-100 px-5">{rows.filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== "").map(([label, value]) => <div key={label} className="grid gap-1 py-3 sm:grid-cols-[160px_1fr]"><dt className="text-sm text-slate-600">{label}</dt><dd className="text-sm font-semibold text-slate-900">{value}</dd></div>)}</dl></>}
+          </section>
+        </div>
+
+        <aside className="space-y-4">
+          <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+            <h2 className="flex items-center gap-3 border-b border-blue-100 pb-4 font-display text-xl font-bold text-[#10294f]"><BookOpen className="size-6 text-blue-800" /> Informasi Bibliografi</h2>
+            <dl className="mt-2 divide-y divide-slate-100 text-sm">
+              {rows.filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== "").map(([label, value]) => <div key={label} className="grid grid-cols-[minmax(90px,115px)_10px_minmax(0,1fr)] gap-2 py-2.5"><dt className="font-semibold text-slate-800">{label}</dt><span>:</span><dd className="break-words text-slate-800">{value}</dd></div>)}
+            </dl>
+            {book.qrcbn && <div className="mt-4 rounded-xl bg-slate-100 p-4"><p className="font-display font-bold text-[#10294f]">Identitas QRCBN</p><p className="mt-1 break-all text-sm text-slate-700">{book.qrcbn}</p><p className="mt-2 text-xs text-slate-500">Gunakan kode ini untuk penelusuran identitas buku.</p></div>}
+          </section>
+
+          <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+            <div className="flex items-center justify-between gap-3"><h2 className="flex items-center gap-2 font-display text-lg font-bold text-[#10294f]"><Clipboard className="size-5 text-blue-800" /> Sitasi (APA 7th)</h2><button type="button" onClick={() => copyText(citation)} className="inline-flex items-center gap-2 rounded-lg border border-blue-200 px-3 py-2 text-xs font-bold text-[#10294f] hover:bg-blue-50">{copied ? <Check className="size-4" /> : <Clipboard className="size-4" />} Salin</button></div>
+            <p className="mt-3 rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-800">{citation}</p>
+          </section>
+        </aside>
+      </section>
+    </div>
+  );
 }
