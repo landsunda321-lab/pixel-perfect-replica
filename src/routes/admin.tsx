@@ -13,12 +13,12 @@ async function api(action:string,method="GET",body?:unknown) {
 type ImageUploadFieldProps = { label:string; kind:"cover"|"author"|"book-pdf"; value?:string; onChange:(url:string)=>void };
 function ImageUploadField({label,kind,value,onChange}:ImageUploadFieldProps) {
  const [busy,setBusy]=useState(false); const [progress,setProgress]=useState(0); const [uploadError,setUploadError]=useState("");
+ const isPdf=kind==="book-pdf";
  async function chooseFile(file?:File) {
   if(!file)return;
   setUploadError("");
-  const isPdf=kind==="book-pdf";
-  if(isPdf ? file.type!=="application/pdf" : !["image/jpeg","image/png","image/webp"].includes(file.type)){setUploadError(isPdf?"Format berkas harus PDF.":"Format harus JPG, JPEG, PNG, atau WebP.");return;}
-  if(file.size>(isPdf?50:5)*1024*1024){setUploadError(isPdf?"Ukuran PDF maksimal 50 MB.":"Ukuran gambar melebihi batas maksimal 5 MB.");return;}
+  if(isPdf ? file.type!=="application/pdf" : !["image/jpeg","image/png","image/webp"].includes(file.type)){setUploadError(isPdf?"Format berkas harus PDF.":"Format harus JPG, JPEG, atau WebP.");return;}
+  if(file.size>(isPdf?50:5)*1024*1024){setUploadError(isPdf?"Ukuran PDF maksimal 50 MB.":"Ukuran gambar maksimal 5 MB.");return;}
   setBusy(true);setProgress(0);
   try {
    const safeName=file.name.toLowerCase().replace(/[^a-z0-9._-]+/g,"-").slice(-90);
@@ -27,18 +27,17 @@ function ImageUploadField({label,kind,value,onChange}:ImageUploadFieldProps) {
     onUploadProgress:({percentage})=>setProgress(Math.round(percentage)),
    });
    onChange(blob.url);
-  } catch(e) {setUploadError(e instanceof Error?e.message:"Gagal mengunggah gambar.");}
+  } catch(e) {setUploadError(e instanceof Error?e.message:(isPdf?"Gagal mengunggah PDF.":"Gagal mengunggah gambar."));}
   finally {setBusy(false);}
  }
  return <div className="space-y-2 rounded-xl border border-slate-200 p-3">
-  <div className="flex items-center justify-between gap-2"><span className="text-sm font-semibold text-slate-800">{label}</span><span className="text-xs text-slate-500">Maks. 5 MB</span></div>
-  {value?<div className="flex items-center gap-3"><img src={value} alt={label} className={kind==="cover"?"h-36 w-24 rounded-lg border object-cover":kind==="author"?"size-20 rounded-full border object-cover":"h-16 w-16 rounded-lg border object-cover"}/><div className="min-w-0 flex-1"><p className="text-xs font-medium text-emerald-700">Gambar sudah diunggah</p><button type="button" onClick={()=>onChange("")} className="mt-2 text-xs font-semibold text-red-600 underline">Hapus pilihan gambar</button></div></div>:<div className="flex items-center gap-3"><div className={kind==="cover"?"flex h-28 w-20 items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-400":kind==="author"?"flex size-20 items-center justify-center rounded-full bg-slate-100 text-xs text-slate-400":"flex size-16 items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-400"}>Pratinjau</div><label className="cursor-pointer rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-900 hover:bg-blue-100">{busy?"Mengunggah...":"Pilih gambar"}<input type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} className="hidden" onChange={e=>{void chooseFile(e.target.files?.[0]);e.currentTarget.value="";}}/></label></div>}
+  <div className="flex items-center justify-between gap-2"><span className="text-sm font-semibold text-slate-800">{label}</span><span className="text-xs text-slate-500">Maks. {isPdf?"50":"5"} MB</span></div>
+  {value?<div className="flex items-center gap-3">{isPdf?<div className="flex h-16 w-16 items-center justify-center rounded-lg border bg-red-50 text-sm font-bold text-red-700">PDF</div>:<img src={value} alt={label} className={kind==="cover"?"h-36 w-24 rounded-lg border object-cover":"size-20 rounded-full border object-cover"}/>}<div className="min-w-0 flex-1"><p className="break-all text-xs font-medium text-emerald-700">{isPdf?"File PDF sudah diunggah":"Gambar sudah diunggah"}</p><a href={value} target="_blank" rel="noreferrer" className="mt-1 block text-xs text-blue-700 underline">{isPdf?"Buka PDF":"Lihat gambar"}</a><button type="button" onClick={()=>onChange("")} className="mt-2 text-xs font-semibold text-red-600 underline">Hapus pilihan {isPdf?"PDF":"gambar"}</button></div></div>:<div className="flex items-center gap-3"><div className={isPdf?"flex h-16 w-16 items-center justify-center rounded-lg bg-red-50 text-sm font-bold text-red-700":kind==="cover"?"flex h-28 w-20 items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-400":"flex size-20 items-center justify-center rounded-full bg-slate-100 text-xs text-slate-400"}>{isPdf?"PDF":"Pratinjau"}</div><label className="cursor-pointer rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-900 hover:bg-blue-100">{busy?"Mengunggah...":isPdf?"Pilih file PDF":"Pilih gambar"}<input type="file" accept={isPdf?"application/pdf": "image/jpeg,image/png,image/webp"} disabled={busy} className="hidden" onChange={e=>{void chooseFile(e.target.files?.[0]);e.currentTarget.value="";}}/></label></div>}
   {busy&&<div><div className="h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-blue-700 transition-all" style={{width:progress+"%"}}/></div><p className="mt-1 text-right text-xs text-slate-500">{progress}%</p></div>}
   {uploadError&&<p role="alert" className="text-xs text-red-700">{uploadError}</p>}
-  <p className="text-xs leading-5 text-slate-500">{kind==="book-pdf"?"Format PDF, maksimal 50 MB. Pilih berkas dari perangkat.":"Format JPG, JPEG, PNG, atau WebP. Pilih gambar langsung dari perangkat, tanpa memasukkan URL."}</p>
+  <p className="text-xs leading-5 text-slate-500">{isPdf?"Format PDF saja, maksimal 50 MB. Pilih dokumen PDF dari perangkat.":"Format JPG, JPEG, atau WebP. Pilih gambar langsung dari perangkat."}</p>
  </div>;
 }
-
 function AdminPage() {
  const [me,setMe]=useState<CmsUser|null>(null); const [users,setUsers]=useState<CmsUser[]>([]);
  const [books,setBooks]=useState<Item[]>([]); const [authors,setAuthors]=useState<Item[]>([]); const [manuscripts,setManuscripts]=useState<Item[]>([]);
