@@ -23,15 +23,15 @@ export function BookCard({ book }: { book: Book }) {
         className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         aria-label={`Lihat detail buku ${book.title}`}
       >
-        <div className="relative aspect-[3/4] w-full overflow-hidden bg-navy-deep">
+        <div className="relative aspect-[3/2] w-full overflow-hidden bg-navy-deep">
           {book.coverImage ? (
             <img
               src={book.coverImage}
               alt={`Sampul buku ${book.title}`}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain bg-gradient-to-br from-slate-100 to-blue-100 p-3"
               loading="lazy"
-              width={600}
-              height={800}
+              width={1536}
+              height={1024}
             />
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-navy-deep to-navy px-6 text-center">

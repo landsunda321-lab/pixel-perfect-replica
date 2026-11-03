@@ -80,7 +80,7 @@ function HomePage() {
           <div className="relative mx-auto hidden w-full max-w-[470px] lg:block">
             <div className="absolute -inset-5 rounded-[2.5rem] border border-white/15 rotate-3" />
             <div className="relative overflow-hidden rounded-[2rem] border border-white/20 bg-white/10 p-3 shadow-2xl shadow-black/30 backdrop-blur">
-              <img src={heroBooks} alt="Tumpukan buku sebagai representasi karya penerbitan" className="aspect-[4/5] w-full rounded-[1.4rem] object-cover" />
+              <img src={heroBooks} alt="Tumpukan buku sebagai representasi karya penerbitan" className="aspect-[3/2] w-full rounded-[1.4rem] object-cover" />
               <div className="absolute bottom-7 left-7 right-7 rounded-2xl border border-white/20 bg-[#0c1e3a]/80 p-5 backdrop-blur-xl">
                 <p className="text-[10px] font-bold uppercase tracking-[.22em] text-sky-200">Our publishing philosophy</p>
                 <p className="mt-2 font-display text-xl font-bold leading-snug text-white">Menerbitkan Gagasan,<br />Mengembangkan Pengetahuan.</p>
@@ -126,8 +126,8 @@ function HomePage() {
               const label = STATUS_LABELS[book.publication_status] || book.publication_status;
               const isPublished = book.publication_status === "terbit" || book.publication_status === "isbn_terbit";
               return <article key={book.id} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-                <div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden bg-gradient-to-br from-slate-100 to-blue-100">
-                  {book.cover_url ? <img src={book.cover_url} alt={`Sampul buku ${book.title}`} loading="lazy" className="h-full w-full object-contain p-3 transition-transform duration-500 group-hover:scale-[1.03]" /> : <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center text-[#17396c]"><BookOpen className="size-10 opacity-60" /><span className="mt-4 font-display text-lg font-bold">{book.title}</span></div>}
+                <div className="relative flex aspect-[3/2] w-full items-center justify-center overflow-hidden bg-gradient-to-br from-slate-100 to-blue-100">
+                  {book.cover_url ? <img src={book.cover_url} alt={`Sampul buku ${book.title}`} loading="lazy" className="h-full w-full object-contain p-3 transition-transform duration-500 group-hover:scale-[1.03]" width={1536} height={1024} /> : <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center text-[#17396c]"><BookOpen className="size-10 opacity-60" /><span className="mt-4 font-display text-lg font-bold">{book.title}</span></div>}
                   <span className={`absolute left-3 top-3 rounded-full px-3 py-1.5 text-[11px] font-bold shadow-sm ${isPublished ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900"}`}>{label}</span>
                 </div>
                 <div className="p-5"><p className="text-[11px] font-bold uppercase tracking-wider text-blue-700">{book.category || "Karya pilihan"}</p><h3 className="mt-2 line-clamp-2 font-display text-base font-bold leading-snug text-[#172e52]">{book.title}</h3><p className="mt-2 line-clamp-1 text-sm text-slate-500">{book.author}</p>{book.isbn && <p className="mt-3 text-xs text-slate-500">ISBN: {book.isbn}</p>}</div>
