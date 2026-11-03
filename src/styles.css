@@ -1,0 +1,211 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system — Griya Pustaka Mandiri
+ * Gaya: futuristic editorial publishing house (premium, elegan, minimalis).
+ * Semua warna memakai oklch dan didefinisikan di sini, bukan di komponen.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Warna merek */
+  --color-navy: var(--navy);
+  --color-navy-deep: var(--navy-deep);
+  --color-sky: var(--sky);
+  --color-azure: var(--azure);
+  --color-mist: var(--mist);
+  --color-ink: var(--ink);
+
+  --font-display: "Montserrat", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-soft: 0 16px 40px -20px oklch(0.26 0.067 260.6 / 0.28);
+  --shadow-card: 0 10px 30px -18px oklch(0.26 0.067 260.6 / 0.22);
+
+  --animate-fade-up: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-in: fade-in 0.9s ease-out both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Palet merek */
+  --paper: oklch(1 0 0);
+  --navy: oklch(0.26 0.067 260.6);
+  --navy-deep: oklch(0.194 0.043 262.9);
+  --sky: oklch(0.874 0.064 252.2);
+  --azure: oklch(0.627 0.162 257.7);
+  --mist: oklch(0.975 0.005 258.3);
+  --ink: oklch(0.249 0.03 256.9);
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--ink);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--ink);
+  --primary: var(--navy);
+  --primary-foreground: oklch(0.984 0.003 247.858);
+  --secondary: var(--mist);
+  --secondary-foreground: var(--navy);
+  --muted: var(--mist);
+  --muted-foreground: oklch(0.52 0.03 257);
+  --accent: oklch(0.945 0.028 252);
+  --accent-foreground: var(--navy);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.912 0.012 255);
+  --input: oklch(0.912 0.012 255);
+  --ring: var(--azure);
+}
+
+.dark {
+  --background: oklch(0.194 0.043 262.9);
+  --foreground: oklch(0.955 0.012 250);
+  --card: oklch(0.24 0.055 261);
+  --card-foreground: oklch(0.955 0.012 250);
+  --popover: oklch(0.24 0.055 261);
+  --popover-foreground: oklch(0.955 0.012 250);
+  --primary: oklch(0.874 0.064 252.2);
+  --primary-foreground: oklch(0.194 0.043 262.9);
+  --secondary: oklch(0.29 0.05 260);
+  --secondary-foreground: oklch(0.955 0.012 250);
+  --muted: oklch(0.29 0.05 260);
+  --muted-foreground: oklch(0.7 0.045 255);
+  --accent: oklch(0.29 0.05 260);
+  --accent-foreground: oklch(0.955 0.012 250);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.627 0.162 257.7);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: var(--color-sky);
+    color: var(--color-navy-deep);
+  }
+}
+
+/* Kontainer halaman yang konsisten */
+@utility shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
+  padding-inline: 1.25rem;
+
+  @media (min-width: 640px) {
+    padding-inline: 2rem;
+  }
+  @media (min-width: 1024px) {
+    padding-inline: 2.5rem;
+  }
+}
+
+
+/* Editorial refresh — refined surfaces, rhythm, focus and motion */
+:root {
+  --radius: 1rem;
+  --mist: oklch(0.965 0.012 248);
+  --navy: oklch(0.235 0.075 260);
+  --navy-deep: oklch(0.16 0.055 260);
+  --azure: oklch(0.59 0.18 252);
+}
+body { background: #fbfcff; }
+::selection { background: #c8ddff; color: #102449; }
+a, button { -webkit-tap-highlight-color: transparent; }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 3px solid #8db8ff; outline-offset: 3px;
+}
+.shell { max-width: 80rem; }
+section { scroll-margin-top: 6rem; }
+main h1 { letter-spacing: -0.045em; }
+main h2 { letter-spacing: -0.035em; }
+main p { text-wrap: pretty; }
+main .rounded-2xl.border, main .rounded-3xl.border {
+  transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+}
+main .rounded-2xl.border:hover, main .rounded-3xl.border:hover {
+  border-color: #c5d7f4;
+  box-shadow: 0 18px 48px -28px rgba(20, 49, 91, .28);
+}
+@media (prefers-reduced-motion: no-preference) {
+  main section { animation: section-enter .55s ease both; }
+  @keyframes section-enter { from { opacity: .82; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+}

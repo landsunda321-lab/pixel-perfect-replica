@@ -1,0 +1,24 @@
+# Roadmap — Website Resmi PT Griya Pustaka Mandiri
+
+- [x] Audit proyek & aktifkan Lovable Cloud (database + penyimpanan pesan kontak)
+- [x] Design system (palet navy editorial, Montserrat + Inter) dan navigasi sticky/hamburger
+- [x] Halaman Beranda, Tentang Penerbit, Katalog Buku, Detail Buku, Akses & Distribusi, Kontak
+- [x] Halaman Kebijakan Privasi dan Kebijakan Hak Cipta (tautan footer)
+- [x] Data katalog lokal (src/data/books.ts) — kosong, tanpa buku fiktif
+- [x] Formulir kontak tersimpan ke database via /api/public/kontak (validasi server + honeypot)
+- [x] SEO metadata per halaman, aksesibilitas, responsif
+- [x] Tes rute dan aturan katalog (ISBN, status, empty state)
+- [x] Audit & perbaikan kesiapan pendaftaran akun ISBN Perpusnas (Perpusnas 11/2025 Pasal 5)
+- [x] Konfigurasi identitas terpusat di src/data/site.ts: nama resmi, bentuk badan usaha, KBLI 58110, alamat/email/telepon (null sampai data resmi ada)
+- [x] Konfigurasi domain griyapustakamandiri.my.id (site.domain + flag `verified`) — DNS saat ini belum memiliki rekaman, jadi label "domain yang direncanakan" tetap tampil
+- [x] Tag canonical per halaman, otomatis aktif hanya setelah `domain.verified = true`
+- [x] Panduan pengisian data (katalog, identitas, domain, formulir) di src/data/README.md
+- [x] Aturan katalog diperketat: slug unik, tautan akses wajib HTTPS, nama penerbit konsisten, cover boleh path aset lokal
+- [x] Halaman Akses & Distribusi menyaring judul berstatus "Tidak tersedia" agar tidak mengklaim ketersediaan keliru
+- [x] Formulir kontak melaporkan keadaan sebenarnya: sukses hanya jika pesan tersimpan; layanan belum terkonfigurasi → pesan 503 + penjelasan jujur (tanpa klaim sukses palsu); honeypot diabaikan tanpa menyimpan
+- [x] Pengujian 7 halaman via URL langsung, navigasi, formulir, 404, responsif Android (390px) & desktop (1440px): tanpa overflow horizontal, tanpa gambar rusak, tanpa error JavaScript
+- [ ] Isi data kontak resmi (alamat, email, telepon) dari dokumen legalitas — menunggu data dari pemilik
+- [ ] Tambah data buku nyata ke src/data/books.ts setelah publikasi pertama (lihat src/data/README.md)
+- [ ] Sediakan SUPABASE_SERVICE_ROLE_KEY di lingkungan server agar formulir kontak benar-benar menyimpan pesan (saat ini tabel contact_messages sudah ada, tetapi kunci layanan belum terpasang)
+- [ ] Daftarkan/arahkan DNS griyapustakamandiri.my.id, verifikasi HTTPS, lalu ubah `site.domain.verified = true`
+- [ ] Pemeriksaan manual kesesuaian persyaratan website penerbit untuk pendaftaran akun ISBN Perpusnas
