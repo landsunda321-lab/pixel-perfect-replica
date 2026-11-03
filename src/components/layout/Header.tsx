@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ArrowUpRight, BookOpenText, Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { site } from "@/data/site";
 
@@ -24,13 +24,14 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/90 shadow-[0_4px_24px_-20px_rgba(15,35,70,.3)] backdrop-blur-xl">
       <div className="shell flex min-h-[76px] items-center justify-between gap-5">
         <Link to="/" className="group flex min-w-0 items-center gap-3" aria-label={`${site.brandName} — beranda`}>
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#17396c] to-[#0b1d3b] text-white shadow-lg shadow-blue-950/15 transition-transform group-hover:-rotate-3">
-            <BookOpenText className="size-5" />
-          </span>
-          <span className="min-w-0">
-            <span className="block truncate font-display text-[13px] font-extrabold tracking-[.13em] text-[#142c52] sm:text-sm">GRIYA PUSTAKA</span>
-            <span className="mt-0.5 block text-[10px] font-semibold tracking-[.28em] text-slate-500">MANDIRI · PUBLISHING</span>
-          </span>
+          <img
+            src="/gpm-logo.webp"
+            alt="Griya Pustaka Mandiri — Penerbitan, Publikasi, Edukasi"
+            className="h-11 w-auto max-w-[190px] shrink-0 object-contain sm:h-12 sm:max-w-[220px]"
+            width="220"
+            height="73"
+            fetchPriority="high"
+          />
         </Link>
 
         <nav aria-label="Navigasi utama" className="hidden items-center gap-1 lg:flex">
