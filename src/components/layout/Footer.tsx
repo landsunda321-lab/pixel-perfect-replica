@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, BookOpenText, Mail, MapPin, Phone } from "lucide-react";
+import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import { businessFieldLabel, site } from "@/data/site";
 
 const LINKS = [
@@ -19,10 +19,16 @@ export function Footer() {
       <div className="pointer-events-none absolute -right-32 -top-40 size-[28rem] rounded-full bg-blue-500/10 blur-3xl" />
       <div className="shell relative grid gap-12 py-16 md:grid-cols-2 lg:grid-cols-[1.3fr_.8fr_1.1fr] lg:py-20">
         <div>
-          <div className="flex items-center gap-3">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15"><BookOpenText className="size-6 text-sky-200" /></span>
-            <div><p className="font-display text-sm font-extrabold tracking-[.13em]">GRIYA PUSTAKA MANDIRI</p><p className="mt-1 text-[10px] tracking-[.25em] text-slate-400">PUBLISHING HOUSE</p></div>
-          </div>
+          <Link to="/" aria-label="Griya Pustaka Mandiri — Beranda" className="inline-flex max-w-full items-center rounded-xl bg-white p-2.5 shadow-lg shadow-black/10 transition-transform hover:-translate-y-0.5">
+            <img
+              src="/gpm-logo.webp"
+              alt="Griya Pustaka Mandiri — Penerbitan, Publikasi, Edukasi"
+              className="h-auto w-[min(100%,280px)] object-contain"
+              width="280"
+              height="94"
+              loading="lazy"
+            />
+          </Link>
           <p className="mt-6 max-w-md text-sm leading-7 text-slate-300">{site.shortSummary}</p>
           <p className="mt-5 text-sm font-medium italic text-sky-200">“{site.tagline}”</p>
         </div>
