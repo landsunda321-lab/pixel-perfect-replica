@@ -88,6 +88,13 @@ export async function handleCmsRequest(request: Request) {
         FROM public.gpm_cms_books WHERE show_public=true AND publication_status <> 'arsip' ORDER BY created_at DESC`;
       return json({ ok: true, items: rows });
     }
+    if (request.method === "GET" && action === "public-book") {
+      const id = text(url.searchParams.get("id"), 80);
+      if (!id) return json({ok:false,error:"Buku tidak ditemukan."},404);
+      const rows = await db()`SELECT id,title,author,category,synopsis,cover_url,isbn,qrcbn,publication_status
+        FROM public.gpm_cms_books WHERE id::text=${id} AND show_public=true AND publication_status <> 'arsip' LIMIT 1`;
+      return rows.length ? json({ok:true,item:rows[0]}) : json({ok:false,error:"Buku tidak ditemukan."},404);
+    }
     if (request.method === "GET" && action === "public-authors") {
       const rows = await db()`SELECT id,slug,name,biography,expertise,photo_url,is_demo FROM public.gpm_cms_authors WHERE show_public=true AND is_demo=false ORDER BY name`;
       return json({ ok: true, items: rows });
