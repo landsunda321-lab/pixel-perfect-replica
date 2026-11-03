@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, BookOpen, CalendarDays, Check, Clipboard, Download, FileText, Share2, UserRound, BookMarked } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { site } from "@/data/site";
 
 type CmsBook = {
   id: string; title: string; author: string; category: string; synopsis?: string; abstract?: string;
@@ -8,7 +9,9 @@ type CmsBook = {
   publication_status: string; publisher?: string; publication_year?: number | null;
   publication_date?: string | null; edition?: string; page_count?: number | null;
   book_size?: string; book_format?: string; language?: string; pdf_url?: string;
-  allow_pdf_download?: boolean;
+  allow_pdf_download?: boolean; print_available?: boolean; print_price?: number | null;
+  digital_available?: boolean; digital_access_type?: "paid" | "free" | "none"; digital_price?: number | null;
+  open_access?: boolean; order_url?: string | null; digital_access_url?: string | null;
 };
 type Tab = "abstract" | "foreword" | "details";
 const STATUS: Record<string, string> = {
@@ -179,6 +182,17 @@ function BookDetailPage() {
               {rows.filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== "").map(([label, value]) => <div key={label} className="grid grid-cols-[minmax(90px,115px)_10px_minmax(0,1fr)] gap-2 py-2.5"><dt className="font-semibold text-slate-800">{label}</dt><span>:</span><dd className="break-words text-slate-800">{value}</dd></div>)}
             </dl>
             {book.qrcbn && <div className="mt-4 rounded-xl bg-slate-100 p-4"><p className="font-display font-bold text-[#10294f]">Identitas QRCBN</p><p className="mt-1 break-all text-sm text-slate-700">{book.qrcbn}</p><p className="mt-2 text-xs text-slate-500">Gunakan kode ini untuk penelusuran identitas buku.</p></div>}
+          </section>
+
+          <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+            <h2 className="font-display text-lg font-bold text-[#10294f]">Ketersediaan dan Cara Memperoleh</h2>
+            <div className="mt-4 space-y-4 text-sm">
+              {book.print_available && <div><p className="font-semibold text-slate-900">Buku cetak</p><p className="mt-1 text-slate-600">{book.print_price != null ? "Harga: Rp " + Number(book.print_price).toLocaleString("id-ID") : "Harga dan ketersediaan dikonfirmasi saat pemesanan."}</p>{book.order_url ? <a href={book.order_url} target="_blank" rel="noreferrer" className="mt-2 inline-flex rounded-lg bg-[#123d78] px-4 py-2.5 font-bold text-white">Pesan buku cetak</a> : <a href={site.contact.phone ? "https://wa.me/62" + site.contact.phone.replace(/^0/,"").replace(/\\D/g,"") + "?text=" + encodeURIComponent("Halo Griya Pustaka Mandiri, saya ingin memesan buku: " + book.title) : "mailto:" + site.contact.email} target="_blank" rel="noreferrer" className="mt-2 inline-flex rounded-lg bg-[#123d78] px-4 py-2.5 font-bold text-white">Hubungi penerbit untuk memesan</a>}</div>}
+              {book.digital_available && book.digital_access_type === "paid" && <div><p className="font-semibold text-slate-900">Buku digital berbayar</p><p className="mt-1 text-slate-600">{book.digital_price != null ? "Harga: Rp " + Number(book.digital_price).toLocaleString("id-ID") : "Harga dikonfirmasi melalui penerbit."}</p>{book.digital_access_url ? <a href={book.digital_access_url} target="_blank" rel="noreferrer" className="mt-2 inline-flex rounded-lg border border-blue-200 px-4 py-2.5 font-bold text-[#123d78]">Akses pembelian digital</a> : <a href={site.contact.phone ? "https://wa.me/62" + site.contact.phone.replace(/^0/,"").replace(/\\D/g,"") + "?text=" + encodeURIComponent("Halo Griya Pustaka Mandiri, saya ingin memperoleh versi digital buku: " + book.title) : "mailto:" + site.contact.email} target="_blank" rel="noreferrer" className="mt-2 inline-flex rounded-lg border border-blue-200 px-4 py-2.5 font-bold text-[#123d78]">Tanyakan akses digital</a>}</div>}
+              {book.digital_available && book.digital_access_type === "free" && <div><p className="font-semibold text-slate-900">Buku digital gratis</p>{book.digital_access_url ? <a href={book.digital_access_url} target="_blank" rel="noreferrer" className="mt-2 inline-flex rounded-lg border border-blue-200 px-4 py-2.5 font-bold text-[#123d78]">Baca / akses buku digital</a> : book.pdf_url && book.allow_pdf_download ? <a href={book.pdf_url} target="_blank" rel="noreferrer" className="mt-2 inline-flex rounded-lg border border-blue-200 px-4 py-2.5 font-bold text-[#123d78]">Baca / unduh PDF</a> : <p className="mt-1 text-slate-600">Tautan akses belum tersedia. Silakan hubungi penerbit.</p>}</div>}
+              {book.open_access && book.pdf_url && book.allow_pdf_download && <div className="rounded-xl bg-emerald-50 p-3"><p className="font-semibold text-emerald-900">Open Access — naskah lengkap</p><p className="mt-1 text-emerald-800">Buku ini dapat diakses publik tanpa biaya.</p><a href={book.pdf_url} target="_blank" rel="noreferrer" className="mt-2 inline-flex rounded-lg bg-emerald-700 px-4 py-2.5 font-bold text-white"><Download className="mr-2 size-4"/>Unduh PDF lengkap</a></div>}
+              {!book.print_available && !book.digital_available && !book.open_access && <p className="text-slate-600">Informasi distribusi belum dikonfirmasi untuk judul ini. Hubungi penerbit untuk menanyakan ketersediaan.</p>}
+            </div>
           </section>
 
           <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
