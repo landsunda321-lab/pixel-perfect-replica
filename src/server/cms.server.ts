@@ -92,7 +92,7 @@ export async function handleCmsRequest(request: Request) {
       const id = text(url.searchParams.get("id"), 80);
       if (!id) return json({ok:false,error:"Buku tidak ditemukan."},404);
       const rows = await db()`SELECT id,title,author,category,synopsis,abstract,keywords,kata_pengantar,cover_url,isbn,qrcbn,publication_status,
-        publisher,publication_year,publication_date,edition,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,
+        publisher,publication_year,publication_date,edition,page_count,book_size,book_format,language,pdf_url,allow_pdf_download
         FROM public.gpm_cms_books WHERE id::text=${id} AND show_public=true AND publication_status <> 'arsip' LIMIT 1`;
       return rows.length ? json({ok:true,item:rows[0]}) : json({ok:false,error:"Buku tidak ditemukan."},404);
     }
