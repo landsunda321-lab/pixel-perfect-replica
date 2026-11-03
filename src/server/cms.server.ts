@@ -84,7 +84,7 @@ export async function handleCmsRequest(request: Request) {
   const action = url.searchParams.get("action") || "";
   try {
     if (request.method === "GET" && action === "public-books") {
-      const rows = await db()`SELECT id,title,subtitle,author,category,synopsis,cover_url,isbn,publication_status,is_demo
+      const rows = await db()`SELECT id,title,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo
         FROM public.gpm_cms_books WHERE show_public=true AND publication_status <> 'arsip' ORDER BY created_at DESC`;
       return json({ ok: true, items: rows });
     }
@@ -169,8 +169,8 @@ export async function handleCmsRequest(request: Request) {
       const b=await readBody(request), title=text(b.title,300), author=text(b.author,200);
       if (!title || !author) return json({ok:false,error:"Judul dan penulis wajib diisi."},400);
       const status=text(b.publication_status,30) || "persiapan";
-      const rows=await db()`INSERT INTO public.gpm_cms_books(title,subtitle,author,category,synopsis,cover_url,isbn,publication_status,is_demo,show_public,created_by)
-        VALUES (${title},${text(b.subtitle,300)},${author},${text(b.category,120)||"Umum"},${text(b.synopsis,10000)},${text(b.cover_url,2000)},${text(b.isbn,30)},${status},${b.is_demo===true},${b.show_public===true},${user!.id}) RETURNING *`;
+      const rows=await db()`INSERT INTO public.gpm_cms_books(title,subtitle,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,show_public,created_by)
+        VALUES (${title},'',${author},${text(b.category,120)||"Umum"},${text(b.synopsis,10000)},${text(b.cover_url,2000)},${text(b.isbn,30)},${text(b.qrcbn,60)},${status},${b.is_demo===true},${b.show_public===true},${user!.id}) RETURNING *`;
       await audit(user!.id,"create_book","book",String(rows[0].id),title);
       return json({ok:true,item:rows[0]},201);
     }
@@ -178,9 +178,9 @@ export async function handleCmsRequest(request: Request) {
       requireRole(user,["admin","editor"]);
       const b=await readBody(request), id=text(b.id,80), title=text(b.title,300), author=text(b.author,200);
       if (!id || !title || !author) return json({ok:false,error:"Data buku tidak lengkap."},400);
-      const rows=await db()`UPDATE public.gpm_cms_books SET title=${title},subtitle=${text(b.subtitle,300)},author=${author},
+      const rows=await db()`UPDATE public.gpm_cms_books SET title=${title},subtitle='',author=${author},
         category=${text(b.category,120)||"Umum"},synopsis=${text(b.synopsis,10000)},cover_url=${text(b.cover_url,2000)},
-        isbn=${text(b.isbn,30)},publication_status=${text(b.publication_status,30)},is_demo=${b.is_demo===true},
+        isbn=${text(b.isbn,30)},qrcbn=${text(b.qrcbn,60)},publication_status=${text(b.publication_status,30)},is_demo=${b.is_demo===true},
         show_public=${b.show_public===true},updated_at=now() WHERE id=${id} RETURNING *`;
       if (!rows.length) return json({ok:false,error:"Buku tidak ditemukan."},404);
       await audit(user!.id,"update_book","book",id,title);
