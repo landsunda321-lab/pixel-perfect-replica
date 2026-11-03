@@ -33,6 +33,7 @@ function BookDetailPage() {
   const { bookId } = Route.useParams();
   const [book, setBook] = useState<CmsBook | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState("");
   const [tab, setTab] = useState<Tab>("abstract");
   const [copied, setCopied] = useState(false);
@@ -41,13 +42,19 @@ function BookDetailPage() {
     let active = true;
     setLoading(true);
     setError("");
+    setNotFound(false);
+    setBook(null);
     fetch("/api/cms?action=public-book&id=" + encodeURIComponent(bookId))
       .then(async (response) => {
-        const data = await response.json();
-        if (!response.ok || !data.item) throw new Error(data.error || "Buku tidak ditemukan.");
-        return data.item as CmsBook;
+        const data = await response.json().catch(() => ({})) as { item?: CmsBook; error?: string };
+        if (response.status === 404) {
+          if (active) setNotFound(true);
+          return null;
+        }
+        if (!response.ok || !data.item) throw new Error(data.error || "Buku tidak dapat dimuat.");
+        return data.item;
       })
-      .then((item) => { if (active) setBook(item); })
+      .then((item) => { if (active && item) setBook(item); })
       .catch((reason) => { if (active) setError(reason instanceof Error ? reason.message : "Buku tidak dapat dimuat."); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
@@ -76,9 +83,27 @@ function BookDetailPage() {
   }
 
   if (loading) return <div className="shell flex min-h-[55vh] items-center justify-center text-sm text-muted-foreground">Memuat detail buku...</div>;
+
+  if (notFound) return (
+    <section className="shell flex min-h-[60vh] items-center justify-center py-20">
+      <div className="max-w-lg text-center">
+        <p className="font-display text-7xl font-extrabold text-[#10294f]">404</p>
+        <h1 className="mt-4 font-display text-2xl font-bold text-[#10294f]">Buku tidak ditemukan</h1>
+        <p className="mt-3 text-base leading-7 text-slate-600">
+          Buku dengan ID <span className="break-all font-medium text-slate-800">{bookId}</span> tidak
+          tersedia di katalog kami atau belum dipublikasikan.
+        </p>
+        <div className="mt-7 flex flex-wrap justify-center gap-3">
+          <Link to="/katalog-buku" className="inline-flex items-center gap-2 rounded-lg bg-[#123d78] px-5 py-3 text-sm font-bold text-white hover:bg-[#0d2c59]"><ArrowLeft className="size-4" /> Kembali ke Katalog</Link>
+          <Link to="/" className="inline-flex items-center gap-2 rounded-lg border border-blue-200 px-5 py-3 text-sm font-bold text-[#10294f] hover:bg-blue-50">Ke Beranda</Link>
+        </div>
+      </div>
+    </section>
+  );
+
   if (!book || error) return (
     <section className="shell flex min-h-[55vh] flex-col items-start justify-center py-16">
-      <div role="alert" className="w-full rounded-xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">{error || "Buku tidak ditemukan."}</div>
+      <div role="alert" className="w-full rounded-xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">{error || "Buku tidak dapat dimuat. Silakan coba beberapa saat lagi."}</div>
       <Link to="/katalog-buku" className="mt-6 inline-flex items-center gap-2 font-semibold text-blue-800"><ArrowLeft className="size-4" /> Kembali ke katalog</Link>
     </section>
   );

@@ -10,14 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AjukanNaskahRouteImport } from './routes/ajukan-naskah'
 import { Route as AksesDistribusiRouteImport } from './routes/akses-distribusi'
-import { Route as KatalogBukuRouteImport } from './routes/katalog-buku'
-import { Route as KatalogBukuBookIdRouteImport } from './routes/katalog-buku.$bookId'
+import { Route as AktivasiAdminRouteImport } from './routes/aktivasi-admin'
+import { Route as JurnalRouteImport } from './routes/jurnal'
 import { Route as KebijakanHakCiptaRouteImport } from './routes/kebijakan-hak-cipta'
 import { Route as KebijakanPrivasiRouteImport } from './routes/kebijakan-privasi'
 import { Route as KontakRouteImport } from './routes/kontak'
+import { Route as LayananPenerbitanRouteImport } from './routes/layanan-penerbitan'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as PenulisRouteImport } from './routes/penulis'
 import { Route as TentangPenerbitRouteImport } from './routes/tentang-penerbit'
+import { Route as ApiCmsRouteImport } from './routes/api/cms'
+import { Route as ApiCmsUploadRouteImport } from './routes/api/cms-upload'
 import { Route as BukuSlugRouteImport } from './routes/buku.$slug'
+import { Route as KatalogBukuIndexRouteImport } from './routes/katalog-buku/index'
+import { Route as KatalogBukuBookIdRouteImport } from './routes/katalog-buku/$bookId'
 import { Route as ApiPublicKontakRouteImport } from './routes/api/public/kontak'
 
 const IndexRoute = IndexRouteImport.update({
@@ -25,19 +34,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AjukanNaskahRoute = AjukanNaskahRouteImport.update({
+  id: '/ajukan-naskah',
+  path: '/ajukan-naskah',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AksesDistribusiRoute = AksesDistribusiRouteImport.update({
   id: '/akses-distribusi',
   path: '/akses-distribusi',
   getParentRoute: () => rootRouteImport,
 } as any)
-const KatalogBukuRoute = KatalogBukuRouteImport.update({
-  id: '/katalog-buku',
-  path: '/katalog-buku',
+const AktivasiAdminRoute = AktivasiAdminRouteImport.update({
+  id: '/aktivasi-admin',
+  path: '/aktivasi-admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const KatalogBukuBookIdRoute = KatalogBukuBookIdRouteImport.update({
-  id: '/katalog-buku/$bookId',
-  path: '/katalog-buku/$bookId',
+const JurnalRoute = JurnalRouteImport.update({
+  id: '/jurnal',
+  path: '/jurnal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KebijakanHakCiptaRoute = KebijakanHakCiptaRouteImport.update({
@@ -55,14 +74,49 @@ const KontakRoute = KontakRouteImport.update({
   path: '/kontak',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LayananPenerbitanRoute = LayananPenerbitanRouteImport.update({
+  id: '/layanan-penerbitan',
+  path: '/layanan-penerbitan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PenulisRoute = PenulisRouteImport.update({
+  id: '/penulis',
+  path: '/penulis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TentangPenerbitRoute = TentangPenerbitRouteImport.update({
   id: '/tentang-penerbit',
   path: '/tentang-penerbit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCmsRoute = ApiCmsRouteImport.update({
+  id: '/api/cms',
+  path: '/api/cms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCmsUploadRoute = ApiCmsUploadRouteImport.update({
+  id: '/api/cms-upload',
+  path: '/api/cms-upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BukuSlugRoute = BukuSlugRouteImport.update({
   id: '/buku/$slug',
   path: '/buku/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KatalogBukuIndexRoute = KatalogBukuIndexRouteImport.update({
+  id: '/katalog-buku/',
+  path: '/katalog-buku/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KatalogBukuBookIdRoute = KatalogBukuBookIdRouteImport.update({
+  id: '/katalog-buku/$bookId',
+  path: '/katalog-buku/$bookId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicKontakRoute = ApiPublicKontakRouteImport.update({
@@ -73,90 +127,153 @@ const ApiPublicKontakRoute = ApiPublicKontakRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/ajukan-naskah': typeof AjukanNaskahRoute
   '/akses-distribusi': typeof AksesDistribusiRoute
-  '/katalog-buku': typeof KatalogBukuRoute
-  '/katalog-buku/$bookId': typeof KatalogBukuBookIdRoute
+  '/aktivasi-admin': typeof AktivasiAdminRoute
+  '/jurnal': typeof JurnalRoute
   '/kebijakan-hak-cipta': typeof KebijakanHakCiptaRoute
   '/kebijakan-privasi': typeof KebijakanPrivasiRoute
   '/kontak': typeof KontakRoute
+  '/layanan-penerbitan': typeof LayananPenerbitanRoute
+  '/login': typeof LoginRoute
+  '/penulis': typeof PenulisRoute
   '/tentang-penerbit': typeof TentangPenerbitRoute
+  '/api/cms': typeof ApiCmsRoute
+  '/api/cms-upload': typeof ApiCmsUploadRoute
   '/buku/$slug': typeof BukuSlugRoute
+  '/katalog-buku/$bookId': typeof KatalogBukuBookIdRoute
+  '/katalog-buku/': typeof KatalogBukuIndexRoute
   '/api/public/kontak': typeof ApiPublicKontakRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/ajukan-naskah': typeof AjukanNaskahRoute
   '/akses-distribusi': typeof AksesDistribusiRoute
-  '/katalog-buku': typeof KatalogBukuRoute
-  '/katalog-buku/$bookId': typeof KatalogBukuBookIdRoute
+  '/aktivasi-admin': typeof AktivasiAdminRoute
+  '/jurnal': typeof JurnalRoute
   '/kebijakan-hak-cipta': typeof KebijakanHakCiptaRoute
   '/kebijakan-privasi': typeof KebijakanPrivasiRoute
   '/kontak': typeof KontakRoute
+  '/layanan-penerbitan': typeof LayananPenerbitanRoute
+  '/login': typeof LoginRoute
+  '/penulis': typeof PenulisRoute
   '/tentang-penerbit': typeof TentangPenerbitRoute
+  '/api/cms': typeof ApiCmsRoute
+  '/api/cms-upload': typeof ApiCmsUploadRoute
   '/buku/$slug': typeof BukuSlugRoute
+  '/katalog-buku/$bookId': typeof KatalogBukuBookIdRoute
+  '/katalog-buku': typeof KatalogBukuIndexRoute
   '/api/public/kontak': typeof ApiPublicKontakRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/ajukan-naskah': typeof AjukanNaskahRoute
   '/akses-distribusi': typeof AksesDistribusiRoute
-  '/katalog-buku': typeof KatalogBukuRoute
-  '/katalog-buku/$bookId': typeof KatalogBukuBookIdRoute
+  '/aktivasi-admin': typeof AktivasiAdminRoute
+  '/jurnal': typeof JurnalRoute
   '/kebijakan-hak-cipta': typeof KebijakanHakCiptaRoute
   '/kebijakan-privasi': typeof KebijakanPrivasiRoute
   '/kontak': typeof KontakRoute
+  '/layanan-penerbitan': typeof LayananPenerbitanRoute
+  '/login': typeof LoginRoute
+  '/penulis': typeof PenulisRoute
   '/tentang-penerbit': typeof TentangPenerbitRoute
+  '/api/cms': typeof ApiCmsRoute
+  '/api/cms-upload': typeof ApiCmsUploadRoute
   '/buku/$slug': typeof BukuSlugRoute
+  '/katalog-buku/$bookId': typeof KatalogBukuBookIdRoute
+  '/katalog-buku/': typeof KatalogBukuIndexRoute
   '/api/public/kontak': typeof ApiPublicKontakRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
+    | '/ajukan-naskah'
     | '/akses-distribusi'
-    | '/katalog-buku'
-    | '/katalog-buku/$bookId'
+    | '/aktivasi-admin'
+    | '/jurnal'
     | '/kebijakan-hak-cipta'
     | '/kebijakan-privasi'
     | '/kontak'
+    | '/layanan-penerbitan'
+    | '/login'
+    | '/penulis'
     | '/tentang-penerbit'
+    | '/api/cms'
+    | '/api/cms-upload'
     | '/buku/$slug'
+    | '/katalog-buku/$bookId'
+    | '/katalog-buku/'
     | '/api/public/kontak'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
+    | '/ajukan-naskah'
     | '/akses-distribusi'
-    | '/katalog-buku'
-    | '/katalog-buku/$bookId'
+    | '/aktivasi-admin'
+    | '/jurnal'
     | '/kebijakan-hak-cipta'
     | '/kebijakan-privasi'
     | '/kontak'
+    | '/layanan-penerbitan'
+    | '/login'
+    | '/penulis'
     | '/tentang-penerbit'
+    | '/api/cms'
+    | '/api/cms-upload'
     | '/buku/$slug'
+    | '/katalog-buku/$bookId'
+    | '/katalog-buku'
     | '/api/public/kontak'
   id:
     | '__root__'
     | '/'
+    | '/admin'
+    | '/ajukan-naskah'
     | '/akses-distribusi'
-    | '/katalog-buku'
-    | '/katalog-buku/$bookId'
+    | '/aktivasi-admin'
+    | '/jurnal'
     | '/kebijakan-hak-cipta'
     | '/kebijakan-privasi'
     | '/kontak'
+    | '/layanan-penerbitan'
+    | '/login'
+    | '/penulis'
     | '/tentang-penerbit'
+    | '/api/cms'
+    | '/api/cms-upload'
     | '/buku/$slug'
+    | '/katalog-buku/$bookId'
+    | '/katalog-buku/'
     | '/api/public/kontak'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  AjukanNaskahRoute: typeof AjukanNaskahRoute
   AksesDistribusiRoute: typeof AksesDistribusiRoute
-  KatalogBukuRoute: typeof KatalogBukuRoute
-  KatalogBukuBookIdRoute: typeof KatalogBukuBookIdRoute
+  AktivasiAdminRoute: typeof AktivasiAdminRoute
+  JurnalRoute: typeof JurnalRoute
   KebijakanHakCiptaRoute: typeof KebijakanHakCiptaRoute
   KebijakanPrivasiRoute: typeof KebijakanPrivasiRoute
   KontakRoute: typeof KontakRoute
+  LayananPenerbitanRoute: typeof LayananPenerbitanRoute
+  LoginRoute: typeof LoginRoute
+  PenulisRoute: typeof PenulisRoute
   TentangPenerbitRoute: typeof TentangPenerbitRoute
+  ApiCmsRoute: typeof ApiCmsRoute
+  ApiCmsUploadRoute: typeof ApiCmsUploadRoute
   BukuSlugRoute: typeof BukuSlugRoute
+  KatalogBukuBookIdRoute: typeof KatalogBukuBookIdRoute
+  KatalogBukuIndexRoute: typeof KatalogBukuIndexRoute
   ApiPublicKontakRoute: typeof ApiPublicKontakRoute
 }
 
@@ -169,6 +286,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ajukan-naskah': {
+      id: '/ajukan-naskah'
+      path: '/ajukan-naskah'
+      fullPath: '/ajukan-naskah'
+      preLoaderRoute: typeof AjukanNaskahRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/akses-distribusi': {
       id: '/akses-distribusi'
       path: '/akses-distribusi'
@@ -176,18 +307,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AksesDistribusiRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/katalog-buku': {
-      id: '/katalog-buku'
-      path: '/katalog-buku'
-      fullPath: '/katalog-buku'
-      preLoaderRoute: typeof KatalogBukuRouteImport
+    '/aktivasi-admin': {
+      id: '/aktivasi-admin'
+      path: '/aktivasi-admin'
+      fullPath: '/aktivasi-admin'
+      preLoaderRoute: typeof AktivasiAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/katalog-buku/$bookId': {
-      id: '/katalog-buku/$bookId'
-      path: '/katalog-buku/$bookId'
-      fullPath: '/katalog-buku/$bookId'
-      preLoaderRoute: typeof KatalogBukuBookIdRouteImport
+    '/jurnal': {
+      id: '/jurnal'
+      path: '/jurnal'
+      fullPath: '/jurnal'
+      preLoaderRoute: typeof JurnalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kebijakan-hak-cipta': {
@@ -211,6 +342,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KontakRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/layanan-penerbitan': {
+      id: '/layanan-penerbitan'
+      path: '/layanan-penerbitan'
+      fullPath: '/layanan-penerbitan'
+      preLoaderRoute: typeof LayananPenerbitanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/penulis': {
+      id: '/penulis'
+      path: '/penulis'
+      fullPath: '/penulis'
+      preLoaderRoute: typeof PenulisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tentang-penerbit': {
       id: '/tentang-penerbit'
       path: '/tentang-penerbit'
@@ -218,11 +370,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TentangPenerbitRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cms': {
+      id: '/api/cms'
+      path: '/api/cms'
+      fullPath: '/api/cms'
+      preLoaderRoute: typeof ApiCmsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cms-upload': {
+      id: '/api/cms-upload'
+      path: '/api/cms-upload'
+      fullPath: '/api/cms-upload'
+      preLoaderRoute: typeof ApiCmsUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/buku/$slug': {
       id: '/buku/$slug'
       path: '/buku/$slug'
       fullPath: '/buku/$slug'
       preLoaderRoute: typeof BukuSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/katalog-buku/': {
+      id: '/katalog-buku/'
+      path: '/katalog-buku'
+      fullPath: '/katalog-buku/'
+      preLoaderRoute: typeof KatalogBukuIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/katalog-buku/$bookId': {
+      id: '/katalog-buku/$bookId'
+      path: '/katalog-buku/$bookId'
+      fullPath: '/katalog-buku/$bookId'
+      preLoaderRoute: typeof KatalogBukuBookIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/kontak': {
@@ -237,14 +417,23 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  AjukanNaskahRoute: AjukanNaskahRoute,
   AksesDistribusiRoute: AksesDistribusiRoute,
-  KatalogBukuRoute: KatalogBukuRoute,
-  KatalogBukuBookIdRoute: KatalogBukuBookIdRoute,
+  AktivasiAdminRoute: AktivasiAdminRoute,
+  JurnalRoute: JurnalRoute,
   KebijakanHakCiptaRoute: KebijakanHakCiptaRoute,
   KebijakanPrivasiRoute: KebijakanPrivasiRoute,
   KontakRoute: KontakRoute,
+  LayananPenerbitanRoute: LayananPenerbitanRoute,
+  LoginRoute: LoginRoute,
+  PenulisRoute: PenulisRoute,
   TentangPenerbitRoute: TentangPenerbitRoute,
+  ApiCmsRoute: ApiCmsRoute,
+  ApiCmsUploadRoute: ApiCmsUploadRoute,
   BukuSlugRoute: BukuSlugRoute,
+  KatalogBukuBookIdRoute: KatalogBukuBookIdRoute,
+  KatalogBukuIndexRoute: KatalogBukuIndexRoute,
   ApiPublicKontakRoute: ApiPublicKontakRoute,
 }
 export const routeTree = rootRouteImport

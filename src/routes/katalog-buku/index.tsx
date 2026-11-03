@@ -3,7 +3,7 @@ import { Library, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { canonicalLinks } from "@/data/site";
 
-export const Route = createFileRoute("/katalog-buku")({
+export const Route = createFileRoute("/katalog-buku/")({
   head: () => ({
     meta: [
       { title: "Katalog Buku — Griya Pustaka Mandiri" },
