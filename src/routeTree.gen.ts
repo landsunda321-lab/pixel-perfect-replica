@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AksesDistribusiRouteImport } from './routes/akses-distribusi'
 import { Route as KatalogBukuRouteImport } from './routes/katalog-buku'
+import { Route as KatalogBukuBookIdRouteImport } from './routes/katalog-buku.$bookId'
 import { Route as KebijakanHakCiptaRouteImport } from './routes/kebijakan-hak-cipta'
 import { Route as KebijakanPrivasiRouteImport } from './routes/kebijakan-privasi'
 import { Route as KontakRouteImport } from './routes/kontak'
@@ -32,6 +33,11 @@ const AksesDistribusiRoute = AksesDistribusiRouteImport.update({
 const KatalogBukuRoute = KatalogBukuRouteImport.update({
   id: '/katalog-buku',
   path: '/katalog-buku',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KatalogBukuBookIdRoute = KatalogBukuBookIdRouteImport.update({
+  id: '/katalog-buku/$bookId',
+  path: '/katalog-buku/$bookId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KebijakanHakCiptaRoute = KebijakanHakCiptaRouteImport.update({
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/akses-distribusi': typeof AksesDistribusiRoute
   '/katalog-buku': typeof KatalogBukuRoute
+  '/katalog-buku/$bookId': typeof KatalogBukuBookIdRoute
   '/kebijakan-hak-cipta': typeof KebijakanHakCiptaRoute
   '/kebijakan-privasi': typeof KebijakanPrivasiRoute
   '/kontak': typeof KontakRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/akses-distribusi': typeof AksesDistribusiRoute
   '/katalog-buku': typeof KatalogBukuRoute
+  '/katalog-buku/$bookId': typeof KatalogBukuBookIdRoute
   '/kebijakan-hak-cipta': typeof KebijakanHakCiptaRoute
   '/kebijakan-privasi': typeof KebijakanPrivasiRoute
   '/kontak': typeof KontakRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/akses-distribusi': typeof AksesDistribusiRoute
   '/katalog-buku': typeof KatalogBukuRoute
+  '/katalog-buku/$bookId': typeof KatalogBukuBookIdRoute
   '/kebijakan-hak-cipta': typeof KebijakanHakCiptaRoute
   '/kebijakan-privasi': typeof KebijakanPrivasiRoute
   '/kontak': typeof KontakRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/akses-distribusi'
     | '/katalog-buku'
+    | '/katalog-buku/$bookId'
     | '/kebijakan-hak-cipta'
     | '/kebijakan-privasi'
     | '/kontak'
@@ -139,6 +149,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AksesDistribusiRoute: typeof AksesDistribusiRoute
   KatalogBukuRoute: typeof KatalogBukuRoute
+  KatalogBukuBookIdRoute: typeof KatalogBukuBookIdRoute
   KebijakanHakCiptaRoute: typeof KebijakanHakCiptaRoute
   KebijakanPrivasiRoute: typeof KebijakanPrivasiRoute
   KontakRoute: typeof KontakRoute
@@ -168,6 +179,13 @@ declare module '@tanstack/react-router' {
       path: '/katalog-buku'
       fullPath: '/katalog-buku'
       preLoaderRoute: typeof KatalogBukuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/katalog-buku/$bookId': {
+      id: '/katalog-buku/$bookId'
+      path: '/katalog-buku/$bookId'
+      fullPath: '/katalog-buku/$bookId'
+      preLoaderRoute: typeof KatalogBukuBookIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kebijakan-hak-cipta': {
@@ -219,6 +237,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AksesDistribusiRoute: AksesDistribusiRoute,
   KatalogBukuRoute: KatalogBukuRoute,
+  KatalogBukuBookIdRoute: KatalogBukuBookIdRoute,
   KebijakanHakCiptaRoute: KebijakanHakCiptaRoute,
   KebijakanPrivasiRoute: KebijakanPrivasiRoute,
   KontakRoute: KontakRoute,
