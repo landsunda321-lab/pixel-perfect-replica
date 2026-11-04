@@ -7,7 +7,7 @@ type CmsBook = {
   id: string; title: string; author: string; category: string; synopsis?: string; abstract?: string;
   keywords?: string; kata_pengantar?: string; cover_url?: string; isbn?: string; qrcbn?: string;
   publication_status: string; publisher?: string; publication_year?: number | null;
-  publication_date?: string | null; edition?: string; page_count?: number | null;
+  publication_date?: string | null; publication_city?: string | null; edition?: string; page_count?: number | null;
   book_size?: string; book_format?: string; language?: string; pdf_url?: string;
   allow_pdf_download?: boolean; print_available?: boolean; print_price?: number | null;
   digital_available?: boolean; digital_access_type?: "paid" | "free" | "none"; digital_price?: number | null;
@@ -118,7 +118,7 @@ function BookDetailPage() {
   ];
   const rows: [string, string | number | null | undefined][] = [
     ["Kategori", book.category], ["Penerbit", book.publisher || "PT Griya Pustaka Mandiri"],
-    ["Tahun Terbit", book.publication_year], ["Tanggal Terbit", dateLabel(book.publication_date)],
+    ["Kota Terbit", book.publication_city], ["Tahun Terbit", book.publication_year], ["Tanggal Terbit", dateLabel(book.publication_date)],
     ["Edisi", book.edition], ["ISBN", book.isbn], ["QRCBN", book.qrcbn],
     ["Jumlah Halaman", book.page_count ? book.page_count + " halaman" : null],
     ["Ukuran", book.book_size], ["Format", book.book_format], ["Bahasa", book.language],
@@ -152,7 +152,7 @@ function BookDetailPage() {
               {book.publication_date && <p className="mt-5 flex items-center gap-2 text-base text-slate-700"><CalendarDays className="size-5 text-blue-800" /> {dateLabel(book.publication_date)}</p>}
               <p className="mt-4 flex items-start gap-2 text-base leading-7 text-slate-700"><UserRound className="mt-1 size-5 shrink-0 text-blue-800" /> {book.author}</p>
               <div className="mt-7 flex flex-wrap gap-3">
-                {book.pdf_url && book.allow_pdf_download && <a href={book.pdf_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-[#123d78] px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#0d2c59]"><Download className="size-5" /> Download PDF</a>}
+                {book.pdf_url && book.allow_pdf_download ? <a href={book.pdf_url} target="_blank" rel="noreferrer" download className="inline-flex items-center gap-2 rounded-lg bg-[#123d78] px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#0d2c59]"><Download className="size-5" /> Unduh PDF</a> : <span aria-disabled="true" title={!book.pdf_url ? "File PDF belum diunggah melalui CMS" : "Unduhan PDF belum diaktifkan melalui CMS"} className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-slate-200 bg-slate-100 px-5 py-3 text-sm font-bold text-slate-400"><Download className="size-5" /> Unduh PDF</span>}
                 <button type="button" onClick={() => copyText(citation)} className="inline-flex items-center gap-2 rounded-lg border border-blue-200 px-5 py-3 text-sm font-bold text-[#10294f] hover:bg-blue-50"><span className="text-lg">❝</span> {copied ? "Tersalin" : "Cite This"}</button>
                 <button type="button" onClick={shareBook} className="inline-flex items-center gap-2 rounded-lg border border-blue-200 px-5 py-3 text-sm font-bold text-[#10294f] hover:bg-blue-50"><Share2 className="size-5" /> Share</button>
               </div>
