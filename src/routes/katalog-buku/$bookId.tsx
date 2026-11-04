@@ -5,7 +5,7 @@ import { site } from "@/data/site";
 
 type CmsBook = {
   id: string; title: string; author: string; category: string; synopsis?: string; abstract?: string;
-  keywords?: string; kata_pengantar?: string; cover_url?: string; isbn?: string; qrcbn?: string;
+  keywords?: string; kata_pengantar?: string; latar_belakang?: string; glosarium?: string; cover_url?: string; isbn?: string; qrcbn?: string;
   publication_status: string; publisher?: string; publication_year?: number | null;
   publication_date?: string | null; publication_city?: string | null; edition?: string; page_count?: number | null;
   book_size?: string; book_format?: string; language?: string; pdf_url?: string;
@@ -13,7 +13,7 @@ type CmsBook = {
   digital_available?: boolean; digital_access_type?: "paid" | "free" | "none"; digital_price?: number | null;
   open_access?: boolean; order_url?: string | null; digital_access_url?: string | null;
 };
-type Tab = "abstract" | "foreword" | "details";
+type Tab = "abstract" | "foreword" | "background" | "glossary";
 const STATUS: Record<string, string> = {
   persiapan: "Dalam Persiapan", proses_isbn: "Proses ISBN", isbn_terbit: "ISBN Terbit",
   proses_cetak: "Proses Cetak", terbit: "Telah Terbit", arsip: "Arsip",
@@ -114,7 +114,8 @@ function BookDetailPage() {
   const tabs: { id: Tab; label: string; icon: typeof FileText }[] = [
     { id: "abstract", label: "Abstrak", icon: FileText },
     { id: "foreword", label: "Kata Pengantar", icon: BookMarked },
-    { id: "details", label: "Detail Buku", icon: Clipboard },
+    { id: "background", label: "Latar Belakang", icon: BookOpen },
+    { id: "glossary", label: "Glosarium", icon: Clipboard },
   ];
   const rows: [string, string | number | null | undefined][] = [
     ["Judul Buku", book.title],
@@ -180,7 +181,8 @@ function BookDetailPage() {
           <section className="min-h-[280px] py-7">
             {tab === "abstract" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><FileText className="size-7 text-blue-700" /> Abstrak</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.abstract || book.synopsis || "Abstrak belum ditambahkan."}</div>{book.keywords && <p className="mt-5 text-sm text-slate-700"><strong>Kata kunci:</strong> {book.keywords}</p>}</>}
             {tab === "foreword" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookMarked className="size-7 text-blue-700" /> Kata Pengantar</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.kata_pengantar || "Kata pengantar belum ditambahkan."}</div></>}
-            {tab === "details" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><Clipboard className="size-7 text-blue-700" /> Detail Buku</h2><dl className="mt-5 divide-y divide-slate-100 rounded-xl border border-blue-100 px-5">{rows.map(([label, value]) => <div key={label} className="grid gap-1 py-3 sm:grid-cols-[160px_1fr]"><dt className="text-sm text-slate-600">{label}</dt><dd className="text-sm font-semibold text-slate-900">{value}</dd></div>)}</dl></>}
+            {tab === "background" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookOpen className="size-7 text-blue-700" /> Latar Belakang</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.latar_belakang || "Latar belakang belum ditambahkan."}</div></>}
+            {tab === "glossary" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><Clipboard className="size-7 text-blue-700" /> Glosarium</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.glosarium || "Glosarium belum ditambahkan."}</div></>}
           </section>
         </div>
 
