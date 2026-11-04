@@ -5,6 +5,7 @@ import { businessFieldLabel, site } from "@/data/site";
 const LINKS = [
   { label: "Tentang Penerbit", to: "/tentang-penerbit" },
   { label: "Katalog Buku", to: "/katalog-buku" },
+  { label: "Akses dan Distribusi Buku", to: "/akses-distribusi" },
   { label: "Direktori Penulis", to: "/penulis" },
   { label: "Informasi Jurnal", to: "/jurnal" },
   { label: "Layanan Penerbitan", to: "/layanan-penerbitan" },
