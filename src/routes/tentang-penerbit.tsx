@@ -22,7 +22,7 @@ export const Route = createFileRoute("/tentang-penerbit")({
       {
         name: "description",
         content:
-          "Profil PT Griya Pustaka Mandiri: penerbit buku yang berfokus pada pengembangan dan penyebarluasan karya tulis akademik, ilmiah, pendidikan, dan praktis.",
+          "Profil Griya Pustaka Mandiri: penerbit buku yang berfokus pada pengembangan dan penyebarluasan karya tulis akademik, ilmiah, pendidikan, dan praktis.",
       },
       { property: "og:title", content: "Tentang Griya Pustaka Mandiri" },
       {
@@ -41,7 +41,7 @@ function AboutPage() {
   const { address, email, phone } = site.contact;
 
   const identityRows: Array<{ label: string; value: string }> = [
-    { label: "Nama Penerbit", value: site.legalName },
+    { label: "Nama Penerbit", value: site.brandName },
     { label: "Bentuk Badan Usaha", value: site.entityForm },
     { label: "Bidang Usaha", value: businessFieldLabel() },
     ...(address ? [{ label: "Alamat Resmi", value: address }] : []),
