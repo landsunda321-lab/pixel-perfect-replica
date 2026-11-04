@@ -88,6 +88,7 @@ export async function handleCmsRequest(request: Request) {
       ADD COLUMN IF NOT EXISTS publication_city text,
       ADD COLUMN IF NOT EXISTS latar_belakang text,
       ADD COLUMN IF NOT EXISTS glosarium text,
+      ADD COLUMN IF NOT EXISTS daftar_pustaka text,
       ADD COLUMN IF NOT EXISTS print_available boolean NOT NULL DEFAULT false,
       ADD COLUMN IF NOT EXISTS print_price integer,
       ADD COLUMN IF NOT EXISTS digital_available boolean NOT NULL DEFAULT false,
@@ -104,7 +105,7 @@ export async function handleCmsRequest(request: Request) {
     if (request.method === "GET" && action === "public-book") {
       const id = text(url.searchParams.get("id"), 80);
       if (!id) return json({ok:false,error:"Buku tidak ditemukan."},404);
-      const rows = await db()`SELECT id,title,author,category,synopsis,abstract,keywords,kata_pengantar,latar_belakang,glosarium,cover_url,isbn,qrcbn,publication_status,
+      const rows = await db()`SELECT id,title,author,category,synopsis,abstract,keywords,kata_pengantar,latar_belakang,glosarium,daftar_pustaka,cover_url,isbn,qrcbn,publication_status,
         publisher,publication_city,publication_year,publication_date,edition,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url
         FROM public.gpm_cms_books WHERE id::text=${id} AND show_public=true AND publication_status <> 'arsip' LIMIT 1`;
       return rows.length ? json({ok:true,item:rows[0]}) : json({ok:false,error:"Buku tidak ditemukan."},404);
@@ -192,9 +193,9 @@ export async function handleCmsRequest(request: Request) {
       const status=text(b.publication_status,30) || "persiapan";
       const rows=await db()`INSERT INTO public.gpm_cms_books
         (title,subtitle,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,show_public,created_by,
-         publisher,publication_city,publication_year,publication_date,edition,abstract,keywords,kata_pengantar,latar_belakang,glosarium,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url)
+         publisher,publication_city,publication_year,publication_date,edition,abstract,keywords,kata_pengantar,latar_belakang,glosarium,daftar_pustaka,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url)
         VALUES (${title},'',${author},${text(b.category,120)||"Umum"},${text(b.synopsis,10000)},${text(b.cover_url,2000)},${text(b.isbn,30)},${text(b.qrcbn,60)},${status},${b.is_demo===true},${b.show_public===true},${user!.id},
-         ${text(b.publisher,200)||"PT Griya Pustaka Mandiri"},${text(b.publication_city,120)||null},${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},${text(b.publication_date,10)||null},${text(b.edition,100)},${text(b.abstract,20000)},${text(b.keywords,2000)},${text(b.kata_pengantar,20000)},${text(b.latar_belakang,20000)},${text(b.glosarium,20000)},${Number.isInteger(Number(b.page_count))&&Number(b.page_count)>0?Number(b.page_count):null},${text(b.book_size,80)},${text(b.book_format,40)},${text(b.language,80)},${text(b.pdf_url,2000)},${b.allow_pdf_download===true},${b.print_available===true},${Number.isInteger(Number(b.print_price))&&Number(b.print_price)>=0?Number(b.print_price):null},${b.digital_available===true},${["paid","free","none"].includes(text(b.digital_access_type,10))?text(b.digital_access_type,10):"none"},${Number.isInteger(Number(b.digital_price))&&Number(b.digital_price)>=0?Number(b.digital_price):null},${b.open_access===true},${text(b.order_url,2000)||null},${text(b.digital_access_url,2000)||null}) RETURNING *`;
+         ${text(b.publisher,200)||"PT Griya Pustaka Mandiri"},${text(b.publication_city,120)||null},${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},${text(b.publication_date,10)||null},${text(b.edition,100)},${text(b.abstract,20000)},${text(b.keywords,2000)},${text(b.kata_pengantar,20000)},${text(b.latar_belakang,20000)},${text(b.glosarium,20000)},${text(b.daftar_pustaka,30000)},${Number.isInteger(Number(b.page_count))&&Number(b.page_count)>0?Number(b.page_count):null},${text(b.book_size,80)},${text(b.book_format,40)},${text(b.language,80)},${text(b.pdf_url,2000)},${b.allow_pdf_download===true},${b.print_available===true},${Number.isInteger(Number(b.print_price))&&Number(b.print_price)>=0?Number(b.print_price):null},${b.digital_available===true},${["paid","free","none"].includes(text(b.digital_access_type,10))?text(b.digital_access_type,10):"none"},${Number.isInteger(Number(b.digital_price))&&Number(b.digital_price)>=0?Number(b.digital_price):null},${b.open_access===true},${text(b.order_url,2000)||null},${text(b.digital_access_url,2000)||null}) RETURNING *`;
       await audit(user!.id,"create_book","book",String(rows[0].id),title);
       return json({ok:true,item:rows[0]},201);
     }
@@ -208,7 +209,7 @@ export async function handleCmsRequest(request: Request) {
         show_public=${b.show_public===true},publisher=${text(b.publisher,200)||"PT Griya Pustaka Mandiri"},publication_city=${text(b.publication_city,120)||null},
         publication_year=${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},
         publication_date=${text(b.publication_date,10)||null},edition=${text(b.edition,100)},abstract=${text(b.abstract,20000)},
-        keywords=${text(b.keywords,2000)},kata_pengantar=${text(b.kata_pengantar,20000)},latar_belakang=${text(b.latar_belakang,20000)},glosarium=${text(b.glosarium,20000)},
+        keywords=${text(b.keywords,2000)},kata_pengantar=${text(b.kata_pengantar,20000)},latar_belakang=${text(b.latar_belakang,20000)},glosarium=${text(b.glosarium,20000)},daftar_pustaka=${text(b.daftar_pustaka,30000)},
         page_count=${Number.isInteger(Number(b.page_count))&&Number(b.page_count)>0?Number(b.page_count):null},
         book_size=${text(b.book_size,80)},book_format=${text(b.book_format,40)},language=${text(b.language,80)},
         pdf_url=${text(b.pdf_url,2000)},allow_pdf_download=${b.allow_pdf_download===true},
