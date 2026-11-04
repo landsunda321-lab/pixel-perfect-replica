@@ -114,7 +114,7 @@ function BookDetailPage() {
   const tabs: { id: Tab; label: string; icon: typeof FileText }[] = [
     { id: "abstract", label: "Abstrak", icon: FileText },
     { id: "foreword", label: "Kata Pengantar", icon: BookMarked },
-    { id: "background", label: "Latar Belakang", icon: BookOpen },
+    { id: "background", label: "Ringkasan", icon: BookOpen },
     { id: "glossary", label: "Glosarium", icon: Clipboard },
   ];
   const rows: [string, string | number | null | undefined][] = [
@@ -181,7 +181,7 @@ function BookDetailPage() {
           <section className="min-h-[280px] py-7">
             {tab === "abstract" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><FileText className="size-7 text-blue-700" /> Abstrak</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.abstract || book.synopsis || "Abstrak belum ditambahkan."}</div>{book.keywords && <p className="mt-5 text-sm text-slate-700"><strong>Kata kunci:</strong> {book.keywords}</p>}</>}
             {tab === "foreword" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookMarked className="size-7 text-blue-700" /> Kata Pengantar</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.kata_pengantar || "Kata pengantar belum ditambahkan."}</div></>}
-            {tab === "background" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookOpen className="size-7 text-blue-700" /> Latar Belakang</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.latar_belakang || "Latar belakang belum ditambahkan."}</div></>}
+            {tab === "background" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookOpen className="size-7 text-blue-700" /> Ringkasan</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.latar_belakang || "Ringkasan belum ditambahkan."}</div></>}
             {tab === "glossary" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><Clipboard className="size-7 text-blue-700" /> Glosarium</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.glosarium || "Glosarium belum ditambahkan."}</div></>}
           </section>
         </div>
