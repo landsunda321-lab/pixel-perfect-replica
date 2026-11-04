@@ -5,7 +5,7 @@ import { site } from "@/data/site";
 
 type CmsBook = {
   id: string; title: string; author: string; category: string; synopsis?: string; abstract?: string;
-  keywords?: string; kata_pengantar?: string; latar_belakang?: string; glosarium?: string; cover_url?: string; isbn?: string; qrcbn?: string;
+  keywords?: string; kata_pengantar?: string; latar_belakang?: string; glosarium?: string; daftar_pustaka?: string; cover_url?: string; isbn?: string; qrcbn?: string;
   publication_status: string; publisher?: string; publication_year?: number | null;
   publication_date?: string | null; publication_city?: string | null; edition?: string; page_count?: number | null;
   book_size?: string; book_format?: string; language?: string; pdf_url?: string;
@@ -13,7 +13,7 @@ type CmsBook = {
   digital_available?: boolean; digital_access_type?: "paid" | "free" | "none"; digital_price?: number | null;
   open_access?: boolean; order_url?: string | null; digital_access_url?: string | null;
 };
-type Tab = "abstract" | "foreword" | "background" | "glossary";
+type Tab = "abstract" | "foreword" | "background" | "glossary" | "references";
 const STATUS: Record<string, string> = {
   persiapan: "Dalam Persiapan", proses_isbn: "Proses ISBN", isbn_terbit: "ISBN Terbit",
   proses_cetak: "Proses Cetak", terbit: "Telah Terbit", arsip: "Arsip",
@@ -116,6 +116,7 @@ function BookDetailPage() {
     { id: "foreword", label: "Kata Pengantar", icon: BookMarked },
     { id: "background", label: "Sinopsis", icon: BookOpen },
     { id: "glossary", label: "Glosarium", icon: Clipboard },
+    { id: "references", label: "Daftar Pustaka", icon: BookMarked },
   ];
   const rows: [string, string | number | null | undefined][] = [
     ["Judul Buku", book.title],
@@ -183,6 +184,7 @@ function BookDetailPage() {
             {tab === "foreword" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookMarked className="size-7 text-blue-700" /> Kata Pengantar</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.kata_pengantar || "Kata pengantar belum ditambahkan."}</div></>}
             {tab === "background" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookOpen className="size-7 text-blue-700" /> Sinopsis</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.synopsis || "Sinopsis belum ditambahkan."}</div></>}
             {tab === "glossary" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><Clipboard className="size-7 text-blue-700" /> Glosarium</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.glosarium || "Glosarium belum ditambahkan."}</div></>}
+            {tab === "references" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookMarked className="size-7 text-blue-700" /> Daftar Pustaka</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.daftar_pustaka || "Daftar pustaka belum ditambahkan."}</div></>}
           </section>
         </div>
 
