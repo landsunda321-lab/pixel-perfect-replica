@@ -68,7 +68,7 @@ function HomePage() {
         <div className="shell relative grid min-h-[620px] items-center gap-12 py-20 lg:grid-cols-[1.1fr_.9fr] lg:py-28">
           <div className="max-w-3xl animate-fade-up">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[11px] font-bold uppercase tracking-[.2em] text-sky-100 backdrop-blur"><Sparkles className="size-3.5" /> Independent Publishing House</span>
-            <p className="mt-8 text-xs font-semibold uppercase tracking-[.28em] text-sky-200">{site.legalName}</p>
+            <p className="mt-8 text-xs font-semibold uppercase tracking-[.28em] text-sky-200">{site.brandName}</p>
             <h1 className="mt-5 max-w-3xl font-display text-5xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[4.4rem]">Setiap gagasan besar <span className="text-sky-300">layak menemukan</span> pembacanya.</h1>
             <p className="mt-7 max-w-xl text-base leading-8 text-slate-200 sm:text-lg">Kami membuka ruang bagi karya akademik, ilmiah, pendidikan, dan gagasan praktis untuk tumbuh menjadi pengetahuan yang dapat dibagikan.</p>
             <div className="mt-9 flex flex-wrap gap-3">
