@@ -9,7 +9,7 @@ export const Route = createFileRoute("/kebijakan-privasi")({
       {
         name: "description",
         content:
-          "Kebijakan privasi website penerbit PT Griya Pustaka Mandiri: data yang dikumpulkan dan cara penggunaannya.",
+          "Kebijakan privasi website penerbit Griya Pustaka Mandiri: data yang dikumpulkan dan cara penggunaannya.",
       },
       { property: "og:title", content: "Kebijakan Privasi — Griya Pustaka Mandiri" },
       { property: "og:type", content: "website" },
@@ -35,7 +35,7 @@ function PrivacyPolicyPage() {
         Kebijakan Privasi
       </h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        Berlaku untuk website resmi {site.legalName}.
+        Berlaku untuk website resmi {site.brandName}.
       </p>
 
       <PolicySection title="Data yang Kami Kumpulkan">
@@ -53,7 +53,7 @@ function PrivacyPolicyPage() {
       <PolicySection title="Penggunaan dan Penyimpanan Data">
         <p>
           Pesan yang dikirim melalui formulir kontak disimpan pada basis data penerbit dan hanya
-          dapat diakses oleh pihak yang berwenang di lingkungan {site.legalName} untuk keperluan
+          dapat diakses oleh pihak yang berwenang di lingkungan {site.brandName} untuk keperluan
           tindak lanjut korespondensi.
         </p>
       </PolicySection>
