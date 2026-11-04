@@ -117,11 +117,20 @@ function BookDetailPage() {
     { id: "details", label: "Detail Buku", icon: Clipboard },
   ];
   const rows: [string, string | number | null | undefined][] = [
-    ["Kategori", book.category], ["Penerbit", book.publisher || "PT Griya Pustaka Mandiri"],
-    ["Kota Terbit", book.publication_city], ["Tahun Terbit", book.publication_year], ["Tanggal Terbit", dateLabel(book.publication_date)],
-    ["Edisi", book.edition], ["ISBN", book.isbn], ["QRCBN", book.qrcbn],
-    ["Jumlah Halaman", book.page_count ? book.page_count + " halaman" : null],
-    ["Ukuran", book.book_size], ["Format", book.book_format], ["Bahasa", book.language],
+    ["Judul Buku", book.title],
+    ["Penulis", book.author],
+    ["Kategori", book.category],
+    ["Penerbit", book.publisher || "PT Griya Pustaka Mandiri"],
+    ["Kota Terbit / Cetak", book.publication_city || "Belum diisi"],
+    ["Tahun Terbit", book.publication_year || "Belum diisi"],
+    ["Tanggal Terbit", dateLabel(book.publication_date) || "Belum diisi"],
+    ["Edisi / Cetakan", book.edition || "Belum diisi"],
+    ["ISBN", book.isbn || "Belum tersedia"],
+    ["QRCBN", book.qrcbn || "Belum tersedia"],
+    ["Jumlah Halaman", book.page_count ? book.page_count + " halaman" : "Belum diisi"],
+    ["Ukuran Buku", book.book_size || "Belum diisi"],
+    ["Format Buku", book.book_format || "Belum diisi"],
+    ["Bahasa", book.language || "Belum diisi"],
   ];
 
   return (
@@ -171,7 +180,7 @@ function BookDetailPage() {
           <section className="min-h-[280px] py-7">
             {tab === "abstract" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><FileText className="size-7 text-blue-700" /> Abstrak</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.abstract || book.synopsis || "Abstrak belum ditambahkan."}</div>{book.keywords && <p className="mt-5 text-sm text-slate-700"><strong>Kata kunci:</strong> {book.keywords}</p>}</>}
             {tab === "foreword" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookMarked className="size-7 text-blue-700" /> Kata Pengantar</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.kata_pengantar || "Kata pengantar belum ditambahkan."}</div></>}
-            {tab === "details" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><Clipboard className="size-7 text-blue-700" /> Detail Buku</h2><dl className="mt-5 divide-y divide-slate-100 rounded-xl border border-blue-100 px-5">{rows.filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== "").map(([label, value]) => <div key={label} className="grid gap-1 py-3 sm:grid-cols-[160px_1fr]"><dt className="text-sm text-slate-600">{label}</dt><dd className="text-sm font-semibold text-slate-900">{value}</dd></div>)}</dl></>}
+            {tab === "details" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><Clipboard className="size-7 text-blue-700" /> Detail Buku</h2><dl className="mt-5 divide-y divide-slate-100 rounded-xl border border-blue-100 px-5">{rows.map(([label, value]) => <div key={label} className="grid gap-1 py-3 sm:grid-cols-[160px_1fr]"><dt className="text-sm text-slate-600">{label}</dt><dd className="text-sm font-semibold text-slate-900">{value}</dd></div>)}</dl></>}
           </section>
         </div>
 
