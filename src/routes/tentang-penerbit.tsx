@@ -41,7 +41,7 @@ function AboutPage() {
   const { address, email, phone } = site.contact;
 
   const identityRows: Array<{ label: string; value: string }> = [
-    { label: "Nama Penerbit", value: site.brandName },
+    { label: "Nama Penerbit", value: site.legalName },
     { label: "Bentuk Badan Usaha", value: site.entityForm },
     { label: "Bidang Usaha", value: businessFieldLabel() },
     ...(address ? [{ label: "Alamat Resmi", value: address }] : []),
