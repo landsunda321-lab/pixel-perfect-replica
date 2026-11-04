@@ -12,7 +12,7 @@ export const Route = createFileRoute("/kontak")({
       {
         name: "description",
         content:
-          "Hubungi PT Griya Pustaka Mandiri — informasi kontak resmi dan formulir pertanyaan mengenai penerbitan buku.",
+          "Hubungi Griya Pustaka Mandiri — informasi kontak resmi dan formulir pertanyaan mengenai penerbitan buku.",
       },
       { property: "og:title", content: "Kontak Penerbit — Griya Pustaka Mandiri" },
       {
@@ -350,7 +350,7 @@ function ContactPage() {
                       </p>
                       <p className="mt-1 text-sm text-muted-foreground">
                         Pesan Anda <strong className="font-semibold">belum terkirim</strong>. Kanal
-                        kontak resmi {site.legalName} — alamat, email, dan nomor telepon — akan
+                        kontak resmi {site.brandName} — alamat, email, dan nomor telepon — akan
                         ditampilkan di halaman ini setelah dikonfirmasi dari dokumen legalitas
                         perusahaan.
                       </p>
