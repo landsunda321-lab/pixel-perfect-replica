@@ -27,7 +27,7 @@ export function Header() {
           <img
             src="/gpm-logo.webp"
             alt="Griya Pustaka Mandiri — Penerbitan, Publikasi, Edukasi"
-            className="h-11 w-auto max-w-[190px] shrink-0 object-contain sm:h-12 sm:max-w-[220px]"
+            className="h-11 w-auto max-w-[190px] shrink-0 object-contain mix-blend-multiply sm:h-12 sm:max-w-[220px]"
             width="220"
             height="73"
             fetchPriority="high"
