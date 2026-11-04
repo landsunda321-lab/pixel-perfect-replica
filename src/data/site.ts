@@ -24,13 +24,12 @@ export const site = {
   businessField: "Penerbitan Buku",
   tagline: "Menerbitkan Gagasan, Mengembangkan Pengetahuan",
   domain: {
-    host: "griyapustakamandiri.my.id",
-    url: "https://griyapustakamandiri.my.id",
+    host: "griyapustakamandiri.web.id",
+    url: "https://griyapustakamandiri.web.id",
     /**
-     * true HANYA setelah domain terpasang dan terverifikasi (DNS + HTTPS
-     * berhasil). Saat ini DNS domain belum memiliki rekaman, jadi tetap false.
+     * Domain resmi telah terhubung ke Vercel dan dapat diakses melalui HTTPS.
      */
-    verified: false,
+    verified: true,
   },
   shortSummary:
     "Penerbit yang berfokus pada buku akademik, ilmiah, pendidikan, dan praktis untuk mendukung pengembangan pengetahuan serta pemberdayaan masyarakat.",
