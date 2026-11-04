@@ -64,7 +64,7 @@ function BookDetailPage() {
   }, [bookId]);
 
   const citation = useMemo(() => book
-    ? book.author + ". (" + (book.publication_year || "t.t.") + "). " + book.title + ". " + (book.publisher || "PT Griya Pustaka Mandiri") + "."
+    ? book.author + ". (" + (book.publication_year || "t.t.") + "). " + book.title + ". " + (book.publisher || "Griya Pustaka Mandiri") + "."
     : "", [book]);
 
   async function copyText(value: string) {
@@ -80,7 +80,7 @@ function BookDetailPage() {
   async function shareBook() {
     if (!book) return;
     try {
-      if (navigator.share) await navigator.share({ title: book.title, text: "Informasi buku dari PT Griya Pustaka Mandiri", url: window.location.href });
+      if (navigator.share) await navigator.share({ title: book.title, text: "Informasi buku dari Griya Pustaka Mandiri", url: window.location.href });
       else await copyText(window.location.href);
     } catch { /* Share dialog dismissed. */ }
   }
@@ -122,7 +122,7 @@ function BookDetailPage() {
     ["Judul Buku", book.title],
     ["Penulis", book.author],
     ["Kategori", book.category],
-    ["Penerbit", book.publisher || "PT Griya Pustaka Mandiri"],
+    ["Penerbit", book.publisher || "Griya Pustaka Mandiri"],
     ["Kota Terbit / Cetak", book.publication_city || "Belum diisi"],
     ["Tahun Terbit", book.publication_year || "Belum diisi"],
     ["Tanggal Terbit", dateLabel(book.publication_date) || "Belum diisi"],
