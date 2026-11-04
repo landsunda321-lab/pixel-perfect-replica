@@ -9,7 +9,7 @@ export const Route = createFileRoute("/kebijakan-hak-cipta")({
       {
         name: "description",
         content:
-          "Kebijakan hak cipta website penerbit PT Griya Pustaka Mandiri: perlindungan karya dan tata cara permohonan izin penggunaan.",
+          "Kebijakan hak cipta website penerbit Griya Pustaka Mandiri: perlindungan karya dan tata cara permohonan izin penggunaan.",
       },
       { property: "og:title", content: "Kebijakan Hak Cipta — Griya Pustaka Mandiri" },
       { property: "og:type", content: "website" },
@@ -35,12 +35,12 @@ function CopyrightPolicyPage() {
         Kebijakan Hak Cipta
       </h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        Berlaku untuk seluruh konten pada website resmi {site.legalName}.
+        Berlaku untuk seluruh konten pada website resmi {site.brandName}.
       </p>
 
       <PolicySection title="Perlindungan Karya">
         <p>
-          Seluruh buku, naskah, sampul, dan materi lain yang diterbitkan oleh {site.legalName}
+          Seluruh buku, naskah, sampul, dan materi lain yang diterbitkan oleh {site.brandName}
           dilindungi oleh hak cipta sesuai ketentuan peraturan perundang-undangan yang berlaku. Hak
           cipta atas isi karya tetap melekat pada pemegang hak sesuai perjanjian penerbitan
           masing-masing judul.
