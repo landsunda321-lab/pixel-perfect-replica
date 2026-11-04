@@ -79,6 +79,8 @@ function AdminPage() {
   <textarea rows={4} placeholder="Sinopsis" value={form.synopsis||""} onChange={e=>setForm({...form,synopsis:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
   <textarea rows={2} placeholder="Kata kunci, pisahkan dengan koma" value={form.keywords||""} onChange={e=>setForm({...form,keywords:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
   <textarea rows={6} placeholder="Kata pengantar buku" value={form.kata_pengantar||""} onChange={e=>setForm({...form,kata_pengantar:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
+  <textarea rows={6} placeholder="Latar belakang buku" value={form.latar_belakang||""} onChange={e=>setForm({...form,latar_belakang:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
+  <textarea rows={6} placeholder="Glosarium (istilah dan definisi)" value={form.glosarium||""} onChange={e=>setForm({...form,glosarium:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
   </fieldset>
   <fieldset className="space-y-3"><legend className="text-sm font-bold text-blue-900">Informasi bibliografi</legend>
   <input placeholder="ISBN" value={form.isbn||""} onChange={e=>setForm({...form,isbn:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
