@@ -49,7 +49,7 @@ export function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="shell flex flex-col gap-3 py-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} {site.legalName}. Seluruh hak cipta dilindungi.</p>
+          <p>© {year} {site.brandName}. Seluruh hak cipta dilindungi.</p>
           <div className="flex gap-5"><Link to="/kebijakan-privasi" className="hover:text-white">Kebijakan Privasi</Link><Link to="/kebijakan-hak-cipta" className="hover:text-white">Kebijakan Hak Cipta</Link></div>
           <p>{businessFieldLabel()}</p>
         </div>
