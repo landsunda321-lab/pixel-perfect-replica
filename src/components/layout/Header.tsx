@@ -25,13 +25,17 @@ export function Header() {
       <div className="shell flex min-h-[76px] items-center justify-between gap-5">
         <Link to="/" className="group flex min-w-0 items-center gap-3" aria-label={`${site.brandName} — beranda`}>
           <img
-            src="/gpm-logo.webp"
-            alt="Griya Pustaka Mandiri — Penerbitan, Publikasi, Edukasi"
-            className="h-11 w-auto max-w-[190px] shrink-0 object-contain mix-blend-multiply sm:h-12 sm:max-w-[220px]"
-            width="220"
-            height="73"
+            src="/gpm-mark.png"
+            alt=""
+            className="size-12 shrink-0 rounded-full object-contain sm:size-[52px]"
+            width="52"
+            height="52"
             fetchPriority="high"
           />
+          <span className="flex min-w-0 flex-col leading-tight">
+            <span className="text-[15px] font-extrabold tracking-tight text-[#12376b] sm:text-base">Griya Pustaka</span>
+            <span className="text-[15px] font-extrabold tracking-tight text-[#087fc4] sm:text-base">Mandiri</span>
+          </span>
         </Link>
 
         <nav aria-label="Navigasi utama" className="hidden items-center gap-1 lg:flex">
