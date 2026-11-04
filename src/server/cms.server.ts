@@ -322,8 +322,8 @@ export async function handleCmsImageUpload(request: Request) {
         let payload: {kind?:string} = {};
         try { payload = JSON.parse(clientPayload || "{}"); } catch { throw new Error("Jenis unggahan tidak valid."); }
         const kind = payload.kind;
-        if (kind !== "cover" && kind !== "author") throw new Error("Jenis gambar tidak diizinkan.");
-        const prefix = kind === "cover" ? "gpm/covers/" : "gpm/authors/";
+        if (kind !== "cover" && kind !== "author" && kind !== "book-pdf") throw new Error("Jenis berkas tidak diizinkan.");
+        const prefix = kind === "cover" ? "gpm/covers/" : kind === "author" ? "gpm/authors/" : "gpm/books/";
         if (!pathname.startsWith(prefix)) throw new Error("Lokasi penyimpanan tidak valid.");
         return {
           allowedContentTypes: kind === "book-pdf" ? PDF_MIME_TYPES : IMAGE_MIME_TYPES,
