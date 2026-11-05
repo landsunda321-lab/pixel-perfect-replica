@@ -35,7 +35,8 @@ export const site = {
     "Penerbit yang berfokus pada buku akademik, ilmiah, pendidikan, dan praktis untuk mendukung pengembangan pengetahuan serta pemberdayaan masyarakat.",
   contact: {
     address: "Perumahan Taman Cileunyi Blok 2G7 No. 11 Cileunyi Kulon, Cileunyi, Kabupaten Bandung" as string | null,
-    email: "griyapustakamandiri@gmail.com" as string | null,
+    email: "admin@griyapustakamandiri.web.id" as string | null,
+    secondaryEmail: "info@griyapustakamandiri.web.id" as string | null,
     phone: "083185154984" as string | null,
     operatingHours: null as string | null,
   },
