@@ -1,8 +1,7 @@
 /**
  * Konfigurasi identitas situs — satu sumber kebenaran untuk data penerbit.
  *
- * Data legal dan kontak harus mengikuti dokumen legalitas terbaru. Alamat
- * ditahan sampai perbedaan RT/RW pada dokumen AHU dan NIB dikonfirmasi.
+ * Data legal dan kontak mengikuti dokumen legalitas dan konfirmasi pemilik.
  */
 export const site = {
   brandName: "GRIYA PUSTAKA MANDIRI",
@@ -20,12 +19,12 @@ export const site = {
   shortSummary:
     "Penerbit yang berfokus pada buku akademik, ilmiah, pendidikan, dan praktis untuk mendukung pengembangan pengetahuan serta pemberdayaan masyarakat.",
   contact: {
-    // Menunggu konfirmasi karena RT/RW pada dokumen AHU dan NIB berbeda.
-    address: null as string | null,
-    // Email resmi penerbit.
-    email: "admin@griyapustakamandiri.web.id" as string | null,
+    address: "Perumahan Taman Cileunyi Blok 2G7 No. 11, RT 010/RW 022, Desa/Kelurahan Cileunyi Kulon, Kecamatan Cileunyi, Kabupaten Bandung, Jawa Barat 40621" as string | null,
+    // Email umum, administrasi, dan informasi penerbit.
+    email: "griyapustakamandiri@gmail.com" as string | null,
+    adminEmail: "admin@griyapustakamandiri.web.id" as string | null,
     secondaryEmail: "info@griyapustakamandiri.web.id" as string | null,
-    // Nomor telepon yang tercantum pada NIB dan nomor HP layanan.
+    // Nomor telepon yang tercantum pada NIB dan nomor HP/WhatsApp layanan.
     phone: "087821094000" as string | null,
     mobile: "083185154984" as string | null,
     operatingHours: null as string | null,
