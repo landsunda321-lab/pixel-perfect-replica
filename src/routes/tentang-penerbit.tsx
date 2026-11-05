@@ -38,7 +38,7 @@ export const Route = createFileRoute("/tentang-penerbit")({
 });
 
 function AboutPage() {
-  const { address, email, secondaryEmail, phone, mobile } = site.contact;
+  const { address, email, adminEmail, secondaryEmail, phone, mobile } = site.contact;
 
   const identityRows: Array<{ label: string; value: string }> = [
     { label: "Nama Badan Usaha", value: site.legalName },
@@ -46,7 +46,8 @@ function AboutPage() {
     { label: "Bentuk Badan Usaha", value: site.entityForm },
     { label: "Bidang Penerbitan", value: businessFieldLabel() },
     ...(address ? [{ label: "Alamat Resmi", value: address }] : []),
-    ...(email ? [{ label: "Email Administrasi", value: email }] : []),
+    ...(email ? [{ label: "Email Penerbit", value: email }] : []),
+    ...(adminEmail ? [{ label: "Email Administrasi", value: adminEmail }] : []),
     ...(secondaryEmail ? [{ label: "Email Informasi", value: secondaryEmail }] : []),
     ...(phone ? [{ label: "Nomor Telepon", value: phone }] : []),
     ...(mobile ? [{ label: "Nomor HP/WhatsApp", value: mobile }] : []),
@@ -195,12 +196,6 @@ function AboutPage() {
             ))}
           </dl>
         </div>
-        {!address ? (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Alamat resmi akan ditampilkan setelah perbedaan penulisan alamat pada dokumen
-            legalitas perusahaan dikonfirmasi.
-          </p>
-        ) : null}
       </section>
     </div>
   );
