@@ -75,6 +75,20 @@ function requireRole(user: User | null, allowed: Role[]) {
   if (!user.is_super_admin && !allowed.includes(user.role)) throw Object.assign(new Error("Anda tidak memiliki hak akses."), { status: 403 });
   return user;
 }
+function requireAdmin(user: User | null) {
+  const actor = requireRole(user, ["admin"]);
+  if (!actor.is_super_admin && actor.role !== "admin") throw Object.assign(new Error("Aksi ini hanya dapat dilakukan Admin."), { status: 403 });
+  return actor;
+}
+function requireEditorOrAdmin(user: User | null) {
+  return requireRole(user, ["admin", "editor"]);
+}
+function assertEditorBookChanges(user: User, book: Record<string, unknown>) {
+  if (user.is_super_admin || user.role === "admin") return;
+  const status = text(book.publication_status, 30);
+  const requestsPublic = book.show_public === true || ["isbn_terbit", "terbit"].includes(status);
+  if (requestsPublic) throw Object.assign(new Error("Editor tidak dapat menyetujui atau menerbitkan buku. Minta Admin melakukan persetujuan publikasi."), { status: 403 });
+ }
 async function audit(userId: string | null, action: string, entity: string, entityId = "", details = "") {
   await db()`INSERT INTO public.gpm_cms_audit_log(user_id,action,entity_type,entity_id,details)
     VALUES (${userId},${action},${entity},${entityId},${details})`;
@@ -155,13 +169,24 @@ export async function handleCmsRequest(request: Request) {
     const user=await currentUser(request);
     if (request.method === "GET" && action === "me") return user ? json({ok:true,user}) : json({ok:false},401);
 
+    if (request.method === "GET" && action === "audit-log") {
+      requireAdmin(user);
+      const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit")) || 50));
+      const rows = await db()`SELECT a.id,a.user_id,u.name AS user_name,u.email AS user_email,
+        a.action,a.entity_type,a.entity_id,a.details,a.created_at
+        FROM public.gpm_cms_audit_log a
+        LEFT JOIN public.gpm_cms_users u ON u.id=a.user_id
+        ORDER BY a.created_at DESC LIMIT ${limit}`;
+      return json({ok:true,items:rows});
+    }
+
     if (request.method === "GET" && action === "users") {
-      requireRole(user,[]);
+      requireAdmin(user);
       const rows=await db()`SELECT id,name,email,role,active,is_super_admin,created_at FROM public.gpm_cms_users ORDER BY created_at DESC`;
       return json({ok:true,items:rows});
     }
     if (request.method === "POST" && action === "users") {
-      requireRole(user,[]);
+      requireAdmin(user);
       const body=await readBody(request), name=text(body.name,120), email=text(body.email,255).toLowerCase();
       const role=text(body.role,20) as Role, password=text(body.password,200);
       if (!name || !/^\S+@\S+\.\S+$/.test(email) || !["admin","editor","author"].includes(role)) return json({ok:false,error:"Data akun tidak valid."},400);
@@ -172,7 +197,7 @@ export async function handleCmsRequest(request: Request) {
       return json({ok:true,item:rows[0]},201);
     }
     if (request.method === "PATCH" && action === "users") {
-      requireRole(user,[]);
+      requireAdmin(user);
       const body=await readBody(request), id=text(body.id,80), active=body.active===true;
       if (!id || id===user!.id) return json({ok:false,error:"Akun ini tidak dapat dinonaktifkan."},400);
       const rows=await db()`UPDATE public.gpm_cms_users SET active=${active},updated_at=now()
@@ -187,10 +212,15 @@ export async function handleCmsRequest(request: Request) {
       return json({ok:true,items:rows});
     }
     if (request.method === "POST" && action === "books") {
-      requireRole(user,["admin","editor"]);
-      const b=await readBody(request), title=text(b.title,300), author=text(b.author,200);
+      requireEditorOrAdmin(user);
+      const b=await readBody(request);
+      assertEditorBookChanges(user!, b);
+      const title=text(b.title,300), author=text(b.author,200);
       if (!title || !author) return json({ok:false,error:"Judul dan penulis wajib diisi."},400);
       const status=text(b.publication_status,30) || "persiapan";
+      if (!user!.is_super_admin && user!.role !== "admin" && text(b.isbn,30)) {
+        throw Object.assign(new Error("Pencatatan ISBN hanya dapat dilakukan Admin."), { status: 403 });
+      }
       const rows=await db()`INSERT INTO public.gpm_cms_books
         (title,subtitle,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,show_public,created_by,
          publisher,publication_city,publication_year,publication_date,edition,abstract,keywords,kata_pengantar,latar_belakang,glosarium,daftar_pustaka,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url)
@@ -200,9 +230,18 @@ export async function handleCmsRequest(request: Request) {
       return json({ok:true,item:rows[0]},201);
     }
     if (request.method === "PATCH" && action === "books") {
-      requireRole(user,["admin","editor"]);
-      const b=await readBody(request), id=text(b.id,80), title=text(b.title,300), author=text(b.author,200);
+      requireEditorOrAdmin(user);
+      const b=await readBody(request);
+      assertEditorBookChanges(user!, b);
+      const id=text(b.id,80), title=text(b.title,300), author=text(b.author,200);
       if (!id || !title || !author) return json({ok:false,error:"Data buku tidak lengkap."},400);
+      if (!user!.is_super_admin && user!.role !== "admin") {
+        const existing = await db()`SELECT isbn FROM public.gpm_cms_books WHERE id=${id} LIMIT 1`;
+        if (!existing.length) return json({ok:false,error:"Buku tidak ditemukan."},404);
+        if (text(b.isbn,30) !== text(existing[0].isbn,30)) {
+          throw Object.assign(new Error("Perubahan ISBN hanya dapat dilakukan Admin."), { status: 403 });
+        }
+      }
       const rows=await db()`UPDATE public.gpm_cms_books SET title=${title},subtitle='',author=${author},
         category=${text(b.category,120)||"Umum"},synopsis=${text(b.synopsis,10000)},cover_url=${text(b.cover_url,2000)},
         isbn=${text(b.isbn,30)},qrcbn=${text(b.qrcbn,60)},publication_status=${text(b.publication_status,30)},is_demo=${b.is_demo===true},
@@ -220,7 +259,7 @@ export async function handleCmsRequest(request: Request) {
       return json({ok:true,item:rows[0]});
     }
     if (request.method === "DELETE" && action === "books") {
-      requireRole(user,["admin","editor"]);
+      requireAdmin(user);
       const id=url.searchParams.get("id")||"";
       await db()`DELETE FROM public.gpm_cms_books WHERE id=${id}`;
       await audit(user!.id,"delete_book","book",id);
