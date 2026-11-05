@@ -214,8 +214,8 @@ export async function handleCmsRequest(request: Request) {
         book_size=${text(b.book_size,80)},book_format=${text(b.book_format,40)},language=${text(b.language,80)},
         pdf_url=${text(b.pdf_url,2000)},allow_pdf_download=${b.allow_pdf_download===true},
         print_available=${b.print_available===true},print_price=${Number.isInteger(Number(b.print_price))&&Number(b.print_price)>=0?Number(b.print_price):null},digital_available=${b.digital_available===true},digital_access_type=${["paid","free","none"].includes(text(b.digital_access_type,10))?text(b.digital_access_type,10):"none"},digital_price=${Number.isInteger(Number(b.digital_price))&&Number(b.digital_price)>=0?Number(b.digital_price):null},open_access=${b.open_access===true},order_url=${text(b.order_url,2000)||null},digital_access_url=${text(b.digital_access_url,2000)||null},
-        updated_at=now() WHERE id=${id} RETURNING *`;
-      if (!rows.length) return json({ok:false,error:"Buku tidak ditemukan."},404);
+        updated_at=now() WHERE id=${id} AND (${canPublish} OR show_public=false) RETURNING *`;
+      if (!rows.length) return json({ok:false,error:"Buku tidak ditemukan atau hanya Admin yang dapat mengubah buku yang sudah dipublikasikan."},404);
       await audit(user!.id,"update_book","book",id,title);
       return json({ok:true,item:rows[0]});
     }
