@@ -140,7 +140,7 @@ function ContactPage() {
                       <dd className="mt-1 text-sm text-muted-foreground">
                         <div className="flex flex-col gap-1">
                           {email ? <a href={`mailto:${email}`} className="transition-colors hover:text-primary">{email}</a> : null}
-                          {adminEmail ? <a href={`mailto:${adminEmail}`} className="transition-colors hover:text-primary">{adminEmail}</a> : null}\n                          {adminEmail ? <a href={`mailto:${adminEmail}`} className="transition-colors hover:text-primary">{adminEmail}</a> : null}
+                          {adminEmail ? <a href={`mailto:${adminEmail}`} className="transition-colors hover:text-primary">{adminEmail}</a> : null}
                           {secondaryEmail ? <a href={`mailto:${secondaryEmail}`} className="transition-colors hover:text-primary">{secondaryEmail}</a> : null}
                         </div>
                       </dd>
