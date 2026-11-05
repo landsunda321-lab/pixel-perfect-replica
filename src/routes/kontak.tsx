@@ -65,7 +65,7 @@ function ContactPage() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error" | "unavailable">(
     "idle",
   );
-  const { address, email, phone, operatingHours } = site.contact;
+  const { address, email, secondaryEmail, phone, operatingHours } = site.contact;
 
   const update =
     (field: keyof ContactFormValues) =>
@@ -100,7 +100,7 @@ function ContactPage() {
     }
   }
 
-  const hasContactData = address || email || phone;
+  const hasContactData = address || email || secondaryEmail || phone;
 
   return (
     <div className="flex flex-col">
@@ -132,18 +132,16 @@ function ContactPage() {
                     </div>
                   </div>
                 ) : null}
-                {email ? (
+                {email || secondaryEmail ? (
                   <div className="flex gap-3">
                     <Mail className="mt-0.5 size-5 shrink-0 text-azure" aria-hidden="true" />
                     <div>
                       <dt className="text-sm font-medium text-foreground">Email Resmi</dt>
                       <dd className="mt-1 text-sm text-muted-foreground">
-                        <a
-                          href={`mailto:${email}`}
-                          className="transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                        >
-                          {email}
-                        </a>
+                        <div className="flex flex-col gap-1">
+                          {email ? <a href={`mailto:${email}`} className="transition-colors hover:text-primary">{email}</a> : null}
+                          {secondaryEmail ? <a href={`mailto:${secondaryEmail}`} className="transition-colors hover:text-primary">{secondaryEmail}</a> : null}
+                        </div>
                       </dd>
                     </div>
                   </div>
