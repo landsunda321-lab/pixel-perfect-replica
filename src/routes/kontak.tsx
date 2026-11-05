@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, Mail, MapPin, Phone, Send, TriangleAlert } from "lucide-react";
+import { CheckCircle2, Mail, MapPin, Phone, MessageCircle, Send, TriangleAlert } from "lucide-react";
 import { useState, type FormEvent } from "react";
 
 import { SectionHeading } from "@/components/SectionHeading";
@@ -147,14 +147,24 @@ function ContactPage() {
                     </div>
                   </div>
                 ) : null}
-                {phone || mobile ? (
+                {phone ? (
                   <div className="flex gap-3">
                     <Phone className="mt-0.5 size-5 shrink-0 text-azure" aria-hidden="true" />
                     <div>
-                      <dt className="text-sm font-medium text-foreground">Telepon / WhatsApp</dt>
-                      <dd className="mt-1 flex flex-col gap-1 text-sm text-muted-foreground">
-                        {phone && <span>Telepon: {phone}</span>}
-                        {mobile && <a href={`https://wa.me/62${mobile.replace(/^0/, "").replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="transition-colors hover:text-primary">WhatsApp: {mobile}</a>}
+                      <dt className="text-sm font-medium text-foreground">Nomor Telepon</dt>
+                      <dd className="mt-1 text-sm text-muted-foreground">
+                        <a href={`tel:${phone.replace(/[^0-9+]/g, "")}`} className="transition-colors hover:text-primary">{phone}</a>
+                      </dd>
+                    </div>
+                  </div>
+                ) : null}
+                {mobile ? (
+                  <div className="flex gap-3">
+                    <MessageCircle className="mt-0.5 size-5 shrink-0 text-azure" aria-hidden="true" />
+                    <div>
+                      <dt className="text-sm font-medium text-foreground">WhatsApp</dt>
+                      <dd className="mt-1 text-sm text-muted-foreground">
+                        <a href={`https://wa.me/62${mobile.replace(/^0/, "").replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="transition-colors hover:text-primary">{mobile}</a>
                       </dd>
                     </div>
                   </div>
