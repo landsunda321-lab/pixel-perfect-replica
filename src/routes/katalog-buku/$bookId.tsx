@@ -13,7 +13,7 @@ type CmsBook = {
   digital_available?: boolean; digital_access_type?: "paid" | "free" | "none"; digital_price?: number | null;
   open_access?: boolean; order_url?: string | null; digital_access_url?: string | null;
 };
-type Tab = "abstract" | "foreword" | "background" | "glossary" | "references";
+type Tab = "synopsis" | "description" | "foreword" | "glossary" | "references";
 const STATUS: Record<string, string> = {
   persiapan: "Dalam Persiapan", proses_isbn: "Proses ISBN", isbn_terbit: "ISBN Terbit",
   proses_cetak: "Proses Cetak", terbit: "Telah Terbit", arsip: "Arsip",
@@ -27,7 +27,7 @@ const dateLabel = (value?: string | null) => {
 export const Route = createFileRoute("/katalog-buku/$bookId")({
   head: () => ({ meta: [
     { title: "Detail Buku — Griya Pustaka Mandiri" },
-    { name: "description", content: "Informasi bibliografi, abstrak, dan detail terbitan Griya Pustaka Mandiri." },
+    { name: "description", content: "Informasi bibliografi, sinopsis, dan detail terbitan Griya Pustaka Mandiri." },
   ] }),
   component: BookDetailPage,
 });
@@ -38,7 +38,7 @@ function BookDetailPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState("");
-  const [tab, setTab] = useState<Tab>("abstract");
+  const [tab, setTab] = useState<Tab>("synopsis");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -112,9 +112,9 @@ function BookDetailPage() {
   );
 
   const tabs: { id: Tab; label: string; icon: typeof FileText }[] = [
-    { id: "abstract", label: "Abstrak", icon: FileText },
+    { id: "synopsis", label: "Sinopsis", icon: BookOpen },
+    { id: "description", label: "Deskripsi", icon: FileText },
     { id: "foreword", label: "Kata Pengantar", icon: BookMarked },
-    { id: "background", label: "Sinopsis", icon: BookOpen },
     { id: "glossary", label: "Glosarium", icon: Clipboard },
     { id: "references", label: "Daftar Pustaka", icon: BookMarked },
   ];
@@ -180,11 +180,11 @@ function BookDetailPage() {
           </div>
 
           <section className="min-h-[280px] py-7">
-            {tab === "abstract" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><FileText className="size-7 text-blue-700" /> Abstrak</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.abstract || book.synopsis || "Abstrak belum ditambahkan."}</div>{book.keywords && <p className="mt-5 text-sm text-slate-700"><strong>Kata kunci:</strong> {book.keywords}</p>}</>}
-            {tab === "foreword" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookMarked className="size-7 text-blue-700" /> Kata Pengantar</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.kata_pengantar || "Kata pengantar belum ditambahkan."}</div></>}
-            {tab === "background" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookOpen className="size-7 text-blue-700" /> Sinopsis</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.synopsis || "Sinopsis belum ditambahkan."}</div></>}
-            {tab === "glossary" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><Clipboard className="size-7 text-blue-700" /> Glosarium</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.glosarium || "Glosarium belum ditambahkan."}</div></>}
-            {tab === "references" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookMarked className="size-7 text-blue-700" /> Daftar Pustaka</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.daftar_pustaka || "Daftar pustaka belum ditambahkan."}</div></>}
+            {tab === "synopsis" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookOpen className="size-7 text-blue-700" /> Sinopsis</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.synopsis || "Sinopsis belum ditambahkan melalui CMS."}</div></>}
+            {tab === "description" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><FileText className="size-7 text-blue-700" /> Deskripsi</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.latar_belakang || "Deskripsi belum ditambahkan melalui CMS."}</div>{book.keywords && <p className="mt-5 text-sm text-slate-700"><strong>Kata kunci:</strong> {book.keywords}</p>}</>}
+            {tab === "foreword" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookMarked className="size-7 text-blue-700" /> Kata Pengantar</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.kata_pengantar || "Kata pengantar belum ditambahkan melalui CMS."}</div></>}
+            {tab === "glossary" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><Clipboard className="size-7 text-blue-700" /> Glosarium</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.glosarium || "Glosarium belum ditambahkan melalui CMS."}</div></>}
+            {tab === "references" && <><h2 className="flex items-center gap-3 font-display text-2xl font-bold text-[#10294f]"><BookMarked className="size-7 text-blue-700" /> Daftar Pustaka</h2><div className="mt-4 whitespace-pre-line text-base leading-7 text-slate-800">{book.daftar_pustaka || "Daftar pustaka belum ditambahkan melalui CMS."}</div></>}
           </section>
         </div>
 
