@@ -318,6 +318,12 @@ const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 export async function handleCmsImageUpload(request: Request) {
   try {
     if (request.method !== "POST") return json({ok:false,error:"Metode tidak diizinkan."},405);
+    const origin = request.headers.get("origin");
+    if (!origin) return json({ok:false,error:"Header Origin wajib untuk unggahan."},403);
+    let originHost = "";
+    try { originHost = new URL(origin).host; } catch { return json({ok:false,error:"Origin unggahan tidak valid."},403); }
+    const expectedHost = request.headers.get("x-forwarded-host") || request.headers.get("host") || new URL(request.url).host;
+    if (originHost !== expectedHost) return json({ok:false,error:"Unggahan lintas situs ditolak."},403);
     if (!process.env.BLOB_READ_WRITE_TOKEN) return json({ok:false,error:"Penyimpanan gambar belum terhubung. Periksa konfigurasi Blob."},503);
     const body = await request.json() as HandleUploadBody;
     const response = await handleUpload({
