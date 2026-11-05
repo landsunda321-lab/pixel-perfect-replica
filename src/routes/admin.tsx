@@ -10,8 +10,8 @@ async function api(action:string,method="GET",body?:unknown) {
  const d=await r.json(); if(!r.ok) throw new Error(d.error||"Permintaan gagal."); return d;
 }
 
-type ImageUploadFieldProps = { label:string; kind:"cover"|"author"|"book-pdf"; value?:string; onChange:(url:string)=>void };
-function ImageUploadField({label,kind,value,onChange}:ImageUploadFieldProps) {
+type ImageUploadFieldProps = { label:string; kind:"cover"|"author"|"book-pdf"; value?:string; onChange:(url:string)=>void; licenseName?:string };
+function ImageUploadField({label,kind,value,onChange,licenseName}:ImageUploadFieldProps) {
  const [busy,setBusy]=useState(false); const [progress,setProgress]=useState(0); const [uploadError,setUploadError]=useState("");
  const isPdf=kind==="book-pdf";
  async function chooseFile(file?:File) {
@@ -23,7 +23,7 @@ function ImageUploadField({label,kind,value,onChange}:ImageUploadFieldProps) {
   try {
    const safeName=file.name.toLowerCase().replace(/[^a-z0-9._-]+/g,"-").slice(-90);
    const blob=await upload(`gpm/${kind === "cover" ? "covers" : kind === "author" ? "authors" : "books"}/${Date.now()}-${safeName}`,file,{
-    access:"public",handleUploadUrl:"/api/cms-upload",clientPayload:JSON.stringify({kind}),
+    access:"public",handleUploadUrl:"/api/cms-upload",clientPayload:JSON.stringify({kind,openAccess:kind==="book-pdf",licenseName}),
     onUploadProgress:({percentage})=>setProgress(Math.round(percentage)),
    });
    onChange(blob.url);
@@ -57,7 +57,7 @@ function AdminPage() {
  async function saveBook(e:React.FormEvent){e.preventDefault();await run(async()=>{await api("books",form.id?"PATCH":"POST",form);setForm({});await refresh();setNotice("Data buku tersimpan.");});}
  async function saveAuthor(e:React.FormEvent){e.preventDefault();await run(async()=>{await api("authors",form.id?"PATCH":"POST",form);setForm({});await refresh();setNotice("Profil penulis tersimpan.");});}
  async function submitManuscript(e:React.FormEvent){e.preventDefault();await run(async()=>{await api("manuscripts","POST",form);setForm({});await refresh();setNotice("Draft naskah tersimpan.");});}
- const superAdmin=!!me?.is_super_admin, canManageUsers=superAdmin||me?.role==="admin", canEdit=superAdmin||me?.role==="admin"||me?.role==="editor";
+ const superAdmin=!!me?.is_super_admin, canManageUsers=superAdmin||me?.role==="admin", canEdit=superAdmin||me?.role==="admin"||me?.role==="editor", canManageDistribution=superAdmin||me?.role==="admin";
  return <main className="min-h-[80vh] bg-slate-50 px-4 py-8"><div className="mx-auto max-w-7xl">
   <header className="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-[#10294f] p-6 text-white"><div><p className="text-xs font-bold uppercase tracking-[.2em] text-sky-200">Griya Pustaka Mandiri</p><h1 className="mt-1 text-2xl font-bold">Content Management System</h1><p className="mt-1 text-sm text-blue-100">{me?.name||"Memuat..."} · {superAdmin?"Super Admin":me?.role}</p></div><button onClick={logout} className="rounded-xl border border-white/30 px-4 py-2 text-sm font-semibold">Keluar</button></header>
   {error&&<p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</p>}{notice&&<p className="mt-5 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800">{notice}</p>}
@@ -90,10 +90,10 @@ function AdminPage() {
   </fieldset>
   <fieldset className="space-y-3"><legend className="text-sm font-bold text-blue-900">Berkas buku</legend>
   <ImageUploadField label="Sampul buku" kind="cover" value={form.cover_url||""} onChange={url=>setForm({...form,cover_url:url})}/>
-  <ImageUploadField label="File PDF buku" kind="book-pdf" value={form.pdf_url||""} onChange={url=>setForm({...form,pdf_url:url})}/>
-  <label className="flex gap-2 text-sm"><input type="checkbox" checked={!!form.allow_pdf_download} onChange={e=>setForm({...form,allow_pdf_download:e.target.checked})}/>Izinkan pengunjung mengunduh PDF</label>
+  {canManageDistribution&&form.open_access&&form.license_name?<ImageUploadField label="File PDF Open Access (publik)" kind="book-pdf" licenseName={form.license_name} value={form.pdf_url||""} onChange={url=>setForm({...form,pdf_url:url,allow_pdf_download:false})}/>:<p className="rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-900">Unggah PDF hanya tersedia untuk Admin setelah Open Access diaktifkan dan lisensi diisi. Berkas ini disimpan di penyimpanan publik; jangan unggah naskah berbayar, naskah belum terbit, atau berkas rahasia.</p>}
+  {canManageDistribution&&<label className="flex gap-2 text-sm"><input type="checkbox" checked={!!form.allow_pdf_download} disabled={!form.open_access||!form.pdf_url} onChange={e=>setForm({...form,allow_pdf_download:e.target.checked})}/>Izinkan pengunjung mengunduh PDF</label>}
   </fieldset>
-  <fieldset className="space-y-3 rounded-xl border border-blue-100 p-3"><legend className="text-sm font-bold text-blue-900">Distribusi dan akses buku</legend>
+  {canManageDistribution?<fieldset className="space-y-3 rounded-xl border border-blue-100 p-3"><legend className="text-sm font-bold text-blue-900">Distribusi dan akses buku · Admin</legend>
   <label className="flex gap-2 text-sm"><input type="checkbox" checked={!!form.print_available} onChange={e=>setForm({...form,print_available:e.target.checked})}/>Buku cetak tersedia untuk dipesan langsung</label>
   <input type="number" min="0" placeholder="Harga buku cetak (Rp), kosong jika belum ditetapkan" value={form.print_price??""} onChange={e=>setForm({...form,print_price:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
   <label className="flex gap-2 text-sm"><input type="checkbox" checked={!!form.digital_available} onChange={e=>setForm({...form,digital_available:e.target.checked})}/>Buku digital tersedia</label>
@@ -104,7 +104,7 @@ function AdminPage() {
   <input placeholder="URL akses digital (opsional, hanya jika sudah aktif)" value={form.digital_access_url||""} onChange={e=>setForm({...form,digital_access_url:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
   <p className="text-xs leading-5 text-slate-500">Jika URL tidak diisi, website tidak akan membuat tautan palsu. Untuk Open Access, unggah PDF lengkap dan aktifkan izin unduh pada bagian Berkas Buku.</p>
   </fieldset>
-  <fieldset className="space-y-3"><legend className="text-sm font-bold text-blue-900">Pengaturan publikasi</legend>
+  {canManageDistribution?<fieldset className="space-y-3"><legend className="text-sm font-bold text-blue-900">Pengaturan publikasi · Admin</legend>
   <select value={form.publication_status||"persiapan"} onChange={e=>setForm({...form,publication_status:e.target.value})} className="w-full rounded-xl border p-3 text-sm"><option value="persiapan">Dalam persiapan</option><option value="proses_isbn">Proses ISBN</option><option value="isbn_terbit">ISBN terbit</option><option value="proses_cetak">Proses cetak</option><option value="terbit">Terbit</option><option value="arsip">Arsip</option></select>
   <label className="flex gap-2 text-sm"><input type="checkbox" checked={!!form.show_public} onChange={e=>setForm({...form,show_public:e.target.checked})}/>Tampilkan di website publik</label>
   <label className="flex gap-2 text-sm"><input type="checkbox" checked={!!form.is_demo} onChange={e=>setForm({...form,is_demo:e.target.checked})}/>Data demonstrasi</label>
