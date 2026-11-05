@@ -211,7 +211,7 @@ export async function handleCmsRequest(request: Request) {
       if (canPublish) validateDistribution(b);
       const rows=await db()`UPDATE public.gpm_cms_books SET title=${title},subtitle='',author=${author},
         category=${text(b.category,120)||"Umum"},synopsis=${text(b.synopsis,10000)},cover_url=${text(b.cover_url,2000)},
-        isbn=${text(b.isbn,30)},qrcbn=${text(b.qrcbn,60)},publication_status=CASE WHEN ${canPublish} THEN ${requestedStatus} ELSE publication_status END,is_demo=${b.is_demo===true},
+        isbn=${text(b.isbn,30)},qrcbn=${text(b.qrcbn,60)},publication_status=CASE WHEN ${canPublish} THEN ${requestedStatus} ELSE publication_status END,is_demo=CASE WHEN ${canPublish} THEN ${b.is_demo===true} ELSE is_demo END,
         show_public=CASE WHEN ${canPublish} THEN ${b.show_public===true} ELSE show_public END,publisher=${text(b.publisher,200)||"Griya Pustaka Mandiri"},publication_city=${text(b.publication_city,120)||null},
         publication_year=${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},
         publication_date=${text(b.publication_date,10)||null},edition=${text(b.edition,100)},abstract=${text(b.abstract,20000)},
