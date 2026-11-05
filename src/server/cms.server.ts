@@ -36,6 +36,9 @@ async function readBody(request: Request) {
   catch { throw new Error("Format permintaan tidak valid."); }
 }
 function text(v: unknown, max = 5000) { return typeof v === "string" ? v.trim().slice(0, max) : ""; }
+function safeHttpsUrl(v: unknown, max = 2000) { const value=text(v,max); if(!value)return null; try { const u=new URL(value); return u.protocol==="https:"?u.toString():null; } catch { return null; } }
+function validPrice(v: unknown) { if(v===null||v===undefined||v==="")return null; const n=Number(v); return Number.isSafeInteger(n)&&n>=0&&n<=2000000000?n:null; }
+function validateDistribution(b: Record<string, unknown>) { if(b.open_access===true&&!text(b.license_name,120)) throw Object.assign(new Error("Lisensi wajib diisi untuk Open Access."),{status:400}); if(b.allow_pdf_download===true&&(b.open_access!==true||!safeHttpsUrl(b.pdf_url))) throw Object.assign(new Error("Unduh PDF memerlukan status Open Access dan file PDF."),{status:400}); if(b.order_url&&!safeHttpsUrl(b.order_url)) throw Object.assign(new Error("Tautan pemesanan harus HTTPS."),{status:400}); if(b.digital_access_url&&!safeHttpsUrl(b.digital_access_url)) throw Object.assign(new Error("Tautan digital harus HTTPS."),{status:400}); if(b.digital_access_type==="paid"&&validPrice(b.digital_price)===null) throw Object.assign(new Error("Harga digital berbayar wajib diisi."),{status:400}); }
 function slugify(value: string) {
   return value.normalize("NFKD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase()
     .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 90) || "penulis";
@@ -95,7 +98,7 @@ export async function handleCmsRequest(request: Request) {
     }
     if (request.method === "GET" && action === "public-books") {
       const rows = await db()`SELECT id,title,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,publication_year,publisher,page_count,book_size,book_format,language,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url
-        FROM public.gpm_cms_books WHERE show_public=true AND publication_status <> 'arsip' ORDER BY created_at DESC`;
+        FROM public.gpm_cms_books WHERE show_public=true AND publication_status='terbit' AND is_demo=false ORDER BY created_at DESC`;
       return json({ ok: true, items: rows });
     }
     if (request.method === "GET" && action === "public-book") {
@@ -103,7 +106,7 @@ export async function handleCmsRequest(request: Request) {
       if (!id) return json({ok:false,error:"Buku tidak ditemukan."},404);
       const rows = await db()`SELECT id,title,author,category,synopsis,abstract,keywords,kata_pengantar,latar_belakang,glosarium,daftar_pustaka,cover_url,isbn,qrcbn,publication_status,
         publisher,publication_city,publication_year,publication_date,edition,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url
-        FROM public.gpm_cms_books WHERE id::text=${id} AND show_public=true AND publication_status <> 'arsip' LIMIT 1`;
+        FROM public.gpm_cms_books WHERE id::text=${id} AND show_public=true AND publication_status='terbit' AND is_demo=false LIMIT 1`;
       return rows.length ? json({ok:true,item:rows[0]}) : json({ok:false,error:"Buku tidak ditemukan."},404);
     }
     if (request.method === "GET" && action === "public-authors") {
@@ -187,6 +190,7 @@ export async function handleCmsRequest(request: Request) {
       const b=await readBody(request), title=text(b.title,300), author=text(b.author,200);
       if (!title || !author) return json({ok:false,error:"Judul dan penulis wajib diisi."},400);
       const canPublish = user!.is_super_admin || user!.role === "admin";
+      if (canPublish) validateDistribution(b);
       const status = canPublish ? (text(b.publication_status,30) || "persiapan") : "persiapan";
       const showPublic = canPublish && b.show_public === true;
       const rows=await db()`INSERT INTO public.gpm_cms_books
@@ -203,6 +207,7 @@ export async function handleCmsRequest(request: Request) {
       if (!id || !title || !author) return json({ok:false,error:"Data buku tidak lengkap."},400);
       const canPublish = user!.is_super_admin || user!.role === "admin";
       const requestedStatus = text(b.publication_status,30) || "persiapan";
+      if (canPublish) validateDistribution(b);
       const rows=await db()`UPDATE public.gpm_cms_books SET title=${title},subtitle='',author=${author},
         category=${text(b.category,120)||"Umum"},synopsis=${text(b.synopsis,10000)},cover_url=${text(b.cover_url,2000)},
         isbn=${text(b.isbn,30)},qrcbn=${text(b.qrcbn,60)},publication_status=CASE WHEN ${canPublish} THEN ${requestedStatus} ELSE publication_status END,is_demo=${b.is_demo===true},
@@ -320,10 +325,12 @@ export async function handleCmsImageUpload(request: Request) {
       onBeforeGenerateToken: async (pathname, clientPayload) => {
         const user = await currentUser(request);
         requireRole(user, ["admin", "editor"]);
-        let payload: {kind?:string} = {};
+        let payload: {kind?:string;openAccess?:boolean;licenseName?:string} = {};
         try { payload = JSON.parse(clientPayload || "{}"); } catch { throw new Error("Jenis unggahan tidak valid."); }
         const kind = payload.kind;
         if (kind !== "cover" && kind !== "author" && kind !== "book-pdf") throw new Error("Jenis berkas tidak diizinkan.");
+        if (kind === "book-pdf" && !user!.is_super_admin && user!.role !== "admin") throw Object.assign(new Error("Hanya Admin yang dapat mengunggah PDF publik."), {status:403});
+        if (kind === "book-pdf" && (payload.openAccess !== true || !text(payload.licenseName,120))) throw Object.assign(new Error("PDF publik hanya boleh diunggah untuk buku Open Access dengan lisensi."), {status:400});
         const prefix = kind === "cover" ? "gpm/covers/" : kind === "author" ? "gpm/authors/" : "gpm/books/";
         if (!pathname.startsWith(prefix)) throw new Error("Lokasi penyimpanan tidak valid.");
         return {
