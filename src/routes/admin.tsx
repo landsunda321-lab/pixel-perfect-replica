@@ -75,11 +75,10 @@ function AdminPage() {
   <select value={form.edition||""} onChange={e=>setForm({...form,edition:e.target.value})} className="w-full rounded-xl border p-3 text-sm"><option value="">Pilih edisi / cetakan</option>{["Cetakan Pertama","Cetakan Kedua","Cetakan Ketiga","Cetakan Keempat","Cetakan Kelima","Edisi Revisi","Edisi Kedua","Edisi Ketiga"].map(v=><option key={v} value={v}>{v}</option>)}</select>
   </fieldset>
   <fieldset className="space-y-3"><legend className="text-sm font-bold text-blue-900">Konten buku</legend>
-  <textarea rows={4} placeholder="Abstrak buku" value={form.abstract||""} onChange={e=>setForm({...form,abstract:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
   <textarea rows={4} placeholder="Sinopsis" value={form.synopsis||""} onChange={e=>setForm({...form,synopsis:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
   <textarea rows={2} placeholder="Kata kunci, pisahkan dengan koma" value={form.keywords||""} onChange={e=>setForm({...form,keywords:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
   <textarea rows={6} placeholder="Kata pengantar buku" value={form.kata_pengantar||""} onChange={e=>setForm({...form,kata_pengantar:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
-  <textarea rows={6} placeholder="Latar belakang buku" value={form.latar_belakang||""} onChange={e=>setForm({...form,latar_belakang:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
+  <textarea rows={6} placeholder="Deskripsi buku" value={form.latar_belakang||""} onChange={e=>setForm({...form,latar_belakang:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
   <textarea rows={6} placeholder="Glosarium (istilah dan definisi)" value={form.glosarium||""} onChange={e=>setForm({...form,glosarium:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
   <textarea rows={8} placeholder="Daftar pustaka" value={form.daftar_pustaka||""} onChange={e=>setForm({...form,daftar_pustaka:e.target.value})} className="w-full rounded-xl border p-3 text-sm"/>
   </fieldset>
