@@ -88,8 +88,7 @@ function assertEditorBookChanges(user: User, book: Record<string, unknown>) {
   const status = text(book.publication_status, 30);
   const requestsPublic = book.show_public === true || ["isbn_terbit", "terbit"].includes(status);
   if (requestsPublic) throw Object.assign(new Error("Editor tidak dapat menyetujui atau menerbitkan buku. Minta Admin melakukan persetujuan publikasi."), { status: 403 });
-  if (text(book.isbn, 30)) throw Object.assign(new Error("Pencatatan atau perubahan ISBN hanya dapat dilakukan Admin."), { status: 403 });
-}
+ }
 async function audit(userId: string | null, action: string, entity: string, entityId = "", details = "") {
   await db()`INSERT INTO public.gpm_cms_audit_log(user_id,action,entity_type,entity_id,details)
     VALUES (${userId},${action},${entity},${entityId},${details})`;
@@ -208,6 +207,9 @@ export async function handleCmsRequest(request: Request) {
       const title=text(b.title,300), author=text(b.author,200);
       if (!title || !author) return json({ok:false,error:"Judul dan penulis wajib diisi."},400);
       const status=text(b.publication_status,30) || "persiapan";
+      if (!user!.is_super_admin && user!.role !== "admin" && text(b.isbn,30)) {
+        throw Object.assign(new Error("Pencatatan ISBN hanya dapat dilakukan Admin."), { status: 403 });
+      }
       const rows=await db()`INSERT INTO public.gpm_cms_books
         (title,subtitle,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,show_public,created_by,
          publisher,publication_city,publication_year,publication_date,edition,abstract,keywords,kata_pengantar,latar_belakang,glosarium,daftar_pustaka,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url)
@@ -222,6 +224,13 @@ export async function handleCmsRequest(request: Request) {
       assertEditorBookChanges(user!, b);
       const id=text(b.id,80), title=text(b.title,300), author=text(b.author,200);
       if (!id || !title || !author) return json({ok:false,error:"Data buku tidak lengkap."},400);
+      if (!user!.is_super_admin && user!.role !== "admin") {
+        const existing = await db()`SELECT isbn FROM public.gpm_cms_books WHERE id=${id} LIMIT 1`;
+        if (!existing.length) return json({ok:false,error:"Buku tidak ditemukan."},404);
+        if (text(b.isbn,30) !== text(existing[0].isbn,30)) {
+          throw Object.assign(new Error("Perubahan ISBN hanya dapat dilakukan Admin."), { status: 403 });
+        }
+      }
       const rows=await db()`UPDATE public.gpm_cms_books SET title=${title},subtitle='',author=${author},
         category=${text(b.category,120)||"Umum"},synopsis=${text(b.synopsis,10000)},cover_url=${text(b.cover_url,2000)},
         isbn=${text(b.isbn,30)},qrcbn=${text(b.qrcbn,60)},publication_status=${text(b.publication_status,30)},is_demo=${b.is_demo===true},
