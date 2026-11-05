@@ -33,3 +33,8 @@ dist-ssr
 
 # Artefak pengujian lokal (screenshot & laporan uji)
 /artifacts/
+
+# Local environment secrets (never commit)
+.env
+.env.*
+!.env.example

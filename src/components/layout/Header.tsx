@@ -5,13 +5,12 @@ import { site } from "@/data/site";
 
 const NAV_ITEMS = [
   { label: "Beranda", to: "/" },
-  { label: "Tentang", to: "/tentang-penerbit" },
-  { label: "Katalog", to: "/katalog-buku" },
-  { label: "Penulis", to: "/penulis" },
-  { label: "Jurnal", to: "/jurnal" },
+  { label: "Tentang Penerbit", to: "/tentang-penerbit" },
+  { label: "Katalog Buku", to: "/katalog-buku" },
+  { label: "Distribusi", to: "/akses-distribusi" },
   { label: "Layanan", to: "/layanan-penerbitan" },
+  { label: "Penulis", to: "/penulis" },
   { label: "Kontak", to: "/kontak" },
-  { label: "Login", to: "/login" },
 ] as const;
 
 export function Header() {
