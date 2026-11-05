@@ -83,20 +83,16 @@ export async function handleCmsRequest(request: Request) {
   const url = new URL(request.url);
   const action = url.searchParams.get("action") || "";
   try {
-    // Kolom distribusi ditambahkan secara idempoten agar database lama tetap kompatibel.
-    await db()`ALTER TABLE public.gpm_cms_books
-      ADD COLUMN IF NOT EXISTS publication_city text,
-      ADD COLUMN IF NOT EXISTS latar_belakang text,
-      ADD COLUMN IF NOT EXISTS glosarium text,
-      ADD COLUMN IF NOT EXISTS daftar_pustaka text,
-      ADD COLUMN IF NOT EXISTS print_available boolean NOT NULL DEFAULT false,
-      ADD COLUMN IF NOT EXISTS print_price integer,
-      ADD COLUMN IF NOT EXISTS digital_available boolean NOT NULL DEFAULT false,
-      ADD COLUMN IF NOT EXISTS digital_access_type text NOT NULL DEFAULT 'none',
-      ADD COLUMN IF NOT EXISTS digital_price integer,
-      ADD COLUMN IF NOT EXISTS open_access boolean NOT NULL DEFAULT false,
-      ADD COLUMN IF NOT EXISTS order_url text,
-      ADD COLUMN IF NOT EXISTS digital_access_url text`;
+    // Reject cross-origin state-changing requests; SameSite cookies are an additional layer.
+    if (["POST", "PATCH", "DELETE"].includes(request.method)) {
+      const origin = request.headers.get("origin");
+      if (origin) {
+        let originHost = "";
+        try { originHost = new URL(origin).host; } catch { return json({ok:false,error:"Origin permintaan tidak valid."},403); }
+        const expectedHost = request.headers.get("x-forwarded-host") || request.headers.get("host") || new URL(request.url).host;
+        if (originHost !== expectedHost) return json({ok:false,error:"Permintaan lintas situs ditolak."},403);
+      }
+    }
     if (request.method === "GET" && action === "public-books") {
       const rows = await db()`SELECT id,title,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,publication_year,publisher,page_count,book_size,book_format,language,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url
         FROM public.gpm_cms_books WHERE show_public=true AND publication_status <> 'arsip' ORDER BY created_at DESC`;
@@ -156,12 +152,12 @@ export async function handleCmsRequest(request: Request) {
     if (request.method === "GET" && action === "me") return user ? json({ok:true,user}) : json({ok:false},401);
 
     if (request.method === "GET" && action === "users") {
-      requireRole(user,[]);
+      requireRole(user,["admin"]);
       const rows=await db()`SELECT id,name,email,role,active,is_super_admin,created_at FROM public.gpm_cms_users ORDER BY created_at DESC`;
       return json({ok:true,items:rows});
     }
     if (request.method === "POST" && action === "users") {
-      requireRole(user,[]);
+      requireRole(user,["admin"]);
       const body=await readBody(request), name=text(body.name,120), email=text(body.email,255).toLowerCase();
       const role=text(body.role,20) as Role, password=text(body.password,200);
       if (!name || !/^\S+@\S+\.\S+$/.test(email) || !["admin","editor","author"].includes(role)) return json({ok:false,error:"Data akun tidak valid."},400);
@@ -172,7 +168,7 @@ export async function handleCmsRequest(request: Request) {
       return json({ok:true,item:rows[0]},201);
     }
     if (request.method === "PATCH" && action === "users") {
-      requireRole(user,[]);
+      requireRole(user,["admin"]);
       const body=await readBody(request), id=text(body.id,80), active=body.active===true;
       if (!id || id===user!.id) return json({ok:false,error:"Akun ini tidak dapat dinonaktifkan."},400);
       const rows=await db()`UPDATE public.gpm_cms_users SET active=${active},updated_at=now()
@@ -190,11 +186,13 @@ export async function handleCmsRequest(request: Request) {
       requireRole(user,["admin","editor"]);
       const b=await readBody(request), title=text(b.title,300), author=text(b.author,200);
       if (!title || !author) return json({ok:false,error:"Judul dan penulis wajib diisi."},400);
-      const status=text(b.publication_status,30) || "persiapan";
+      const canPublish = user!.is_super_admin || user!.role === "admin";
+      const status = canPublish ? (text(b.publication_status,30) || "persiapan") : "persiapan";
+      const showPublic = canPublish && b.show_public === true;
       const rows=await db()`INSERT INTO public.gpm_cms_books
         (title,subtitle,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,show_public,created_by,
          publisher,publication_city,publication_year,publication_date,edition,abstract,keywords,kata_pengantar,latar_belakang,glosarium,daftar_pustaka,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url)
-        VALUES (${title},'',${author},${text(b.category,120)||"Umum"},${text(b.synopsis,10000)},${text(b.cover_url,2000)},${text(b.isbn,30)},${text(b.qrcbn,60)},${status},${b.is_demo===true},${b.show_public===true},${user!.id},
+        VALUES (${title},'',${author},${text(b.category,120)||"Umum"},${text(b.synopsis,10000)},${text(b.cover_url,2000)},${text(b.isbn,30)},${text(b.qrcbn,60)},${status},${b.is_demo===true},${showPublic},${user!.id},
          ${text(b.publisher,200)||"Griya Pustaka Mandiri"},${text(b.publication_city,120)||null},${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},${text(b.publication_date,10)||null},${text(b.edition,100)},${text(b.abstract,20000)},${text(b.keywords,2000)},${text(b.kata_pengantar,20000)},${text(b.latar_belakang,20000)},${text(b.glosarium,20000)},${text(b.daftar_pustaka,30000)},${Number.isInteger(Number(b.page_count))&&Number(b.page_count)>0?Number(b.page_count):null},${text(b.book_size,80)},${text(b.book_format,40)},${text(b.language,80)},${text(b.pdf_url,2000)},${b.allow_pdf_download===true},${b.print_available===true},${Number.isInteger(Number(b.print_price))&&Number(b.print_price)>=0?Number(b.print_price):null},${b.digital_available===true},${["paid","free","none"].includes(text(b.digital_access_type,10))?text(b.digital_access_type,10):"none"},${Number.isInteger(Number(b.digital_price))&&Number(b.digital_price)>=0?Number(b.digital_price):null},${b.open_access===true},${text(b.order_url,2000)||null},${text(b.digital_access_url,2000)||null}) RETURNING *`;
       await audit(user!.id,"create_book","book",String(rows[0].id),title);
       return json({ok:true,item:rows[0]},201);
@@ -203,10 +201,12 @@ export async function handleCmsRequest(request: Request) {
       requireRole(user,["admin","editor"]);
       const b=await readBody(request), id=text(b.id,80), title=text(b.title,300), author=text(b.author,200);
       if (!id || !title || !author) return json({ok:false,error:"Data buku tidak lengkap."},400);
+      const canPublish = user!.is_super_admin || user!.role === "admin";
+      const requestedStatus = text(b.publication_status,30) || "persiapan";
       const rows=await db()`UPDATE public.gpm_cms_books SET title=${title},subtitle='',author=${author},
         category=${text(b.category,120)||"Umum"},synopsis=${text(b.synopsis,10000)},cover_url=${text(b.cover_url,2000)},
-        isbn=${text(b.isbn,30)},qrcbn=${text(b.qrcbn,60)},publication_status=${text(b.publication_status,30)},is_demo=${b.is_demo===true},
-        show_public=${b.show_public===true},publisher=${text(b.publisher,200)||"Griya Pustaka Mandiri"},publication_city=${text(b.publication_city,120)||null},
+        isbn=${text(b.isbn,30)},qrcbn=${text(b.qrcbn,60)},publication_status=CASE WHEN ${canPublish} THEN ${requestedStatus} ELSE publication_status END,is_demo=${b.is_demo===true},
+        show_public=CASE WHEN ${canPublish} THEN ${b.show_public===true} ELSE show_public END,publisher=${text(b.publisher,200)||"Griya Pustaka Mandiri"},publication_city=${text(b.publication_city,120)||null},
         publication_year=${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},
         publication_date=${text(b.publication_date,10)||null},edition=${text(b.edition,100)},abstract=${text(b.abstract,20000)},
         keywords=${text(b.keywords,2000)},kata_pengantar=${text(b.kata_pengantar,20000)},latar_belakang=${text(b.latar_belakang,20000)},glosarium=${text(b.glosarium,20000)},daftar_pustaka=${text(b.daftar_pustaka,30000)},
@@ -220,10 +220,11 @@ export async function handleCmsRequest(request: Request) {
       return json({ok:true,item:rows[0]});
     }
     if (request.method === "DELETE" && action === "books") {
-      requireRole(user,["admin","editor"]);
+      requireRole(user,["admin"]);
       const id=url.searchParams.get("id")||"";
-      await db()`DELETE FROM public.gpm_cms_books WHERE id=${id}`;
-      await audit(user!.id,"delete_book","book",id);
+      const rows=await db()`UPDATE public.gpm_cms_books SET publication_status='arsip',show_public=false,updated_at=now() WHERE id=${id} RETURNING id`;
+      if (!rows.length) return json({ok:false,error:"Buku tidak ditemukan."},404);
+      await audit(user!.id,"archive_book","book",id,"Buku diarsipkan; data dipertahankan");
       return json({ok:true});
     }
     if (request.method === "GET" && action === "authors") {
