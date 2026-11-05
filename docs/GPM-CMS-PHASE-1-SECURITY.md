@@ -18,7 +18,7 @@
 Run `migrations/20261105_gpm_cms_phase1_safety.sql` against staging first. It adds only three indexes and does not change records.
 
 ## Outstanding security operations
-- A tracked `.env` exists in the public repository. Do not read or reuse values from it. Rotate credentials that may have been committed, then remove the tracked file in a reviewed change and keep `.env*` ignored except safe examples.
+- The tracked `.env` file has been removed from this branch and `.env` / `.env.*` are now ignored. The reviewed file diff contained only `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` client configuration (publishable by design), not a service-role key or database password. Still review repository history and Vercel environment settings for any separately committed private credentials; rotate any private secret found.
 - Private Vercel Blob storage is not yet provisioned. Do not upload manuscripts, contracts, or ISBN evidence to a public Blob store. Provision a private Blob store and use `@vercel/blob` >=2.3 before implementing authenticated private-file upload/download.
 - Existing public PDF URLs must be treated as public.
 - Production migration and deployment promotion require staging validation and explicit operator approval.
