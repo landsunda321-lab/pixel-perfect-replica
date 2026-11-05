@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, Mail, MapPin, Phone, Send, TriangleAlert } from "lucide-react";
+import { CheckCircle2, Mail, MapPin, Phone, MessageCircle, Send, TriangleAlert } from "lucide-react";
 import { useState, type FormEvent } from "react";
 
 import { SectionHeading } from "@/components/SectionHeading";
@@ -65,7 +65,7 @@ function ContactPage() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error" | "unavailable">(
     "idle",
   );
-  const { address, email, secondaryEmail, phone, operatingHours } = site.contact;
+  const { address, email, adminEmail, secondaryEmail, phone, mobile, operatingHours } = site.contact;
 
   const update =
     (field: keyof ContactFormValues) =>
@@ -100,7 +100,7 @@ function ContactPage() {
     }
   }
 
-  const hasContactData = address || email || secondaryEmail || phone;
+  const hasContactData = address || email || adminEmail || secondaryEmail || phone || mobile;
 
   return (
     <div className="flex flex-col">
@@ -132,7 +132,7 @@ function ContactPage() {
                     </div>
                   </div>
                 ) : null}
-                {email || secondaryEmail ? (
+                {email || adminEmail || secondaryEmail ? (
                   <div className="flex gap-3">
                     <Mail className="mt-0.5 size-5 shrink-0 text-azure" aria-hidden="true" />
                     <div>
@@ -140,6 +140,7 @@ function ContactPage() {
                       <dd className="mt-1 text-sm text-muted-foreground">
                         <div className="flex flex-col gap-1">
                           {email ? <a href={`mailto:${email}`} className="transition-colors hover:text-primary">{email}</a> : null}
+                          {adminEmail ? <a href={`mailto:${adminEmail}`} className="transition-colors hover:text-primary">{adminEmail}</a> : null}
                           {secondaryEmail ? <a href={`mailto:${secondaryEmail}`} className="transition-colors hover:text-primary">{secondaryEmail}</a> : null}
                         </div>
                       </dd>
@@ -150,8 +151,21 @@ function ContactPage() {
                   <div className="flex gap-3">
                     <Phone className="mt-0.5 size-5 shrink-0 text-azure" aria-hidden="true" />
                     <div>
-                      <dt className="text-sm font-medium text-foreground">Nomor Telepon Resmi</dt>
-                      <dd className="mt-1 text-sm text-muted-foreground"><a href={`https://wa.me/62${phone.replace(/^0/, "").replace(/\\D/g, "")}`} target="_blank" rel="noreferrer" className="transition-colors hover:text-primary"> {phone} (WhatsApp)</a></dd>
+                      <dt className="text-sm font-medium text-foreground">Nomor Telepon</dt>
+                      <dd className="mt-1 text-sm text-muted-foreground">
+                        <a href={`tel:${phone.replace(/[^0-9+]/g, "")}`} className="transition-colors hover:text-primary">{phone}</a>
+                      </dd>
+                    </div>
+                  </div>
+                ) : null}
+                {mobile ? (
+                  <div className="flex gap-3">
+                    <MessageCircle className="mt-0.5 size-5 shrink-0 text-azure" aria-hidden="true" />
+                    <div>
+                      <dt className="text-sm font-medium text-foreground">WhatsApp</dt>
+                      <dd className="mt-1 text-sm text-muted-foreground">
+                        <a href={`https://wa.me/62${mobile.replace(/^0/, "").replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="transition-colors hover:text-primary">{mobile}</a>
+                      </dd>
                     </div>
                   </div>
                 ) : null}
@@ -164,10 +178,7 @@ function ContactPage() {
               </dl>
               {!hasContactData ? (
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                  Alamat, email, dan nomor telepon resmi akan ditampilkan setelah data tersebut
-                  dikonfirmasi dari dokumen legalitas perusahaan. Sementara itu, sampaikan pesan
-                  melalui formulir di samping — status pengiriman ditampilkan apa adanya, termasuk
-                  bila layanan pesan belum terhubung.
+                  Gunakan alamat email atau nomor WhatsApp yang tercantum di atas untuk menghubungi penerbit. Anda juga dapat mengirim pertanyaan melalui formulir ini.
                 </p>
               ) : null}
             </div>
@@ -348,9 +359,7 @@ function ContactPage() {
                       </p>
                       <p className="mt-1 text-sm text-muted-foreground">
                         Pesan Anda <strong className="font-semibold">belum terkirim</strong>. Kanal
-                        kontak resmi {site.brandName} — alamat, email, dan nomor telepon — akan
-                        ditampilkan di halaman ini setelah dikonfirmasi dari dokumen legalitas
-                        perusahaan.
+                        Silakan hubungi penerbit melalui email atau WhatsApp yang tercantum pada informasi kontak.
                       </p>
                     </div>
                   </div>
