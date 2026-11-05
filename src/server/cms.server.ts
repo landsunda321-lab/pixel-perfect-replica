@@ -169,6 +169,17 @@ export async function handleCmsRequest(request: Request) {
     const user=await currentUser(request);
     if (request.method === "GET" && action === "me") return user ? json({ok:true,user}) : json({ok:false},401);
 
+    if (request.method === "GET" && action === "audit-log") {
+      requireAdmin(user);
+      const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit")) || 50));
+      const rows = await db()`SELECT a.id,a.user_id,u.name AS user_name,u.email AS user_email,
+        a.action,a.entity_type,a.entity_id,a.details,a.created_at
+        FROM public.gpm_cms_audit_log a
+        LEFT JOIN public.gpm_cms_users u ON u.id=a.user_id
+        ORDER BY a.created_at DESC LIMIT ${limit}`;
+      return json({ok:true,items:rows});
+    }
+
     if (request.method === "GET" && action === "users") {
       requireAdmin(user);
       const rows=await db()`SELECT id,name,email,role,active,is_super_admin,created_at FROM public.gpm_cms_users ORDER BY created_at DESC`;
