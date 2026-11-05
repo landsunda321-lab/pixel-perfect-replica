@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Building2, Copyright, FileText, PenLine, ShieldCheck } from "lucide-react";
 
 import editorialDesk from "@/assets/editorial-desk.jpg";
@@ -22,9 +22,9 @@ export const Route = createFileRoute("/tentang-penerbit")({
       {
         name: "description",
         content:
-          "Profil Griya Pustaka Mandiri: penerbit buku yang berfokus pada pengembangan dan penyebarluasan karya tulis akademik, ilmiah, pendidikan, dan praktis.",
+          "Profil PT Griya Pustaka Mandiri: penerbit buku yang berfokus pada pengembangan dan penyebarluasan karya tulis akademik, ilmiah, pendidikan, dan praktis.",
       },
-      { property: "og:title", content: "Tentang Griya Pustaka Mandiri" },
+      { property: "og:title", content: "Tentang PT Griya Pustaka Mandiri" },
       {
         property: "og:description",
         content:
@@ -41,9 +41,10 @@ function AboutPage() {
   const { address, email, phone } = site.contact;
 
   const identityRows: Array<{ label: string; value: string }> = [
-    { label: "Nama Penerbit", value: site.brandName },
+    { label: "Nama Badan Usaha", value: site.legalName },
+    { label: "Nama Merek Penerbit", value: site.brandName },
     { label: "Bentuk Badan Usaha", value: site.entityForm },
-    { label: "Bidang Usaha", value: businessFieldLabel() },
+    { label: "Bidang Penerbitan", value: businessFieldLabel() },
     ...(address ? [{ label: "Alamat Resmi", value: address }] : []),
     ...(email ? [{ label: "Email Resmi", value: email }] : []),
     ...(phone ? [{ label: "Nomor Telepon Resmi", value: phone }] : []),
@@ -61,7 +62,7 @@ function AboutPage() {
             Profil Penerbit
           </p>
           <h1 className="mt-3 font-display text-4xl font-bold text-primary sm:text-5xl">
-            Tentang Griya Pustaka Mandiri
+            Tentang PT Griya Pustaka Mandiri
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
             Penerbitan Buku dan Pengembangan Pengetahuan
@@ -192,10 +193,10 @@ function AboutPage() {
             ))}
           </dl>
         </div>
-        {!address || !email || !phone ? (
+        {!address ? (
           <p className="mt-4 text-sm text-muted-foreground">
-            Alamat, email, dan nomor telepon resmi akan ditampilkan setelah data tersebut
-            dikonfirmasi dari dokumen legalitas perusahaan.
+            Alamat resmi akan ditampilkan setelah perbedaan penulisan alamat pada dokumen
+            legalitas perusahaan dikonfirmasi.
           </p>
         ) : null}
       </section>
