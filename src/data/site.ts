@@ -22,10 +22,12 @@ export const site = {
   contact: {
     // Menunggu konfirmasi karena RT/RW pada dokumen AHU dan NIB berbeda.
     address: null as string | null,
-    // Mengikuti email dan nomor telepon yang tercantum pada NIB.
-    email: "griyapustakamandiri@gmail.com" as string | null,
-    secondaryEmail: null as string | null,
+    // Email resmi penerbit.
+    email: "admin@griyapustakamandiri.web.id" as string | null,
+    secondaryEmail: "info@griyapustakamandiri.web.id" as string | null,
+    // Nomor telepon yang tercantum pada NIB dan nomor HP layanan.
     phone: "087821094000" as string | null,
+    mobile: "083185154984" as string | null,
     operatingHours: null as string | null,
   },
 } as const;
@@ -49,7 +51,7 @@ export function canonicalLinks(path: string): Array<{ rel: string; href: string 
 
 /** True jika minimal satu kanal kontak resmi sudah diisi. */
 export function hasOfficialContact(): boolean {
-  return Boolean(site.contact.address || site.contact.email || site.contact.phone);
+  return Boolean(site.contact.address || site.contact.email || site.contact.phone || site.contact.mobile);
 }
 
 export interface PublishingArea {
