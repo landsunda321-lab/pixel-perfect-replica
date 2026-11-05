@@ -36,6 +36,9 @@ async function readBody(request: Request) {
   catch { throw new Error("Format permintaan tidak valid."); }
 }
 function text(v: unknown, max = 5000) { return typeof v === "string" ? v.trim().slice(0, max) : ""; }
+function safeHttpsUrl(v: unknown, max = 2000) { const value=text(v,max); if(!value)return null; try { const u=new URL(value); return u.protocol==="https:"?u.toString():null; } catch { return null; } }
+function validPrice(v: unknown) { if(v===null||v===undefined||v==="")return null; const n=Number(v); return Number.isSafeInteger(n)&&n>=0&&n<=2000000000?n:null; }
+function validateDistribution(b: Record<string, unknown>) { if(b.publication_status!==undefined&&!["persiapan","proses_isbn","isbn_terbit","proses_cetak","terbit","arsip"].includes(text(b.publication_status,30))) throw Object.assign(new Error("Status publikasi tidak valid."),{status:400}); if(b.open_access===true&&!text(b.license_name,120)) throw Object.assign(new Error("Lisensi wajib diisi untuk Open Access."),{status:400}); if(b.allow_pdf_download===true&&(b.open_access!==true||!safeHttpsUrl(b.pdf_url))) throw Object.assign(new Error("Unduh PDF memerlukan status Open Access dan file PDF."),{status:400}); if(b.order_url&&!safeHttpsUrl(b.order_url)) throw Object.assign(new Error("Tautan pemesanan harus HTTPS."),{status:400}); if(b.digital_access_url&&!safeHttpsUrl(b.digital_access_url)) throw Object.assign(new Error("Tautan digital harus HTTPS."),{status:400}); if(b.digital_access_type==="paid"&&validPrice(b.digital_price)===null) throw Object.assign(new Error("Harga digital berbayar wajib diisi."),{status:400}); }
 function slugify(value: string) {
   return value.normalize("NFKD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase()
     .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 90) || "penulis";
@@ -86,6 +89,7 @@ export async function handleCmsRequest(request: Request) {
     // Reject cross-origin state-changing requests; SameSite cookies are an additional layer.
     if (["POST", "PATCH", "DELETE"].includes(request.method)) {
       const origin = request.headers.get("origin");
+      if (!origin) return json({ok:false,error:"Header Origin wajib untuk permintaan perubahan data."},403);
       if (origin) {
         let originHost = "";
         try { originHost = new URL(origin).host; } catch { return json({ok:false,error:"Origin permintaan tidak valid."},403); }
@@ -94,16 +98,16 @@ export async function handleCmsRequest(request: Request) {
       }
     }
     if (request.method === "GET" && action === "public-books") {
-      const rows = await db()`SELECT id,title,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,publication_year,publisher,page_count,book_size,book_format,language,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url
-        FROM public.gpm_cms_books WHERE show_public=true AND publication_status <> 'arsip' ORDER BY created_at DESC`;
+      const rows = await db()`SELECT id,title,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,publication_year,publisher,page_count,book_size,book_format,language,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,license_name,license_url,rights_holder,rights_notice,order_url,digital_access_url,CASE WHEN open_access=true AND allow_pdf_download=true THEN pdf_url ELSE NULL END AS pdf_url,(open_access=true AND allow_pdf_download=true AND pdf_url<>'') AS allow_pdf_download
+        FROM public.gpm_cms_books WHERE show_public=true AND publication_status='terbit' AND is_demo=false ORDER BY created_at DESC`;
       return json({ ok: true, items: rows });
     }
     if (request.method === "GET" && action === "public-book") {
       const id = text(url.searchParams.get("id"), 80);
       if (!id) return json({ok:false,error:"Buku tidak ditemukan."},404);
       const rows = await db()`SELECT id,title,author,category,synopsis,abstract,keywords,kata_pengantar,latar_belakang,glosarium,daftar_pustaka,cover_url,isbn,qrcbn,publication_status,
-        publisher,publication_city,publication_year,publication_date,edition,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url
-        FROM public.gpm_cms_books WHERE id::text=${id} AND show_public=true AND publication_status <> 'arsip' LIMIT 1`;
+        publisher,publication_city,publication_year,publication_date,edition,page_count,book_size,book_format,language,CASE WHEN open_access=true AND allow_pdf_download=true THEN pdf_url ELSE NULL END AS pdf_url,(open_access=true AND allow_pdf_download=true AND pdf_url<>'') AS allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,license_name,license_url,rights_holder,rights_notice,order_url,digital_access_url
+        FROM public.gpm_cms_books WHERE id::text=${id} AND show_public=true AND publication_status='terbit' AND is_demo=false LIMIT 1`;
       return rows.length ? json({ok:true,item:rows[0]}) : json({ok:false,error:"Buku tidak ditemukan."},404);
     }
     if (request.method === "GET" && action === "public-authors") {
@@ -187,13 +191,14 @@ export async function handleCmsRequest(request: Request) {
       const b=await readBody(request), title=text(b.title,300), author=text(b.author,200);
       if (!title || !author) return json({ok:false,error:"Judul dan penulis wajib diisi."},400);
       const canPublish = user!.is_super_admin || user!.role === "admin";
+      if (canPublish) validateDistribution(b);
       const status = canPublish ? (text(b.publication_status,30) || "persiapan") : "persiapan";
       const showPublic = canPublish && b.show_public === true;
       const rows=await db()`INSERT INTO public.gpm_cms_books
         (title,subtitle,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,show_public,created_by,
-         publisher,publication_city,publication_year,publication_date,edition,abstract,keywords,kata_pengantar,latar_belakang,glosarium,daftar_pustaka,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,order_url,digital_access_url)
+         publisher,publication_city,publication_year,publication_date,edition,abstract,keywords,kata_pengantar,latar_belakang,glosarium,daftar_pustaka,page_count,book_size,book_format,language,pdf_url,allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,license_name,license_url,rights_holder,rights_notice,order_url,digital_access_url)
         VALUES (${title},'',${author},${text(b.category,120)||"Umum"},${text(b.synopsis,10000)},${text(b.cover_url,2000)},${text(b.isbn,30)},${text(b.qrcbn,60)},${status},${b.is_demo===true},${showPublic},${user!.id},
-         ${text(b.publisher,200)||"Griya Pustaka Mandiri"},${text(b.publication_city,120)||null},${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},${text(b.publication_date,10)||null},${text(b.edition,100)},${text(b.abstract,20000)},${text(b.keywords,2000)},${text(b.kata_pengantar,20000)},${text(b.latar_belakang,20000)},${text(b.glosarium,20000)},${text(b.daftar_pustaka,30000)},${Number.isInteger(Number(b.page_count))&&Number(b.page_count)>0?Number(b.page_count):null},${text(b.book_size,80)},${text(b.book_format,40)},${text(b.language,80)},${text(b.pdf_url,2000)},${b.allow_pdf_download===true},${b.print_available===true},${Number.isInteger(Number(b.print_price))&&Number(b.print_price)>=0?Number(b.print_price):null},${b.digital_available===true},${["paid","free","none"].includes(text(b.digital_access_type,10))?text(b.digital_access_type,10):"none"},${Number.isInteger(Number(b.digital_price))&&Number(b.digital_price)>=0?Number(b.digital_price):null},${b.open_access===true},${text(b.order_url,2000)||null},${text(b.digital_access_url,2000)||null}) RETURNING *`;
+         ${text(b.publisher,200)||"Griya Pustaka Mandiri"},${text(b.publication_city,120)||null},${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},${text(b.publication_date,10)||null},${text(b.edition,100)},${text(b.abstract,20000)},${text(b.keywords,2000)},${text(b.kata_pengantar,20000)},${text(b.latar_belakang,20000)},${text(b.glosarium,20000)},${text(b.daftar_pustaka,30000)},${Number.isInteger(Number(b.page_count))&&Number(b.page_count)>0?Number(b.page_count):null},${text(b.book_size,80)},${text(b.book_format,40)},${text(b.language,80)},${canPublish ? safeHttpsUrl(b.pdf_url) : null},${canPublish && b.allow_pdf_download===true && b.open_access===true},${canPublish && b.print_available===true},${canPublish ? validPrice(b.print_price) : null},${canPublish && b.digital_available===true},${canPublish && ["paid","free","none"].includes(text(b.digital_access_type,10))?text(b.digital_access_type,10):"none"},${canPublish ? validPrice(b.digital_price) : null},${canPublish && b.open_access===true},${canPublish ? text(b.license_name,120) : ""},${canPublish ? safeHttpsUrl(b.license_url) : null},${canPublish ? text(b.rights_holder,200) : ""},${canPublish ? text(b.rights_notice,2000) : ""},${canPublish ? safeHttpsUrl(b.order_url) : null},${canPublish ? safeHttpsUrl(b.digital_access_url) : null}) RETURNING *`;
       await audit(user!.id,"create_book","book",String(rows[0].id),title);
       return json({ok:true,item:rows[0]},201);
     }
@@ -203,17 +208,18 @@ export async function handleCmsRequest(request: Request) {
       if (!id || !title || !author) return json({ok:false,error:"Data buku tidak lengkap."},400);
       const canPublish = user!.is_super_admin || user!.role === "admin";
       const requestedStatus = text(b.publication_status,30) || "persiapan";
+      if (canPublish) validateDistribution(b);
       const rows=await db()`UPDATE public.gpm_cms_books SET title=${title},subtitle='',author=${author},
         category=${text(b.category,120)||"Umum"},synopsis=${text(b.synopsis,10000)},cover_url=${text(b.cover_url,2000)},
-        isbn=${text(b.isbn,30)},qrcbn=${text(b.qrcbn,60)},publication_status=CASE WHEN ${canPublish} THEN ${requestedStatus} ELSE publication_status END,is_demo=${b.is_demo===true},
+        isbn=${text(b.isbn,30)},qrcbn=${text(b.qrcbn,60)},publication_status=CASE WHEN ${canPublish} THEN ${requestedStatus} ELSE publication_status END,is_demo=CASE WHEN ${canPublish} THEN ${b.is_demo===true} ELSE is_demo END,
         show_public=CASE WHEN ${canPublish} THEN ${b.show_public===true} ELSE show_public END,publisher=${text(b.publisher,200)||"Griya Pustaka Mandiri"},publication_city=${text(b.publication_city,120)||null},
         publication_year=${Number.isInteger(Number(b.publication_year))&&Number(b.publication_year)>0?Number(b.publication_year):null},
         publication_date=${text(b.publication_date,10)||null},edition=${text(b.edition,100)},abstract=${text(b.abstract,20000)},
         keywords=${text(b.keywords,2000)},kata_pengantar=${text(b.kata_pengantar,20000)},latar_belakang=${text(b.latar_belakang,20000)},glosarium=${text(b.glosarium,20000)},daftar_pustaka=${text(b.daftar_pustaka,30000)},
         page_count=${Number.isInteger(Number(b.page_count))&&Number(b.page_count)>0?Number(b.page_count):null},
         book_size=${text(b.book_size,80)},book_format=${text(b.book_format,40)},language=${text(b.language,80)},
-        pdf_url=${text(b.pdf_url,2000)},allow_pdf_download=${b.allow_pdf_download===true},
-        print_available=${b.print_available===true},print_price=${Number.isInteger(Number(b.print_price))&&Number(b.print_price)>=0?Number(b.print_price):null},digital_available=${b.digital_available===true},digital_access_type=${["paid","free","none"].includes(text(b.digital_access_type,10))?text(b.digital_access_type,10):"none"},digital_price=${Number.isInteger(Number(b.digital_price))&&Number(b.digital_price)>=0?Number(b.digital_price):null},open_access=${b.open_access===true},order_url=${text(b.order_url,2000)||null},digital_access_url=${text(b.digital_access_url,2000)||null},
+        pdf_url=CASE WHEN ${canPublish} THEN ${safeHttpsUrl(b.pdf_url)} ELSE pdf_url END,allow_pdf_download=CASE WHEN ${canPublish} THEN ${b.allow_pdf_download===true && b.open_access===true} ELSE allow_pdf_download END,
+        print_available=CASE WHEN ${canPublish} THEN ${b.print_available===true} ELSE print_available END,print_price=CASE WHEN ${canPublish} THEN ${validPrice(b.print_price)} ELSE print_price END,digital_available=CASE WHEN ${canPublish} THEN ${b.digital_available===true} ELSE digital_available END,digital_access_type=CASE WHEN ${canPublish} THEN ${["paid","free","none"].includes(text(b.digital_access_type,10))?text(b.digital_access_type,10):"none"} ELSE digital_access_type END,digital_price=CASE WHEN ${canPublish} THEN ${validPrice(b.digital_price)} ELSE digital_price END,open_access=CASE WHEN ${canPublish} THEN ${b.open_access===true} ELSE open_access END,license_name=CASE WHEN ${canPublish} THEN ${text(b.license_name,120)} ELSE license_name END,license_url=CASE WHEN ${canPublish} THEN ${safeHttpsUrl(b.license_url)} ELSE license_url END,rights_holder=CASE WHEN ${canPublish} THEN ${text(b.rights_holder,200)} ELSE rights_holder END,rights_notice=CASE WHEN ${canPublish} THEN ${text(b.rights_notice,2000)} ELSE rights_notice END,order_url=CASE WHEN ${canPublish} THEN ${safeHttpsUrl(b.order_url)} ELSE order_url END,digital_access_url=CASE WHEN ${canPublish} THEN ${safeHttpsUrl(b.digital_access_url)} ELSE digital_access_url END,
         updated_at=now() WHERE id=${id} AND (${canPublish} OR show_public=false) RETURNING *`;
       if (!rows.length) return json({ok:false,error:"Buku tidak ditemukan atau hanya Admin yang dapat mengubah buku yang sudah dipublikasikan."},404);
       await audit(user!.id,"update_book","book",id,title);
@@ -312,6 +318,12 @@ const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 export async function handleCmsImageUpload(request: Request) {
   try {
     if (request.method !== "POST") return json({ok:false,error:"Metode tidak diizinkan."},405);
+    const origin = request.headers.get("origin");
+    if (!origin) return json({ok:false,error:"Header Origin wajib untuk unggahan."},403);
+    let originHost = "";
+    try { originHost = new URL(origin).host; } catch { return json({ok:false,error:"Origin unggahan tidak valid."},403); }
+    const expectedHost = request.headers.get("x-forwarded-host") || request.headers.get("host") || new URL(request.url).host;
+    if (originHost !== expectedHost) return json({ok:false,error:"Unggahan lintas situs ditolak."},403);
     if (!process.env.BLOB_READ_WRITE_TOKEN) return json({ok:false,error:"Penyimpanan gambar belum terhubung. Periksa konfigurasi Blob."},503);
     const body = await request.json() as HandleUploadBody;
     const response = await handleUpload({
@@ -320,10 +332,12 @@ export async function handleCmsImageUpload(request: Request) {
       onBeforeGenerateToken: async (pathname, clientPayload) => {
         const user = await currentUser(request);
         requireRole(user, ["admin", "editor"]);
-        let payload: {kind?:string} = {};
+        let payload: {kind?:string;openAccess?:boolean;licenseName?:string} = {};
         try { payload = JSON.parse(clientPayload || "{}"); } catch { throw new Error("Jenis unggahan tidak valid."); }
         const kind = payload.kind;
         if (kind !== "cover" && kind !== "author" && kind !== "book-pdf") throw new Error("Jenis berkas tidak diizinkan.");
+        if (kind === "book-pdf" && !user!.is_super_admin && user!.role !== "admin") throw Object.assign(new Error("Hanya Admin yang dapat mengunggah PDF publik."), {status:403});
+        if (kind === "book-pdf" && (payload.openAccess !== true || !text(payload.licenseName,120))) throw Object.assign(new Error("PDF publik hanya boleh diunggah untuk buku Open Access dengan lisensi."), {status:400});
         const prefix = kind === "cover" ? "gpm/covers/" : kind === "author" ? "gpm/authors/" : "gpm/books/";
         if (!pathname.startsWith(prefix)) throw new Error("Lokasi penyimpanan tidak valid.");
         return {
