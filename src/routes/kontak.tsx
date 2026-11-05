@@ -139,7 +139,8 @@ function ContactPage() {
                       <dt className="text-sm font-medium text-foreground">Email Resmi</dt>
                       <dd className="mt-1 text-sm text-muted-foreground">
                         <div className="flex flex-col gap-1">
-                          {email ? <a href={`mailto:${email}`} className="transition-colors hover:text-primary">{email}</a> : null}\n                          {adminEmail ? <a href={`mailto:${adminEmail}`} className="transition-colors hover:text-primary">{adminEmail}</a> : null}
+                          {email ? <a href={`mailto:${email}`} className="transition-colors hover:text-primary">{email}</a> : null}
+                          {adminEmail ? <a href={`mailto:${adminEmail}`} className="transition-colors hover:text-primary">{adminEmail}</a> : null}\n                          {adminEmail ? <a href={`mailto:${adminEmail}`} className="transition-colors hover:text-primary">{adminEmail}</a> : null}
                           {secondaryEmail ? <a href={`mailto:${secondaryEmail}`} className="transition-colors hover:text-primary">{secondaryEmail}</a> : null}
                         </div>
                       </dd>
@@ -150,8 +151,11 @@ function ContactPage() {
                   <div className="flex gap-3">
                     <Phone className="mt-0.5 size-5 shrink-0 text-azure" aria-hidden="true" />
                     <div>
-                      <dt className="text-sm font-medium text-foreground">Nomor Telepon Resmi</dt>
-                      <dd className="mt-1 text-sm text-muted-foreground"><a href={`https://wa.me/62${phone.replace(/^0/, "").replace(/\\D/g, "")}`} target="_blank" rel="noreferrer" className="transition-colors hover:text-primary"> {phone} (WhatsApp)</a></dd>
+                      <dt className="text-sm font-medium text-foreground">Telepon / WhatsApp</dt>
+                      <dd className="mt-1 flex flex-col gap-1 text-sm text-muted-foreground">
+                        {phone && <span>Telepon: {phone}</span>}
+                        {mobile && <a href={`https://wa.me/62${mobile.replace(/^0/, "").replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="transition-colors hover:text-primary">WhatsApp: {mobile}</a>}
+                      </dd>
                     </div>
                   </div>
                 ) : null}
@@ -164,10 +168,7 @@ function ContactPage() {
               </dl>
               {!hasContactData ? (
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                  Alamat, email, dan nomor telepon resmi akan ditampilkan setelah data tersebut
-                  dikonfirmasi dari dokumen legalitas perusahaan. Sementara itu, sampaikan pesan
-                  melalui formulir di samping — status pengiriman ditampilkan apa adanya, termasuk
-                  bila layanan pesan belum terhubung.
+                  Gunakan alamat email atau nomor WhatsApp yang tercantum di atas untuk menghubungi penerbit. Anda juga dapat mengirim pertanyaan melalui formulir ini.
                 </p>
               ) : null}
             </div>
@@ -348,9 +349,7 @@ function ContactPage() {
                       </p>
                       <p className="mt-1 text-sm text-muted-foreground">
                         Pesan Anda <strong className="font-semibold">belum terkirim</strong>. Kanal
-                        kontak resmi {site.brandName} — alamat, email, dan nomor telepon — akan
-                        ditampilkan di halaman ini setelah dikonfirmasi dari dokumen legalitas
-                        perusahaan.
+                        Silakan hubungi penerbit melalui email atau WhatsApp yang tercantum pada informasi kontak.
                       </p>
                     </div>
                   </div>
