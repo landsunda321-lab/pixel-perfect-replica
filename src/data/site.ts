@@ -1,43 +1,31 @@
 /**
  * Konfigurasi identitas situs — satu sumber kebenaran untuk data penerbit.
  *
- * PENTING: data kontak resmi (alamat, email, telepon) hanya diisi dari dokumen
- * legalitas yang dipakai untuk pendaftaran akun ISBN Perpusnas. Jangan mengisi
- * nilai contoh atau palsu — biarkan null sampai data resmi tersedia; UI akan
- * menyembunyikan baris yang belum ada datanya.
- *
- * Cara mengonfigurasi (lihat juga src/data/README.md):
- * - Alamat/email/telepon: tempelkan nilai persis dari dokumen legalitas ke
- *   site.contact; baris yang null otomatis tidak ditampilkan di mana pun.
- * - KBLI: cukup ubah site.klbiCode bila klasifikasi resmi berbeda.
- * - Domain: isi domain.host/domain.url, lalu ubah domain.verified menjadi true
- *   HANYA setelah DNS menyelesaikan dan HTTPS berhasil diverifikasi. Selama
- *   false, halaman menampilkan keterangan "domain yang direncanakan" dan
- *   canonical URL belum dikirim.
+ * Data legal dan kontak harus mengikuti dokumen legalitas terbaru. Alamat
+ * ditahan sampai perbedaan RT/RW pada dokumen AHU dan NIB dikonfirmasi.
  */
 export const site = {
   brandName: "GRIYA PUSTAKA MANDIRI",
   legalName: "PT Griya Pustaka Mandiri",
   entityForm: "Perseroan Perorangan",
-  /** Klasifikasi baku kegiatan usaha penerbitan buku. */
+  /** KBLI resmi kegiatan usaha penerbitan buku. */
   klbiCode: "58110",
   businessField: "Penerbitan Buku",
   tagline: "Menerbitkan Gagasan, Mengembangkan Pengetahuan",
   domain: {
     host: "griyapustakamandiri.web.id",
     url: "https://griyapustakamandiri.web.id",
-    /**
-     * Domain resmi telah terhubung ke Vercel dan dapat diakses melalui HTTPS.
-     */
     verified: true,
   },
   shortSummary:
     "Penerbit yang berfokus pada buku akademik, ilmiah, pendidikan, dan praktis untuk mendukung pengembangan pengetahuan serta pemberdayaan masyarakat.",
   contact: {
-    address: "Perumahan Taman Cileunyi Blok 2G7 No. 11 Cileunyi Kulon, Cileunyi, Kabupaten Bandung" as string | null,
-    email: "admin@griyapustakamandiri.web.id" as string | null,
-    secondaryEmail: "info@griyapustakamandiri.web.id" as string | null,
-    phone: "083185154984" as string | null,
+    // Menunggu konfirmasi karena RT/RW pada dokumen AHU dan NIB berbeda.
+    address: null as string | null,
+    // Mengikuti email dan nomor telepon yang tercantum pada NIB.
+    email: "griyapustakamandiri@gmail.com" as string | null,
+    secondaryEmail: null as string | null,
+    phone: "087821094000" as string | null,
     operatingHours: null as string | null,
   },
 } as const;
@@ -47,18 +35,12 @@ export function businessFieldLabel(): string {
   return `${site.businessField} (KBLI ${site.klbiCode})`;
 }
 
-/**
- * Label domain untuk ditampilkan: menambahkan keterangan "direncanakan" hanya
- * selama domain belum terpasang, sehingga tidak ada klaim domain aktif.
- */
+/** Label domain untuk ditampilkan. */
 export function domainLabel(): string {
   return site.domain.verified ? site.domain.host : `${site.domain.host} (domain yang direncanakan)`;
 }
 
-/**
- * Tag canonical untuk sebuah path. Kosong selama domain belum terpasang agar
- * URL produksi yang belum ada tidak pernah diiklankan ke mesin pencari.
- */
+/** Tag canonical untuk sebuah path. */
 export function canonicalLinks(path: string): Array<{ rel: string; href: string }> {
   if (!site.domain.verified) return [];
   const normalized = path.startsWith("/") ? path : `/${path}`;
