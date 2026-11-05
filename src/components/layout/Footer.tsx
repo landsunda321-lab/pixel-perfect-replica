@@ -14,7 +14,7 @@ const LINKS = [
 ];
 export function Footer() {
   const year = new Date().getFullYear();
-  const { address, email, phone } = site.contact;
+  const { address, email, secondaryEmail, phone } = site.contact;
   return (
     <footer className="relative overflow-hidden bg-[#0b1b35] text-white">
       <div className="pointer-events-none absolute -right-32 -top-40 size-[28rem] rounded-full bg-blue-500/10 blur-3xl" />
@@ -41,7 +41,7 @@ export function Footer() {
           <h2 className="text-xs font-bold uppercase tracking-[.2em] text-sky-200">Terhubung dengan Kami</h2>
           <ul className="mt-5 space-y-4 text-sm text-slate-300">
             {address && <li className="flex gap-3"><MapPin className="mt-0.5 size-4 shrink-0 text-sky-300" /><span className="leading-6">{address}</span></li>}
-            {email && <li className="flex gap-3"><Mail className="size-4 shrink-0 text-sky-300" /><a href={`mailto:${email}`} className="hover:text-white">{email}</a></li>}
+            {(email || secondaryEmail) && <li className="flex gap-3"><Mail className="size-4 shrink-0 text-sky-300" /><div className="flex flex-col gap-1">{email && <a href={`mailto:${email}`} className="hover:text-white">{email}</a>}{secondaryEmail && <a href={`mailto:${secondaryEmail}`} className="hover:text-white">{secondaryEmail}</a>}</div></li>}
             {phone && <li className="flex gap-3"><Phone className="size-4 shrink-0 text-sky-300" /><a href={`https://wa.me/62${phone.replace(/^0/, "").replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="hover:text-white">{phone} · WhatsApp</a></li>}
           </ul>
           <div className="mt-7"><Link to="/kontak" className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-white/10">Informasi Kontak <ArrowUpRight className="size-4" /></Link></div>
