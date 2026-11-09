@@ -99,7 +99,7 @@ export async function handleCmsRequest(request: Request) {
     }
     if (request.method === "GET" && action === "public-books") {
       const rows = await db()`SELECT id,title,author,category,synopsis,cover_url,isbn,qrcbn,publication_status,is_demo,publication_year,publisher,page_count,book_size,book_format,language,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,license_name,license_url,rights_holder,rights_notice,order_url,digital_access_url,CASE WHEN open_access=true AND allow_pdf_download=true THEN pdf_url ELSE NULL END AS pdf_url,(open_access=true AND allow_pdf_download=true AND pdf_url<>'') AS allow_pdf_download
-        FROM public.gpm_cms_books WHERE show_public=true AND publication_status='terbit' AND is_demo=false ORDER BY created_at DESC`;
+        FROM public.gpm_cms_books WHERE show_public=true AND publication_status<>'arsip' AND is_demo=false ORDER BY created_at DESC`;
       return json({ ok: true, items: rows });
     }
     if (request.method === "GET" && action === "public-book") {
@@ -107,7 +107,7 @@ export async function handleCmsRequest(request: Request) {
       if (!id) return json({ok:false,error:"Buku tidak ditemukan."},404);
       const rows = await db()`SELECT id,title,author,category,synopsis,abstract,keywords,kata_pengantar,latar_belakang,glosarium,daftar_pustaka,cover_url,isbn,qrcbn,publication_status,
         publisher,publication_city,publication_year,publication_date,edition,page_count,book_size,book_format,language,CASE WHEN open_access=true AND allow_pdf_download=true THEN pdf_url ELSE NULL END AS pdf_url,(open_access=true AND allow_pdf_download=true AND pdf_url<>'') AS allow_pdf_download,print_available,print_price,digital_available,digital_access_type,digital_price,open_access,license_name,license_url,rights_holder,rights_notice,order_url,digital_access_url
-        FROM public.gpm_cms_books WHERE id::text=${id} AND show_public=true AND publication_status='terbit' AND is_demo=false LIMIT 1`;
+        FROM public.gpm_cms_books WHERE id::text=${id} AND show_public=true AND publication_status<>'arsip' AND is_demo=false LIMIT 1`;
       return rows.length ? json({ok:true,item:rows[0]}) : json({ok:false,error:"Buku tidak ditemukan."},404);
     }
     if (request.method === "GET" && action === "public-authors") {
@@ -240,6 +240,15 @@ export async function handleCmsRequest(request: Request) {
       const rows=await db()`UPDATE public.gpm_cms_books SET publication_status='persiapan',show_public=false,updated_at=now() WHERE id=${id} AND publication_status='arsip' RETURNING id`;
       if (!rows.length) return json({ok:false,error:"Buku arsip tidak ditemukan."},404);
       await audit(user!.id,"restore_book","book",id,"Buku dipulihkan ke daftar aktif sebagai persiapan");
+      return json({ok:true});
+    }
+    if (request.method === "DELETE" && action === "delete-archived-book") {
+      requireRole(user,["admin"]);
+      const id=url.searchParams.get("id")||"";
+      if (!id) return json({ok:false,error:"ID buku tidak valid."},400);
+      const rows=await db()`DELETE FROM public.gpm_cms_books WHERE id=${id} AND publication_status='arsip' RETURNING id`;
+      if (!rows.length) return json({ok:false,error:"Buku arsip tidak ditemukan."},404);
+      await audit(user!.id,"permanently_delete_archived_book","book",id,"Buku arsip dihapus permanen");
       return json({ok:true});
     }
     if (request.method === "GET" && action === "authors") {
