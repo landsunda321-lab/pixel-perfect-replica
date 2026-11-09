@@ -54,7 +54,7 @@ function AdminPage() {
  async function run(fn:()=>Promise<void>) {setError("");setNotice("");try{await fn();}catch(e){setError(e instanceof Error?e.message:"Terjadi kesalahan.");}}
  async function logout(){await api("logout","POST",{});await navigate({to:"/login"});}
  async function createUser(e:React.FormEvent){e.preventDefault();await run(async()=>{await api("users","POST",userForm);setUserForm({name:"",email:"",password:"",role:"editor"});await refresh();setNotice("Akun berhasil dibuat.");});}
- async function saveBook(e:React.FormEvent){e.preventDefault();await run(async()=>{await api("books",form.id?"PATCH":"POST",form);setForm({});await refresh();setNotice("Data buku tersimpan.");});}
+ async function saveBook(e:React.FormEvent){e.preventDefault();await run(async()=>{const payload={...form,allow_pdf_download:form.open_access===true&&typeof form.pdf_url==="string"&&form.pdf_url.startsWith("https://")&&form.allow_pdf_download===true};await api("books",form.id?"PATCH":"POST",payload);setForm({});await refresh();setNotice("Data buku tersimpan.");});}
  async function saveAuthor(e:React.FormEvent){e.preventDefault();await run(async()=>{await api("authors",form.id?"PATCH":"POST",form);setForm({});await refresh();setNotice("Profil penulis tersimpan.");});}
  async function submitManuscript(e:React.FormEvent){e.preventDefault();await run(async()=>{await api("manuscripts","POST",form);setForm({});await refresh();setNotice("Draft naskah tersimpan.");});}
  const superAdmin=!!me?.is_super_admin, canManageUsers=superAdmin||me?.role==="admin", canEdit=superAdmin||me?.role==="admin"||me?.role==="editor", canManageDistribution=superAdmin||me?.role==="admin";
