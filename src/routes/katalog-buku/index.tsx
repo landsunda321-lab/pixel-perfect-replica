@@ -24,9 +24,9 @@ type CmsBook = {
 const CONTROL = "w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground shadow-sm";
 type PublicationGroup = "terbit" | "persiapan" | "isbn";
 const PUBLICATION_GROUPS: { id: PublicationGroup; label: string; description: string }[] = [
-  { id: "terbit", label: "Buku Terbit", description: "Buku yang telah resmi diterbitkan." },
   { id: "persiapan", label: "Buku dalam Persiapan", description: "Naskah dan buku yang masih dalam tahap persiapan penerbitan." },
   { id: "isbn", label: "Buku dalam Proses ISBN", description: "Buku yang sedang menjalani proses pengajuan atau penerbitan ISBN." },
+  { id: "terbit", label: "Buku Terbit", description: "Buku yang telah resmi diterbitkan." },
 ];
 function getPublicationGroup(status: string): PublicationGroup {
   if (status === "terbit") return "terbit";
