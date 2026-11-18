@@ -8,9 +8,8 @@ import { site } from "@/data/site";
  *
  * ATURAN DATA:
  * - Jangan mengisi katalog dengan buku fiktif.
- * - ISBN hanya diisi setelah diberikan secara resmi (Perpusnas); isbn: null
- *   sampai nomor resmi tersedia. Jangan mengisi angka yang menyerupai ISBN.
- * - Untuk buku "Dalam Persiapan", jangan mengisi isbn, publicationYear, atau
+ * - Data bibliografis diisi hanya jika tersedia dan telah diverifikasi.
+ * - Untuk buku "Dalam Persiapan", jangan mengisi publicationYear atau
  *   accessUrl seolah sudah terbit.
  * - accessUrl hanya untuk tautan resmi yang sudah dikonfirmasi berfungsi.
  * - Cara memasukkan data: lihat src/data/README.md.
@@ -24,7 +23,6 @@ export const DEFAULT_PUBLISHER = site.legalName;
 
 export const BOOK_STATUSES = [
   "Dalam Persiapan",
-  "Simulasi — Dalam Proses Pengajuan ISBN",
   "Terbit",
   "Tersedia dalam format digital",
   "Tersedia dalam format cetak",
@@ -60,7 +58,6 @@ export const bookSchema = z.object({
       (value) => OFFICIAL_PUBLISHER_NAMES.has(value.trim().toLowerCase()),
       "nama penerbit harus konsisten dengan nama resmi penerbit",
     ),
-  isbn: z.string().min(10).max(17).nullable().optional(),
   format: z.string().min(1).nullable().optional(),
   language: z.string().min(1).nullable().optional(),
   pages: z.number().int().positive().nullable().optional(),
@@ -79,11 +76,7 @@ export const bookSchema = z.object({
 export type Book = z.infer<typeof bookSchema>;
 
 
-/**
- * ENTRI DEMONSTRASI — bukan daftar permohonan ISBN yang benar-benar dikirim.
- * Ganti atau hapus seluruh entri DEMO sebelum katalog dipublikasikan sebagai data faktual.
- * ISBN, tahun terbit, jumlah halaman, harga, dan tautan akses sengaja tidak diisi.
- */
+/** Katalog lokal dinonaktifkan; sumber data publik sekarang adalah CMS/Neon. */
 /**
  * Katalog lokal dinonaktifkan: sumber data publik sekarang adalah CMS/Neon.
  * Jangan menambahkan dummy atau data buku di berkas ini.
@@ -116,14 +109,9 @@ export function getBookBySlug(slug: string): Book | undefined {
   return getValidatedBooks().find((book) => book.slug === slug);
 }
 
-/** ISBN hanya boleh ditampilkan jika benar-benar diberikan dan buku tidak dalam persiapan. */
-export function canShowIsbn(book: Book): boolean {
-  return book.isbn != null && book.availabilityStatus !== "Dalam Persiapan" && book.availabilityStatus !== "Simulasi — Dalam Proses Pengajuan ISBN";
-}
-
-/** Buku dianggap sudah memiliki publikasi yang terkonfirmasi. */
+/** Buku dianggap telah diterbitkan jika status publikasinya secara eksplisit menyatakan Terbit. */
 export function isPublished(book: Book): boolean {
-  return book.availabilityStatus !== "Dalam Persiapan" && book.availabilityStatus !== "Simulasi — Dalam Proses Pengajuan ISBN";
+  return book.availabilityStatus === "Terbit";
 }
 
 /**
