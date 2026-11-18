@@ -65,10 +65,11 @@ function CopyrightPolicyPage() {
         </p>
       </PolicySection>
 
-      <PolicySection title="Data Bibliografis">
+      <PolicySection title="Kelengkapan Informasi Terbitan">
         <p>
-          Informasi bibliografis seperti ISBN dicantumkan secara akurat dan hanya setelah nomor
-          tersebut diberikan secara resmi oleh lembaga yang berwenang.
+          Setiap terbitan memiliki karakteristik dan kebutuhan administrasi yang dapat berbeda.
+          Informasi katalog disajikan berdasarkan data yang tersedia dan telah diverifikasi untuk
+          masing-masing judul.
         </p>
       </PolicySection>
 

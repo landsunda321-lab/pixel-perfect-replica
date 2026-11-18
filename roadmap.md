@@ -7,8 +7,8 @@
 - [x] Data katalog lokal (src/data/books.ts) — kosong, tanpa buku fiktif
 - [x] Formulir kontak tersimpan ke database via /api/public/kontak (validasi server + honeypot)
 - [x] SEO metadata per halaman, aksesibilitas, responsif
-- [x] Tes rute dan aturan katalog (ISBN, status, empty state)
-- [x] Audit & perbaikan kesiapan pendaftaran akun ISBN Perpusnas (Perpusnas 11/2025 Pasal 5)
+- [x] Tes rute dan aturan katalog, status publikasi, serta empty state
+- [x] Penyesuaian konten dan alur katalog agar tidak mempromosikan layanan/fasilitas administrasi bibliografis tertentu
 - [x] Konfigurasi identitas terpusat di src/data/site.ts: nama resmi, bentuk badan usaha, KBLI 58110, alamat/email/telepon (null sampai data resmi ada)
 - [x] Konfigurasi domain griyapustakamandiri.my.id (site.domain + flag `verified`) — DNS saat ini belum memiliki rekaman, jadi label "domain yang direncanakan" tetap tampil
 - [x] Tag canonical per halaman, otomatis aktif hanya setelah `domain.verified = true`
@@ -21,4 +21,4 @@
 - [ ] Tambah data buku nyata ke src/data/books.ts setelah publikasi pertama (lihat src/data/README.md)
 - [ ] Sediakan SUPABASE_SERVICE_ROLE_KEY di lingkungan server agar formulir kontak benar-benar menyimpan pesan (saat ini tabel contact_messages sudah ada, tetapi kunci layanan belum terpasang)
 - [ ] Daftarkan/arahkan DNS griyapustakamandiri.my.id, verifikasi HTTPS, lalu ubah `site.domain.verified = true`
-- [ ] Pemeriksaan manual kesesuaian persyaratan website penerbit untuk pendaftaran akun ISBN Perpusnas
+- [ ] Pemeriksaan manual kesesuaian seluruh halaman publik dengan ketentuan website penerbit

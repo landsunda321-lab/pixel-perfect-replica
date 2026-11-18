@@ -5,7 +5,7 @@ import { site } from "@/data/site";
 
 type CmsBook = {
   id: string; title: string; author: string; category: string; synopsis?: string; abstract?: string;
-  keywords?: string; kata_pengantar?: string; latar_belakang?: string; glosarium?: string; daftar_pustaka?: string; cover_url?: string; isbn?: string; qrcbn?: string;
+  keywords?: string; kata_pengantar?: string; latar_belakang?: string; glosarium?: string; daftar_pustaka?: string; cover_url?: string; qrcbn?: string;
   publication_status: string; publisher?: string; publication_year?: number | null;
   publication_date?: string | null; publication_city?: string | null; edition?: string; page_count?: number | null;
   book_size?: string; book_format?: string; language?: string; pdf_url?: string;
@@ -15,8 +15,8 @@ type CmsBook = {
 };
 type Tab = "synopsis" | "description" | "foreword" | "glossary" | "references";
 const STATUS: Record<string, string> = {
-  persiapan: "Dalam Persiapan", proses_isbn: "Proses ISBN", isbn_terbit: "ISBN Terbit",
-  proses_cetak: "Proses Cetak", terbit: "Telah Terbit", arsip: "Arsip",
+  persiapan: "Dalam Persiapan", proses_cetak: "Proses Cetak",
+  terbit: "Telah Terbit", arsip: "Arsip",
 };
 const dateLabel = (value?: string | null) => {
   if (!value) return "";
@@ -127,7 +127,6 @@ function BookDetailPage() {
     ["Tahun Terbit", book.publication_year || "Belum diisi"],
     ["Tanggal Terbit", dateLabel(book.publication_date) || "Belum diisi"],
     ["Edisi / Cetakan", book.edition || "Belum diisi"],
-    ["ISBN", book.isbn || "Belum tersedia"],
     ["QRCBN", book.qrcbn || "Belum tersedia"],
     ["Jumlah Halaman", book.page_count ? book.page_count + " halaman" : "Belum diisi"],
     ["Ukuran Buku", book.book_size || "Belum diisi"],

@@ -155,8 +155,8 @@ export const commitments: CommitmentItem[] = [
       "Menyunting naskah secara profesional agar informasi tersaji jelas, runtut, dan tepat.",
   },
   {
-    title: "Informasi Bibliografis yang Akurat",
+    title: "Transparansi Penerbitan",
     description:
-      "Mencantumkan data bibliografis — termasuk ISBN resmi — secara benar dan hanya setelah diberikan secara resmi.",
+      "Menyampaikan informasi mengenai proses, format, dan ketersediaan setiap terbitan secara jelas dan sesuai kondisi sebenarnya.",
   },
 ];
