@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { canonicalLinks, site } from "@/data/site";
 
 type DistributionBook = {
-  id: string; title: string; author: string; cover_url?: string | null; isbn?: string | null;
+  id: string; title: string; author: string; cover_url?: string | null;
   publication_status: string; print_available?: boolean; print_price?: number | null;
   digital_available?: boolean; digital_access_type?: string; digital_price?: number | null;
   open_access?: boolean; pdf_url?: string | null; allow_pdf_download?: boolean;
@@ -58,7 +58,6 @@ function AccessDistributionPage() {
             {book.cover_url && <img src={book.cover_url} alt={"Sampul " + book.title} className="h-32 w-24 rounded-lg bg-slate-50 object-contain" />}
             <div className="min-w-0 flex-1">
               <h3 className="font-bold text-[#10294f]">{book.title}</h3><p className="mt-1 text-sm text-slate-600">Oleh: {book.author}</p>
-              {book.isbn && <p className="mt-1 text-xs text-slate-500">ISBN: {book.isbn}</p>}
               <div className="mt-3 flex flex-wrap gap-2 text-xs">
                 {book.print_available && <span className="rounded-full bg-blue-50 px-3 py-1 text-blue-900">Cetak tersedia{book.print_price != null ? " · Rp " + Number(book.print_price).toLocaleString("id-ID") : ""}</span>}
                 {book.digital_available && <span className="rounded-full bg-sky-50 px-3 py-1 text-sky-900">{book.digital_access_type === "paid" ? "Digital berbayar" : book.digital_access_type === "free" ? "Digital gratis" : "Digital tersedia"}{book.digital_price != null && book.digital_access_type === "paid" ? " · Rp " + Number(book.digital_price).toLocaleString("id-ID") : ""}</span>}

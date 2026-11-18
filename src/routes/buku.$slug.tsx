@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, BookOpen, Info } from "lucide-react";
 
-import { canShowIsbn, getBookBySlug } from "@/data/books";
+import { getBookBySlug } from "@/data/books";
 import { canonicalLinks } from "@/data/site";
 
 export const Route = createFileRoute("/buku/$slug")({
@@ -72,7 +72,6 @@ function BookDetailPage() {
     ...(book.pages ? [{ label: "Jumlah Halaman", value: `${book.pages} halaman` }] : []),
     ...(book.language ? [{ label: "Bahasa", value: book.language }] : []),
     ...(book.format ? [{ label: "Format", value: book.format }] : []),
-    ...(canShowIsbn(book) ? [{ label: "ISBN", value: book.isbn! }] : []),
     { label: "Status Publikasi", value: book.availabilityStatus },
   ];
 
