@@ -16,7 +16,7 @@ Berkas `src/data/books.ts` dipertahankan untuk tipe, validasi, dan halaman lama 
 
 - `brandName`, `legalName`, `entityForm` — identitas penerbit.
 - `contact.address`, `contact.email`, `contact.phone`, dan `contact.operatingHours` hanya diisi dari dokumen resmi.
-- Jangan mengarang alamat, email, nomor telepon, ISBN, penulis, atau tautan distribusi.
+- Jangan mengarang alamat, email, nomor telepon, penulis, atau tautan distribusi.
 
 ## Prosedur pengelolaan katalog
 
@@ -27,4 +27,4 @@ Berkas `src/data/books.ts` dipertahankan untuk tipe, validasi, dan halaman lama 
 5. Aktifkan **Tampilkan di website publik** setelah data siap dipublikasikan.
 6. Simpan dan periksa halaman publik `/katalog-buku` atau `/penulis`.
 
-ISBN hanya diisi setelah nomor resmi diterbitkan. Tautan akses hanya boleh diisi dengan tautan HTTPS yang sah dan telah diuji.
+Kelengkapan informasi setiap judul dicatat sesuai data yang benar-benar tersedia dan telah diverifikasi. Tidak semua terbitan memiliki karakteristik, format, atau kelengkapan bibliografis yang sama. Tautan akses hanya boleh diisi dengan tautan HTTPS yang sah dan telah diuji.

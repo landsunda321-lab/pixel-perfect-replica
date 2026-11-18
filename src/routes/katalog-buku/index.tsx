@@ -19,18 +19,16 @@ export const Route = createFileRoute("/katalog-buku/")({
 
 type CmsBook = {
   id: string; title: string; subtitle?: string; author: string; category: string;
-  synopsis?: string; cover_url?: string; isbn?: string; publication_status: string; is_demo: boolean;
+  synopsis?: string; cover_url?: string; publication_status: string; is_demo: boolean;
 };
 const CONTROL = "w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground shadow-sm";
-type PublicationGroup = "terbit" | "persiapan" | "isbn";
+type PublicationGroup = "terbit" | "persiapan";
 const PUBLICATION_GROUPS: { id: PublicationGroup; label: string; description: string }[] = [
-  { id: "persiapan", label: "Buku dalam Persiapan", description: "Naskah dan buku yang masih dalam tahap persiapan penerbitan." },
-  { id: "isbn", label: "Buku dalam Proses ISBN", description: "Buku yang sedang menjalani proses pengajuan atau penerbitan ISBN." },
-  { id: "terbit", label: "Buku Terbit", description: "Buku yang telah resmi diterbitkan." },
+  { id: "persiapan", label: "Dalam Proses Penerbitan", description: "Naskah dan buku yang masih melalui tahapan editorial, produksi, atau persiapan penerbitan." },
+  { id: "terbit", label: "Buku Telah Terbit", description: "Buku yang telah diterbitkan dan ditampilkan dalam katalog penerbit." },
 ];
 function getPublicationGroup(status: string): PublicationGroup {
   if (status === "terbit") return "terbit";
-  if (status === "proses_isbn" || status === "isbn_terbit") return "isbn";
   return "persiapan";
 }
 function CatalogPage() {
@@ -55,7 +53,6 @@ function CatalogPage() {
   const groupCounts = useMemo(() => ({
     terbit: books.filter(b => getPublicationGroup(b.publication_status) === "terbit").length,
     persiapan: books.filter(b => getPublicationGroup(b.publication_status) === "persiapan").length,
-    isbn: books.filter(b => getPublicationGroup(b.publication_status) === "isbn").length,
   }), [books]);
   const filtered = useMemo(() => books.filter(b =>
     getPublicationGroup(b.publication_status) === publicationGroup &&
@@ -85,7 +82,7 @@ function CatalogPage() {
       </div>
     </section>
     <section className="shell py-10 lg:py-14">
-      <div className="grid gap-3 md:grid-cols-3" role="tablist" aria-label="Kategori status penerbitan">
+      <div className="grid gap-3 md:grid-cols-2" role="tablist" aria-label="Kategori status penerbitan">
         {PUBLICATION_GROUPS.map(group => (
           <button key={group.id} type="button" role="tab" aria-selected={publicationGroup === group.id}
             onClick={() => setPublicationGroup(group.id)}
